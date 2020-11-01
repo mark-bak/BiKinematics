@@ -12,8 +12,12 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.anchorlayout import AnchorLayout
+from kivy.uix.scatter import Scatter
 
 from kivy.properties import ObjectProperty
+from kivy.properties import StringProperty
+from kivy.properties import NumericProperty
+
 from kivy.factory import Factory
 from kivy.uix.popup import Popup
 from kivy.uix.behaviors import DragBehavior
@@ -28,6 +32,7 @@ class LoadDialog(FloatLayout):
         return os.getcwd()
 
 class MainPage(FloatLayout):
+    #Properties
 
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
@@ -40,41 +45,21 @@ class MainPage(FloatLayout):
         self._popup.open()
         
     def load(self, path, filename):
-        self.add_widget(GeoImporter(filename=str(filename[0])))
+        #put the stuff to do here
         self.dismiss_popup()
 
+class Coords(BoxLayout):
+    #Properties
+    txt = StringProperty() #Label text 
+    txt_x = StringProperty()
+    txt_y = StringProperty()
 
-class GeoImporter(FloatLayout):
-    ##GEO IMPORT FROM PICTURE WIDGET  
-    filename = ObjectProperty(None)
-    def axle_points_press(self):
-        self.add_widget(AxlePoints())
-            
-
-class AxlePoints(Widget):
-    f_axle=ObjectProperty(None)
-    r_axle=ObjectProperty(None)
-
-    def on_touch_up(self,touch):
-        if self.f_axle.check_collision(self.r_axle):
-            self.f_axle.x=self.f_axle.x+25
-
-    pass
-    
-class GeoPoint(Widget,DragBehavior):
-    #def on_touch_move(self,touch):       
-     #   if self.collide_point(touch.x,touch.y):
-      #      self.center_x=touch.x
-       #     self.center_y=touch.y
-        #    print(str(self.pos))         
-    pass
-
-    def check_collision(self,widg):
-        return self.collide_widget(widg)
-
-
+class GeoPoint(Scatter):
+    #Properties
+    txt = StringProperty() #Label text
 
 class BiKinematicsApp(App):
+    
     def build(self):
 
         self.screen_manager = ScreenManager()

@@ -1,25 +1,78 @@
 #: kivy 1.11.1
 
-<SidebarButt@Button>:
-    #customise sidebar button here 
-    
+<Coords@BoxLayout>:
+    orientation: "horizontal"
+    size_hint_y:None
+    height: 30
+    Label:
+        text: root.txt
+    TextInput:
+        text: root.txt_x
+    TextInput:
+        text: root.txt_y
 
+
+<GeoPoint@Scatter>:
+    size_hint: None,None
+    size: lbl.size
+    canvas.after:
+        Color:
+            rgba: 0,1,0,0.5
+        Rectangle:
+            size: self.size
+            pos: self.pos 
+        Color:
+            rgba: 1,0,0,1
+        Ellipse:
+            size: 5,5
+            pos: self.pos[0]-2.5,self.pos[1]-2.5
+    Label:
+        id:lbl
+        text: root.txt
+        size: self.texture_size
+               
 <MainPage>:
-    BoxLayout:
-        orientation: 'vertical'
+    GeoPoint:
+        id: g1
+        txt: 'Point1'
+    GeoPoint:
+        id:g2
+        txt: 'Point2'
+ 
+    AnchorLayout: #Points and buttons on rhs
+        anchor_x: "right"
+        anchor_y: "top"
         BoxLayout:
-            size_hint_y: None
-            height: 30
-            orientation: 'horizontal'
-            Button:              
-                text: 'Browse'
-                on_release: root.show_load()
-            Button:
-                text: 'This does nothing'
-            Button:
-                text: 'This does nothing'
-        Label:
-        
+            orientation: "vertical"
+            size_hint_x: None
+            width: 250 
+            canvas.after:
+                Color:
+                    rgba: 1,0,0,0.5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos  
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y:None
+                height: 30
+                Label:
+                    text: "Point"
+                Label:
+                    text: "x_pos"
+                Label:
+                    text: "y_pos"    
+
+            Coords:
+                txt: "Point1"
+                txt_x: str(round(g1.x,2))
+                txt_y: str(round(g1.y,2))
+            Coords:
+                txt: "Point2"
+                txt_x: str(round(g2.x,2))
+                txt_y: str(round(g2.y,2))
+            Coords:
+          
 
 <LoadDialog>:
     BoxLayout:
@@ -39,63 +92,4 @@
 
             Button:
                 text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection) 
-
-<GeoImporter>:
-    Image:
-        source: root.filename
-        pos: root.center_x-self.width/2+100,root.center_y-self.height/2-30
-    AnchorLayout:
-        anchor_x: 'left'
-        anchor_y: 'top'
-        BoxLayout:
-            size_hint_x: None
-            width: 100
-            orientation: 'vertical'
-            Label:
-                size_hint_y: None
-                height: 30
-            SidebarButt:
-                text:'Axle Points'
-                on_release: root.axle_points_press()
-            SidebarButt:
-                text:'Suspension Points'
-            SidebarButt:
-                text: 'BB Point'
-            SidebarButt:
-                text: 'Clear'
-            SidebarButt:
-                text: 'Save'
-
-<GeoPoint>:
-
-    id:self.id
-    pos:root.pos
-    size: 25,25
-    canvas:
-        Color: 
-            rgb: 1,0,0
-        Ellipse:
-            pos: root.pos
-            size: 25,25
-    FloatLayout:
-        Label:
-            text: 'more test text'
-
-
-<AxlePoints>:
-    f_axle: F_Axle
-    r_axle: R_Axle
-    GeoPoint:
-        id: F_Axle
-        pos: root.center_x+50,root.center_y
-        size:25,25 
-        Label:
-            text: 'test text'
-            pos_hint: 'top',1 
-    GeoPoint:
-        id: R_Axle
-        pos: root.center_x-50,root.center_y
-        size:25,25
-
-
+                on_release: root.load(filechooser.path, filechooser.selection)
