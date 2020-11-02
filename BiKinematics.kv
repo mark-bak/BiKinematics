@@ -1,6 +1,6 @@
 #: kivy 1.11.1
 
-<Coords@BoxLayout>:
+<Coords>:
     orientation: "horizontal"
     size_hint_y:None
     height: 30
@@ -12,7 +12,7 @@
         text: root.txt_y
 
 
-<GeoPoint@Scatter>:
+<GeoPoint>:
     size_hint: None,None
     size: lbl.size
     canvas.after:
@@ -38,11 +38,13 @@
     GeoPoint:
         id:g2
         txt: 'Point2'
- 
+
     AnchorLayout: #Points and buttons on rhs
+        
         anchor_x: "right"
         anchor_y: "top"
         BoxLayout:
+            id: sidebar
             orientation: "vertical"
             size_hint_x: None
             width: 250 

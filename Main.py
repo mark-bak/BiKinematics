@@ -33,6 +33,16 @@ class LoadDialog(FloatLayout):
 
 class MainPage(FloatLayout):
     #Properties
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+        #self.create_coords()
+
+    def create_coords(self):
+        for wid in list(self.children):
+            if str(wid.__class__)=="<class '__main__.GeoPoint'>":
+                print(wid.x)
+                self.ids['sidebar'].add_widget(Coords(txt='create_coord_test',wid=wid))
+
 
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
@@ -49,10 +59,17 @@ class MainPage(FloatLayout):
         self.dismiss_popup()
 
 class Coords(BoxLayout):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+
     #Properties
     txt = StringProperty() #Label text 
     txt_x = StringProperty()
     txt_y = StringProperty()
+    #wid = ObjectProperty(None)
+
+    #def update_string(self,wid):
+    #    self.txt_x=str(wid.x)
 
 class GeoPoint(Scatter):
     #Properties
