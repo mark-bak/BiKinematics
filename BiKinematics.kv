@@ -5,7 +5,7 @@
     size_hint_y:None
     height: 30
     Label:
-        text: root.txt
+        text: root.ref
     TextInput:
         text: root.txt_x
     TextInput:
@@ -28,22 +28,19 @@
             pos: self.pos[0]-2.5,self.pos[1]-2.5
     Label:
         id:lbl
-        text: root.txt
+        text: root.ref
         size: self.texture_size
                
 <MainPage>:
     GeoPoint:
-        id: g1
-        txt: 'Point1'
+        ref: 'G1'
     GeoPoint:
-        id:g2
-        txt: 'Point2'
+        ref: 'G2'
 
-    AnchorLayout: #Points and buttons on rhs
-        
+    AnchorLayout: #Sidebar button anchor      
         anchor_x: "right"
         anchor_y: "top"
-        BoxLayout:
+        BoxLayout: #Sidebar button layout
             id: sidebar
             orientation: "vertical"
             size_hint_x: None
@@ -63,18 +60,7 @@
                 Label:
                     text: "x_pos"
                 Label:
-                    text: "y_pos"    
-
-            Coords:
-                txt: "Point1"
-                txt_x: str(round(g1.x,2))
-                txt_y: str(round(g1.y,2))
-            Coords:
-                txt: "Point2"
-                txt_x: str(round(g2.x,2))
-                txt_y: str(round(g2.y,2))
-            Coords:
-          
+                    text: "y_pos"              
 
 <LoadDialog>:
     BoxLayout:
