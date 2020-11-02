@@ -35,14 +35,14 @@ class MainPage(FloatLayout):
     #Properties
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        #self.create_coords()
+        self.create_coords()
 
-    def create_coords(self):
+    def create_coords(self):   
+        ##Create sidebar coordinate display for every GeoPoint specified in the .kv file
         for wid in list(self.children):
+            #for each geo point, create an associated coord display and add to sidebar
             if str(wid.__class__)=="<class '__main__.GeoPoint'>":
-                print(wid.x)
-                self.ids['sidebar'].add_widget(Coords(txt='create_coord_test',wid=wid))
-
+                self.ids['sidebar'].add_widget(Coords(ref=wid.ref))
 
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
@@ -59,21 +59,32 @@ class MainPage(FloatLayout):
         self.dismiss_popup()
 
 class Coords(BoxLayout):
+    ##Coordinate box - layout in .kv file
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
     #Properties
-    txt = StringProperty() #Label text 
     txt_x = StringProperty()
     txt_y = StringProperty()
-    #wid = ObjectProperty(None)
-
-    #def update_string(self,wid):
-    #    self.txt_x=str(wid.x)
+    ref = StringProperty()
 
 class GeoPoint(Scatter):
+    ##Draggable point of bike geo
+
     #Properties
-    txt = StringProperty() #Label text
+    ref = StringProperty()
+
+    def on_pos(self,x,y):
+        self.update_coords()
+
+    def update_coords(self):
+        ##Update the assoiated coordinate display
+        for c in self.parent.walk():
+            if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work
+                if c.ref == self.ref:
+                    c.txt_x = str(round(self.x,2))
+                    c.txt_y = str(round(self.y,2))
+
 
 class BiKinematicsApp(App):
     
