@@ -1,4 +1,5 @@
 import os
+import math
 
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -42,7 +43,7 @@ class MainPage(FloatLayout):
         for wid in list(self.children):
             #for each geo point, create an associated coord display and add to sidebar
             if str(wid.__class__)=="<class '__main__.GeoPoint'>":
-                self.ids['sidebar'].add_widget(Coords(ref=wid.ref))
+                self.ids['sidebar'].add_widget(Coords(ref=wid.ref,point_type=wid.point_type))
 
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
@@ -63,16 +64,22 @@ class Coords(BoxLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
+    def type_dropdown(self):
+        #might need this
+        pass
+
     #Properties
     txt_x = StringProperty()
     txt_y = StringProperty()
     ref = StringProperty()
+    point_type = StringProperty()
 
 class GeoPoint(Scatter):
     ##Draggable point of bike geo
 
     #Properties
     ref = StringProperty()
+    point_type = StringProperty('free')
 
     def on_pos(self,x,y):
         self.update_coords()
@@ -84,6 +91,14 @@ class GeoPoint(Scatter):
                 if c.ref == self.ref:
                     c.txt_x = str(round(self.x,2))
                     c.txt_y = str(round(self.y,2))
+
+class Link():
+    a = ObjectProperty(None)
+    b = ObjectProperty(None)
+    length = NumericProperty()
+
+
+
 
 
 class BiKinematicsApp(App):
@@ -98,6 +113,10 @@ class BiKinematicsApp(App):
         self.screen_manager.add_widget(screen)
 
         return self.screen_manager
+
+    def update_graphics(self):
+        #maybe put all the linked update stuff in here??
+        pass
 
 if __name__ == '__main__':
     app = BiKinematicsApp()

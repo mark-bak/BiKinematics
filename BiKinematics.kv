@@ -6,6 +6,9 @@
     height: 30
     Label:
         text: root.ref
+    Label:
+        text: root.point_type
+        on_touch_down: root.type_dropdown()
     TextInput:
         text: root.txt_x
     TextInput:
@@ -33,9 +36,26 @@
                
 <MainPage>:
     GeoPoint:
-        ref: 'G1'
+        ref: 'Main_Piv'
+        point_type: 'ground'
     GeoPoint:
-        ref: 'G2'
+        ref: 'Horst_Piv'
+        point_type: 'joint'
+    GeoPoint:
+        ref: 'SStay_Piv'
+        point_type: 'joint'
+    GeoPoint:
+        ref: 'Rocker_Piv'
+        point_type: 'ground'
+    GeoPoint:
+        ref: 'Shock_Linkage'
+        point_type: 'end_eff'
+    GeoPoint:
+        ref: 'Rear_Axle'
+        point_type: 'end_eff'  
+    GeoPoint:
+        ref: 'Shock_Frame'
+        point_type: 'ground'
 
     AnchorLayout: #Sidebar button anchor      
         anchor_x: "right"
@@ -44,7 +64,7 @@
             id: sidebar
             orientation: "vertical"
             size_hint_x: None
-            width: 250 
+            width: 400 
             canvas.after:
                 Color:
                     rgba: 1,0,0,0.5
@@ -57,6 +77,8 @@
                 height: 30
                 Label:
                     text: "Point"
+                Label:
+                    text: "Type"
                 Label:
                     text: "x_pos"
                 Label:
