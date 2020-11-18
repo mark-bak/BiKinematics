@@ -1,6 +1,7 @@
 #:kivy 1.11.1 
 
 <Coords>:
+#Coordinate readout box
     orientation: "horizontal"
     size_hint_y:None
     height: 30
@@ -16,6 +17,7 @@
 
 
 <GeoPoint>:
+#Geometry point
     size_hint: None,None
     size: lbl.size
     canvas.after:
@@ -33,8 +35,14 @@
         id:lbl
         text: root.ref
         size: self.texture_size
-               
+
+
+<Link>:
+#Link between geo
+    points: a.x,a.y,b.x,b.y
+
 <MainPage>:
+    #gonna make all these addable by code at some point
     GeoPoint:
         ref: 'Main_Piv'
         point_type: 'ground'
@@ -82,7 +90,26 @@
                 Label:
                     text: "x_pos"
                 Label:
-                    text: "y_pos"              
+                    text: "y_pos" 
+
+    AnchorLayout: #Top button anchor      
+        anchor_y: "top"
+        BoxLayout: #Topbar button layout
+            size_hint_y: None
+            height: 50
+            id: topbar
+            orientation: "horizontal"
+            canvas.after:
+                Color:
+                    rgba: 0,0,1,0.5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos  
+            Button:
+                text: 'Add Link'
+                on_release: root.add_link()
+
+
 
 <LoadDialog>:
     BoxLayout:
