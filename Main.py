@@ -1,28 +1,34 @@
+#standard lib imports
 import os
 import math
 
+#Kivy base
 from kivy.app import App
 from kivy.uix.widget import Widget
 
+#Kivy widgets
 from kivy.uix.image import Image
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
+from kivy.uix.dropdown import DropDown
 
+#Kivy layouts
 from kivy.uix.boxlayout import BoxLayout 
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scatter import Scatter
+from kivy.uix.popup import Popup
 
+#Kivy properties (kinda like class properties but can interact w/Kivy)
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
 
+#Kivy misc
 from kivy.factory import Factory
-from kivy.uix.popup import Popup
 from kivy.uix.behaviors import DragBehavior
-
 from kivy.uix.screenmanager import ScreenManager,Screen
 
 class LoadDialog(FloatLayout):
@@ -58,6 +64,18 @@ class MainPage(FloatLayout):
     def load(self, path, filename):
         #put the stuff to do here
         self.dismiss_popup()
+
+    ##links
+    def add_link(self):
+        self.dropdown = DropDown()
+        for g in self.parent.walk():
+             if str(g.__class__)=="<class '__main__.GeoPoint'>": #bit dodgy but seems to work
+                 btn = Button(text='placeholder', size_hint_y=None, height=44)
+                 self.dropdown.add_widget(btn)
+        content = self.dropdown
+        self.popup = Popup(title = 'Choose Links', content = content,
+                            size_hint=(0.9, 0.9))
+        self.popup.open()
 
 class Coords(BoxLayout):
     ##Coordinate box - layout in .kv file
