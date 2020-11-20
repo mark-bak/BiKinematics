@@ -1,48 +1,12 @@
 #:kivy 1.11.1 
 
-<Coords>:
-#Coordinate readout box
-    orientation: "horizontal"
-    size_hint_y:None
-    height: 30
-    Label:
-        text: root.ref
-    Label:
-        text: root.point_type
-        on_touch_down: root.type_dropdown()
-    TextInput:
-        text: root.txt_x
-    TextInput:
-        text: root.txt_y
-
-
-<GeoPoint>:
-#Geometry point
-    size_hint: None,None
-    size: lbl.size
-    canvas.after:
-        Color:
-            rgba: 0,1,0,0.5
-        Rectangle:
-            size: self.size
-            pos: self.pos 
-        Color:
-            rgba: 1,0,0,1
-        Ellipse:
-            size: 5,5
-            pos: self.pos[0]-2.5,self.pos[1]-2.5
-    Label:
-        id:lbl
-        text: root.ref
-        size: self.texture_size
-
-
-<Link>:
-#Link between geo
-    points: a.x,a.y,b.x,b.y
+#general layout properties
+#: set sidebar_width 400
+#: set sidebar_coords_height 30
+#: set topbar_height 50
 
 <MainPage>:
-    #gonna make all these addable by code at some point
+#gonna make all these addable by code at some point
     GeoPoint:
         ref: 'Main_Piv'
         point_type: 'ground'
@@ -72,7 +36,7 @@
             id: sidebar
             orientation: "vertical"
             size_hint_x: None
-            width: 400 
+            width: sidebar_width
             canvas.after:
                 Color:
                     rgba: 1,0,0,0.5
@@ -82,7 +46,7 @@
             BoxLayout:
                 orientation: 'horizontal'
                 size_hint_y:None
-                height: 30
+                height: sidebar_coords_height
                 Label:
                     text: "Point"
                 Label:
@@ -94,9 +58,12 @@
 
     AnchorLayout: #Top button anchor      
         anchor_y: "top"
+        anchor_x: "left"
         BoxLayout: #Topbar button layout
             size_hint_y: None
-            height: 50
+            height: topbar_height
+            size_hint_x: None
+            width: root.width - sidebar_width
             id: topbar
             orientation: "horizontal"
             canvas.after:
@@ -107,10 +74,48 @@
                     pos: self.pos  
             Button:
                 text: 'Add Link'
-                on_release: root.add_link()
+                on_release: root.add_link() 
 
 
+<Coords>:
+#Coordinate readout box
+    orientation: "horizontal"
+    size_hint_y:None
+    height: sidebar_coords_height
+    Label:
+        text: root.ref
+    Label:
+        text: root.point_type
+        on_touch_down: root.type_dropdown()
+    TextInput:
+        text: root.txt_x
+    TextInput:
+        text: root.txt_y
 
+<GeoPoint>:
+#Geometry point
+    size_hint: None,None
+    size: lbl.size
+    canvas.after:
+        Color:
+            rgba: 0,1,0,0.5
+        Rectangle:
+            size: self.size
+            pos: self.pos 
+        Color:
+            rgba: 1,0,0,1
+        Ellipse:
+            size: 5,5
+            pos: self.pos[0]-2.5,self.pos[1]-2.5
+    Label:
+        id:lbl
+        text: root.ref
+        size: self.texture_size
+
+<Link>:
+    canvas:
+        Line:
+            points: self.points
 <LoadDialog>:
     BoxLayout:
         size: root.size
