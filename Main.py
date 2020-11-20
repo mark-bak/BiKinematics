@@ -78,13 +78,16 @@ class MainPage(FloatLayout):
         
     
     def on_link_point(self,instance,value):
-        lis = value[:]
-        if len(lis)>1 and lis[0]==lis[1]:
-            lis.pop(0)
-        if len(lis)>1:
+        objs = value[:]
+        if len(objs)>1 and objs[0]==objs[1]:
+            objs.pop(0)
+        if len(objs)>1:
             print(self.link_mode)
-            print(lis)
-            link = Link(point_objs = lis)
+            print(objs)
+            a = objs[0]
+            b = objs[1]
+            link = Link(a = a, b = b)
+            link.points = [a.pos,b.pos]
             self.link_point.clear()
             self.add_widget(link)
             self.link_mode = False
@@ -123,9 +126,9 @@ class GeoPoint(Scatter):
                     c.txt_x = str(round(self.x,2))
                     c.txt_y = str(round(self.y,2))
             if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
-                if c.point_objs[0] == self:
+                if c.a == self:
                     c.points[0] = self.pos
-                if c.point_objs[1] == self:
+                if c.b == self:
                     c.points[1] = self.pos
 
     def on_touch_down(self,touch):
@@ -136,13 +139,10 @@ class GeoPoint(Scatter):
 
 class Link(FloatLayout):
 
-    point_objs = ListProperty()
-    points = ListProperty([(0,0),(0,0)])
+    a = ObjectProperty(None)
+    b = ObjectProperty(None)
+    points = ListProperty()
     length = NumericProperty()
-
-
-
-
 
 class BiKinematicsApp(App):
     
