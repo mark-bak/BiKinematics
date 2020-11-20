@@ -1,6 +1,7 @@
 #standard lib imports
 import os
 import math
+from functools import partial
 
 #Kivy base
 from kivy.app import App
@@ -25,6 +26,8 @@ from kivy.uix.popup import Popup
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
+from kivy.properties import BooleanProperty
+from kivy.properties import ListProperty
 
 #Kivy misc
 from kivy.factory import Factory
@@ -39,10 +42,12 @@ class LoadDialog(FloatLayout):
         return os.getcwd()
 
 class MainPage(FloatLayout):
-    #Properties
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.create_coords()
+    #Kivy properties
+    link_mode = BooleanProperty(False)
+    link_point = ListProperty()
 
     def create_coords(self):   
         ##Create sidebar coordinate display for every GeoPoint specified in the .kv file
@@ -60,22 +65,30 @@ class MainPage(FloatLayout):
         self._popup = Popup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
-        
+   
     def load(self, path, filename):
         #put the stuff to do here
         self.dismiss_popup()
 
-    ##links
+    ##Geometry shizzle
     def add_link(self):
-        self.dropdown = DropDown()
-        for g in self.parent.walk():
-             if str(g.__class__)=="<class '__main__.GeoPoint'>": #bit dodgy but seems to work
-                 btn = Button(text='placeholder', size_hint_y=None, height=44)
-                 self.dropdown.add_widget(btn)
-        content = self.dropdown
-        self.popup = Popup(title = 'Choose Links', content = content,
-                            size_hint=(0.9, 0.9))
-        self.popup.open()
+        self.link_mode = True
+        print(self.link_mode)
+        print(self.link_point)
+        
+    
+    def on_link_point(self,instance,value):
+        lis = value[:]
+        if len(lis)>1 and lis[0]==lis[1]:
+            lis.pop(0)
+        if len(lis)>1:
+            print(self.link_mode)
+            print(lis)
+            link = Link(point_objs = lis)
+            self.link_point.clear()
+            self.add_widget(link)
+            self.link_mode = False
+            print(self.link_mode)
 
 class Coords(BoxLayout):
     ##Coordinate box - layout in .kv file
@@ -109,10 +122,22 @@ class GeoPoint(Scatter):
                 if c.ref == self.ref:
                     c.txt_x = str(round(self.x,2))
                     c.txt_y = str(round(self.y,2))
+            if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
+                if c.point_objs[0] == self:
+                    c.points[0] = self.pos
+                if c.point_objs[1] == self:
+                    c.points[1] = self.pos
 
-class Link():
-    a = ObjectProperty(None)
-    b = ObjectProperty(None)
+    def on_touch_down(self,touch):
+        #custom touch behaviour
+        if self.parent.link_mode == True:
+            self.parent.link_point.append(self)
+        return super(GeoPoint,self).on_touch_down(touch) #do standard scatter touch behaviour
+
+class Link(FloatLayout):
+
+    point_objs = ListProperty()
+    points = ListProperty([(0,0),(0,0)])
     length = NumericProperty()
 
 
