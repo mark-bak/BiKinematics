@@ -92,6 +92,16 @@
     TextInput:
         text: root.txt_y
 
+<LinkData>:
+    #Coordinate readout box
+    orientation: "horizontal"
+    size_hint_y:None
+    height: sidebar_coords_height
+    Label:
+        text: root.ref
+    TextInput:
+        text: root.len_txt
+
 <GeoPoint>:
 #Geometry point
     size_hint: None,None
@@ -113,6 +123,8 @@
         size: self.texture_size
 
 <Link>:
+    length: self.update_length()
+    ref: self.a.ref+' - '+self.b.ref
     canvas:
         Line:
             points: self.points

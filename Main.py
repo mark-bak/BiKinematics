@@ -2,6 +2,7 @@
 import os
 import math
 from functools import partial
+import numpy as np
 
 #Kivy base
 from kivy.app import App
@@ -55,7 +56,7 @@ class MainPage(FloatLayout):
             #for each geo point, create an associated coord display and add to sidebar
             if str(wid.__class__)=="<class '__main__.GeoPoint'>":
                 self.ids['sidebar'].add_widget(Coords(ref=wid.ref,point_type=wid.point_type))
-
+                
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
         self._popup.dismiss()
@@ -73,25 +74,23 @@ class MainPage(FloatLayout):
     ##Geometry shizzle
     def add_link(self):
         self.link_mode = True
-        print(self.link_mode)
-        print(self.link_point)
-        
+        print('adding link!')
+       
     
     def on_link_point(self,instance,value):
         objs = value[:]
-        if len(objs)>1 and objs[0]==objs[1]:
+        if len(objs)>1 and objs[0]==objs[1]: # stops acccidentally selecting same point twice
             objs.pop(0)
         if len(objs)>1:
-            print(self.link_mode)
-            print(objs)
             a = objs[0]
             b = objs[1]
-            link = Link(a = a, b = b)
-            link.points = [a.pos,b.pos]
+            new_link = Link(a = a, b = b)
+            new_link.points = [a.pos,b.pos]
             self.link_point.clear()
-            self.add_widget(link)
+            self.add_widget(new_link)
             self.link_mode = False
-            print(self.link_mode)
+            self.ids['sidebar'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
+            print('link {} added'.format(new_link.ref))
 
 class Coords(BoxLayout):
     ##Coordinate box - layout in .kv file
@@ -108,6 +107,14 @@ class Coords(BoxLayout):
     ref = StringProperty()
     point_type = StringProperty()
 
+class LinkData(BoxLayout):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+    
+    #Properties
+    len_txt = StringProperty()
+    ref = StringProperty()
+
 class GeoPoint(Scatter):
     ##Draggable point of bike geo
 
@@ -121,7 +128,7 @@ class GeoPoint(Scatter):
     def update_coords(self):
         ##Update the assoiated coordinate display
         for c in self.parent.walk():
-            if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work
+            if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work - should probs change to c.ids[] or something
                 if c.ref == self.ref:
                     c.txt_x = str(round(self.x,2))
                     c.txt_y = str(round(self.y,2))
@@ -130,19 +137,34 @@ class GeoPoint(Scatter):
                     c.points[0] = self.pos
                 if c.b == self:
                     c.points[1] = self.pos
+                c.update_length()
+
 
     def on_touch_down(self,touch):
         #custom touch behaviour
-        if self.parent.link_mode == True:
-            self.parent.link_point.append(self)
+        if self.collide_point(touch.x,touch.y):
+            #print('touch '+self.ref)
+            if self.parent.link_mode == True: #if in add_link mode, add this to the selection list
+                self.parent.link_point.append(self)
         return super(GeoPoint,self).on_touch_down(touch) #do standard scatter touch behaviour
 
-class Link(FloatLayout):
+class Link(Widget):
 
     a = ObjectProperty(None)
     b = ObjectProperty(None)
     points = ListProperty()
     length = NumericProperty()
+    ref = StringProperty()
+
+    def update_length(self):
+        new_len = float(np.linalg.norm([self.a.x-self.b.x,self.a.y-self.b.y]))
+        if self.parent != None:
+            for c in self.parent.walk():
+                if str(c.__class__)=="<class '__main__.LinkData'>": #bit dodgy but seems to work
+                    if c.ref == self.ref:
+                        c.len_txt = str(round(new_len,2))
+        return new_len
+
 
 class BiKinematicsApp(App):
     
