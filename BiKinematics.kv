@@ -1,7 +1,7 @@
 #:kivy 1.11.1 
 
 #general layout properties
-#: set sidebar_width 400
+#: set sidebar_width 420
 #: set sidebar_coords_height 30
 #: set topbar_height 50
 
@@ -31,30 +31,65 @@
 
     AnchorLayout: #Sidebar button anchor      
         anchor_x: "right"
-        anchor_y: "top"
-        BoxLayout: #Sidebar button layout
-            id: sidebar
+        anchor_y: "bottom"
+        
+        BoxLayout:
             orientation: "vertical"
             size_hint_x: None
             width: sidebar_width
-            canvas.after:
-                Color:
-                    rgba: 1,0,0,0.5
-                Rectangle:
-                    size: self.size
-                    pos: self.pos  
+            size_hint_y: None
+            height: root.height - topbar_height
+            BoxLayout: #Sidebar button layout
+                id: coords_list
+                orientation: "vertical"
+                size_hint_x: None
+                width: sidebar_width
+                canvas.after:
+                    Color:
+                        rgba: 1,1,1,1
+                    Line:
+                        points: [(self.x,self.y),(self.x,self.y+self.height)]
+                #     Color:
+                #         rgba: 1,0,0,0.5
+                #     Rectangle:
+                #         size: self.size
+                #         pos: self.pos  
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: "Point"
+                    Label:
+                        text: "Type"
+                    Label:
+                        text: "x_pos"
+                    Label:
+                        text: "y_pos" 
+
             BoxLayout:
-                orientation: 'horizontal'
-                size_hint_y:None
-                height: sidebar_coords_height
-                Label:
-                    text: "Point"
-                Label:
-                    text: "Type"
-                Label:
-                    text: "x_pos"
-                Label:
-                    text: "y_pos" 
+                id: links_list
+                orientation: "vertical"
+                size_hint_x: None
+                width: sidebar_width
+                canvas.after:
+                    Color:
+                        rgba: 1,1,1,1
+                    Line:
+                        points: [(self.x,self.y),(self.x,self.y+self.height)]
+                    # Color:
+                    #     rgba: 0,1,0,0.5
+                    # Rectangle:
+                    #     size: self.size
+                    #     pos: self.pos  
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: "Link"
+                    Label:
+                        text: "Length"
 
     AnchorLayout: #Top button anchor      
         anchor_y: "top"
@@ -62,19 +97,17 @@
         BoxLayout: #Topbar button layout
             size_hint_y: None
             height: topbar_height
-            size_hint_x: None
-            width: root.width - sidebar_width
             id: topbar
             orientation: "horizontal"
-            canvas.after:
-                Color:
-                    rgba: 0,0,1,0.5
-                Rectangle:
-                    size: self.size
-                    pos: self.pos  
+            # canvas.after:
+            #     Color:
+            #         rgba: 0,0,1,0.5
+            #     Rectangle:
+            #         size: self.size
+            #         pos: self.pos  
             Button:
                 text: 'Add Link'
-                on_release: root.add_link() 
+                on_release: root.link_mode() 
 
 
 <Coords>:

@@ -3,6 +3,7 @@ import os
 import math
 from functools import partial
 import numpy as np
+import json
 
 #Kivy base
 from kivy.app import App
@@ -24,6 +25,7 @@ from kivy.uix.scatter import Scatter
 from kivy.uix.popup import Popup
 
 #Kivy properties (kinda like class properties but can interact w/Kivy)
+#pylint: disable=no-name-in-module
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
@@ -47,15 +49,16 @@ class MainPage(FloatLayout):
         super().__init__(**kwargs)
         self.create_coords()
     #Kivy properties
-    link_mode = BooleanProperty(False)
-    link_point = ListProperty()
+    mode = StringProperty('Main')
+    #need to write something to check mode is normal
+    link_points = ListProperty()
 
     def create_coords(self):   
         ##Create sidebar coordinate display for every GeoPoint specified in the .kv file
         for wid in list(self.children):
             #for each geo point, create an associated coord display and add to sidebar
             if str(wid.__class__)=="<class '__main__.GeoPoint'>":
-                self.ids['sidebar'].add_widget(Coords(ref=wid.ref,point_type=wid.point_type))
+                self.ids['coords_list'].add_widget(Coords(ref=wid.ref,point_type=wid.point_type))
                 
     ##FILE BROWSER POPUP
     def dismiss_popup(self):
@@ -71,13 +74,15 @@ class MainPage(FloatLayout):
         #put the stuff to do here
         self.dismiss_popup()
 
+
+
     ##Geometry shizzle
-    def add_link(self):
-        self.link_mode = True
+    def link_mode(self):
+        self.mode = 'Add_Link'
         print('adding link!')
        
     
-    def on_link_point(self,instance,value):
+    def on_link_points(self,instance,value):
         objs = value[:]
         if len(objs)>1 and objs[0]==objs[1]: # stops acccidentally selecting same point twice
             objs.pop(0)
@@ -86,10 +91,10 @@ class MainPage(FloatLayout):
             b = objs[1]
             new_link = Link(a = a, b = b)
             new_link.points = [a.pos,b.pos]
-            self.link_point.clear()
+            self.link_points.clear()
             self.add_widget(new_link)
-            self.link_mode = False
-            self.ids['sidebar'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
+            self.mode = 'Main'
+            self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
             print('link {} added'.format(new_link.ref))
 
 class Coords(BoxLayout):
@@ -130,8 +135,8 @@ class GeoPoint(Scatter):
         for c in self.parent.walk():
             if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work - should probs change to c.ids[] or something
                 if c.ref == self.ref:
-                    c.txt_x = str(round(self.x,2))
-                    c.txt_y = str(round(self.y,2))
+                    c.txt_x = str(round(self.x))
+                    c.txt_y = str(round(self.y))
             if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
                 if c.a == self:
                     c.points[0] = self.pos
@@ -144,8 +149,8 @@ class GeoPoint(Scatter):
         #custom touch behaviour
         if self.collide_point(touch.x,touch.y):
             #print('touch '+self.ref)
-            if self.parent.link_mode == True: #if in add_link mode, add this to the selection list
-                self.parent.link_point.append(self)
+            if self.parent.mode == 'Add_Link': #if in Add_Link mode, add this to the selection list
+                self.parent.link_points.append(self)
         return super(GeoPoint,self).on_touch_down(touch) #do standard scatter touch behaviour
 
 class Link(Widget):
