@@ -6,33 +6,20 @@
 #: set topbar_height 50
 
 <MainPage>:
-#gonna make all these addable by code at some point
-    GeoPoint:
-        ref: 'Main_Piv'
-        point_type: 'ground'
-    GeoPoint:
-        ref: 'Horst_Piv'
-        point_type: 'joint'
-    GeoPoint:
-        ref: 'SStay_Piv'
-        point_type: 'joint'
-    GeoPoint:
-        ref: 'Rocker_Piv'
-        point_type: 'ground'
-    GeoPoint:
-        ref: 'Shock_Linkage'
-        point_type: 'end_eff'
-    GeoPoint:
-        ref: 'Rear_Axle'
-        point_type: 'end_eff'  
-    GeoPoint:
-        ref: 'Shock_Frame'
-        point_type: 'ground'
-
-    AnchorLayout: #Sidebar button anchor      
+    AnchorLayout:
+        id: current_mode
+        anchor_x: "left"
+        anchor_y: "bottom"
+        size_hint: None,None
+        size: lbl.size 
+        Label:
+            id: lbl
+            text: root.mode + root.info
+            size: self.texture_size  
+            
+    AnchorLayout:     
         anchor_x: "right"
         anchor_y: "bottom"
-        
         BoxLayout:
             orientation: "vertical"
             size_hint_x: None
@@ -104,10 +91,21 @@
             #         rgba: 0,0,1,0.5
             #     Rectangle:
             #         size: self.size
-            #         pos: self.pos  
-            Button:
+            #         pos: self.pos
+
+            TopbarButton:
+                text: 'Load Geo Data'
+                on_release:
+            TopbarButton:
+                text: 'Load Image'
+                on_release:
+            TopbarButton:
+                text: 'Add Point'
+                on_release: root.point_mode()
+            TopbarButton:
                 text: 'Add Link'
-                on_release: root.link_mode() 
+                on_release: root.link_mode()
+
 
 
 <Coords>:
@@ -157,10 +155,43 @@
 
 <Link>:
     length: self.update_length()
-    ref: self.a.ref+' - '+self.b.ref
+    ref: self.a.ref+'_'+self.b.ref
     canvas:
         Line:
             points: self.points
+
+<TopbarButton@Button>:    
+
+
+<PointDialog@BoxLayout>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    BoxLayout:
+        orientation: 'horizontal'
+        Label:
+            text: 'Name'
+        TextInput:
+            id: point_ref
+    BoxLayout:
+        orientation: 'horizontal'
+        Label:
+            text: 'Point Type'
+        Spinner:
+            id: point_typ
+            text: 'ground'
+            values: 'ground', 'joint', 'end_eff'
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
+
+        Button:
+            text: "Add"
+            on_release: root.add(root.touch,point_ref.text,point_typ.text)
+
 <LoadDialog>:
     BoxLayout:
         size: root.size
