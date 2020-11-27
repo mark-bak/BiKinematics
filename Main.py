@@ -37,31 +37,21 @@ from kivy.factory import Factory
 from kivy.uix.behaviors import DragBehavior
 from kivy.uix.screenmanager import ScreenManager,Screen
 
-class LoadDialog(FloatLayout):
-    ##FILE BROWESER POPUP WIDGET - SEE .kv FILE
-    load = ObjectProperty(None)
-    cancel = ObjectProperty(None)
-    def get_dir(self):
-        return os.getcwd()
-
 class MainPage(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.create_coords()
+
     #Kivy properties
     mode = StringProperty('Main')
-    #need to write something to check mode is normal
+    info = StringProperty()
+
+    links = ListProperty()
+    points = ListProperty()
     link_points = ListProperty()
 
-    def create_coords(self):   
-        ##Create sidebar coordinate display for every GeoPoint specified in the .kv file
-        for wid in list(self.children):
-            #for each geo point, create an associated coord display and add to sidebar
-            if str(wid.__class__)=="<class '__main__.GeoPoint'>":
-                self.ids['coords_list'].add_widget(Coords(ref=wid.ref,point_type=wid.point_type))
-                
-    ##FILE BROWSER POPUP
+    #FILE BROWSER POPUP
     def dismiss_popup(self):
+        self.mode = 'Main'
         self._popup.dismiss()
 
     def show_load(self):
@@ -74,16 +64,37 @@ class MainPage(FloatLayout):
         #put the stuff to do here
         self.dismiss_popup()
 
-
+    def on_touch_down(self,touch):
+        #custom touch behaviour
+        if self.mode == 'Add_Point':
+            self.point_dialog(touch)
+        return super(MainPage,self).on_touch_down(touch) #do standard touch behaviour
 
     ##Geometry shizzle
+    def point_mode(self):
+        self.mode = 'Add_Point'
+        self.info = ': click to add point'
+    
+    def point_dialog(self,touch):
+        content = PointDialog(add=self.add_point,cancel = self.dismiss_popup,touch = touch)
+        self._popup = Popup(title="Add Point", content=content,
+                            size_hint=(0.6, 0.3))
+        self._popup.open()
+
+    def add_point(self,touch,ref,typ):
+        new_point = GeoPoint(ref = ref,point_type = typ,pos = touch.pos)
+        self.add_widget(new_point)
+        self.ids['coords_list'].add_widget(Coords(ref=ref,point_type=typ))
+        self.dismiss_popup()
+        self.info = ': point \'{}\' added'.format(new_point.ref)
+
     def link_mode(self):
         self.mode = 'Add_Link'
-        print('adding link!')
-       
-    
+        self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
+         
     def on_link_points(self,instance,value):
-        objs = value[:]
+        objs = value
+        self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
         if len(objs)>1 and objs[0]==objs[1]: # stops acccidentally selecting same point twice
             objs.pop(0)
         if len(objs)>1:
@@ -95,22 +106,36 @@ class MainPage(FloatLayout):
             self.add_widget(new_link)
             self.mode = 'Main'
             self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
-            print('link {} added'.format(new_link.ref))
+            self.info = ': link \'{}\' added'.format(new_link.ref)
+
+class LoadDialog(FloatLayout):
+    #FILE BROWESER POPUP WIDGET - SEE .kv FILE
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+    def get_dir(self):
+        return os.getcwd()
+
+class PointDialog(BoxLayout):
+    add = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+    touch = ObjectProperty(None)
+    #layout defined in .kv file
+    pass
 
 class Coords(BoxLayout):
     ##Coordinate box - layout in .kv file
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-    def type_dropdown(self):
-        #might need this
-        pass
-
     #Properties
     txt_x = StringProperty()
     txt_y = StringProperty()
     ref = StringProperty()
     point_type = StringProperty()
+
+    def type_dropdown(self):
+        #might need this
+        pass
 
 class LinkData(BoxLayout):
     def __init__(self,**kwargs):
@@ -132,17 +157,18 @@ class GeoPoint(Scatter):
 
     def update_coords(self):
         ##Update the assoiated coordinate display
-        for c in self.parent.walk():
-            if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work - should probs change to c.ids[] or something
-                if c.ref == self.ref:
-                    c.txt_x = str(round(self.x))
-                    c.txt_y = str(round(self.y))
-            if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
-                if c.a == self:
-                    c.points[0] = self.pos
-                if c.b == self:
-                    c.points[1] = self.pos
-                c.update_length()
+        if self.parent != None: # bobge for now - will sort later
+            for c in self.parent.walk():
+                if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work - should probs change to c.ids[] or something
+                    if c.ref == self.ref:
+                        c.txt_x = str(round(self.x))
+                        c.txt_y = str(round(self.y))
+                if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
+                    if c.a == self:
+                        c.points[0] = self.pos
+                    if c.b == self:
+                        c.points[1] = self.pos
+                    c.update_length()
 
 
     def on_touch_down(self,touch):
