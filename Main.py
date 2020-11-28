@@ -44,50 +44,93 @@ class MainPage(FloatLayout):
     #Kivy properties
     mode = StringProperty('Main')
     info = StringProperty()
-
     links = ListProperty()
     points = ListProperty()
     link_points = ListProperty()
 
-    #FILE BROWSER POPUP
+    #General methods
     def dismiss_popup(self):
         self.mode = 'Main'
         self._popup.dismiss()
 
-    def show_load(self):
-        content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+    #Load methods
+    def open_load_dialog(self):
+        content = LoadDialog(load=self.load_bike_data, cancel=self.dismiss_popup)
         self._popup = Popup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
    
-    def load(self, path, filename):
-        #put the stuff to do here
+    def load_bike_data(self, path, selection):
+        filename = selection[0]
+        with open(filename) as f:
+            data = json.load(f)
+            for key in data:
+                if data[key]['object']=="GeoPoint":
+                    self.add_point(key,data[key]['type'],data[key]['position'])
+            for key in data: # needs new loop as all points must be created before links
+                if data[key]['object']=="Link":
+                    a_ref = data[key]['a']
+                    b_ref = data[key]['b']
+                    for w in self.walk():
+                        if isinstance(w,GeoPoint):
+                            if w.ref == a_ref:
+                                a = w
+                            if w.ref == b_ref:
+                                b = w
+                    self.add_link(a=a,b=b)
         self.dismiss_popup()
 
     def on_touch_down(self,touch):
         #custom touch behaviour
-        if self.mode == 'Add_Point':
-            self.point_dialog(touch)
+        if self.mode == 'Add_Point' and self.collide_point(touch.x,touch.y):
+            self.open_point_dialog(touch)
         return super(MainPage,self).on_touch_down(touch) #do standard touch behaviour
 
-    ##Geometry shizzle
+    #Save methods
+    def open_save_dialog(self):
+        content = SaveDialog(save = self.save_bike_data,cancel = self.dismiss_popup)
+        self._popup = Popup(title="Save file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+    
+    def save_bike_data(self,filename):
+        ind = filename.find('.')
+        if ind != -1:
+            filename = filename[0:ind]
+        filename = filename+'.json'
+        save_data = {}
+        for w in self.walk():
+            if isinstance(w,GeoPoint):
+                properties={'object':'GeoPoint','type':w.point_type,'position':w.pos}
+                save_data[w.ref]= properties
+            if isinstance(w,Link):
+                properties={'object':'Link','a':w.a.ref,'b':w.b.ref}
+                save_data[w.ref]= properties
+        with open(filename,'w') as f:
+            json.dump(save_data,f,indent=2)
+        self.dismiss_popup()
+
+    #Add point methods
     def point_mode(self):
+        #Called on add link button press (see .kv)
         self.mode = 'Add_Point'
         self.info = ': click to add point'
     
-    def point_dialog(self,touch):
+    def open_point_dialog(self,touch):
         content = PointDialog(add=self.add_point,cancel = self.dismiss_popup,touch = touch)
         self._popup = Popup(title="Add Point", content=content,
                             size_hint=(0.6, 0.3))
         self._popup.open()
 
-    def add_point(self,touch,ref,typ):
-        new_point = GeoPoint(ref = ref,point_type = typ,pos = touch.pos)
+    def add_point(self,ref,typ,pos):
+        #Called on add button press in point dialog popup (see .kv)
+        new_point = GeoPoint(ref = ref,point_type = typ,pos = pos)
         self.add_widget(new_point)
         self.ids['coords_list'].add_widget(Coords(ref=ref,point_type=typ))
         self.dismiss_popup()
         self.info = ': point \'{}\' added'.format(new_point.ref)
 
+    #Add link methods
     def link_mode(self):
         self.mode = 'Add_Link'
         self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
@@ -100,17 +143,25 @@ class MainPage(FloatLayout):
         if len(objs)>1:
             a = objs[0]
             b = objs[1]
-            new_link = Link(a = a, b = b)
-            new_link.points = [a.pos,b.pos]
+            self.add_link(a,b)
             self.link_points.clear()
-            self.add_widget(new_link)
             self.mode = 'Main'
-            self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
-            self.info = ': link \'{}\' added'.format(new_link.ref)
 
-class LoadDialog(FloatLayout):
-    #FILE BROWESER POPUP WIDGET - SEE .kv FILE
+    def add_link(self,a,b):
+        new_link = Link(a = a, b = b)
+        new_link.points = [a.pos,b.pos]
+        self.add_widget(new_link)
+        self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
+        self.info = ': link \'{}\' added'.format(new_link.ref)
+
+class LoadDialog(BoxLayout):
     load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+    def get_dir(self):
+        return os.getcwd()
+
+class SaveDialog(BoxLayout):
+    save = ObjectProperty(None)
     cancel = ObjectProperty(None)
     def get_dir(self):
         return os.getcwd()
@@ -156,20 +207,19 @@ class GeoPoint(Scatter):
         self.update_coords()
 
     def update_coords(self):
-        ##Update the assoiated coordinate display
-        if self.parent != None: # bobge for now - will sort later
-            for c in self.parent.walk():
-                if str(c.__class__)=="<class '__main__.Coords'>": #bit dodgy but seems to work - should probs change to c.ids[] or something
-                    if c.ref == self.ref:
-                        c.txt_x = str(round(self.x))
-                        c.txt_y = str(round(self.y))
-                if str(c.__class__)=="<class '__main__.Link'>": #bit dodgy but seems to work
-                    if c.a == self:
-                        c.points[0] = self.pos
-                    if c.b == self:
-                        c.points[1] = self.pos
-                    c.update_length()
-
+        ##Update the associated coordinate display
+        if self.parent != None:
+            for w in self.parent.walk():
+                if isinstance(w,Coords):
+                    if w.ref == self.ref:
+                        w.txt_x = str(round(self.x))
+                        w.txt_y = str(round(self.y))
+                if isinstance(w,Link): 
+                    if w.a == self:
+                        w.points[0] = self.pos
+                    if w.b == self:
+                        w.points[1] = self.pos
+                    w.update_length()
 
     def on_touch_down(self,touch):
         #custom touch behaviour
@@ -190,10 +240,10 @@ class Link(Widget):
     def update_length(self):
         new_len = float(np.linalg.norm([self.a.x-self.b.x,self.a.y-self.b.y]))
         if self.parent != None:
-            for c in self.parent.walk():
-                if str(c.__class__)=="<class '__main__.LinkData'>": #bit dodgy but seems to work
-                    if c.ref == self.ref:
-                        c.len_txt = str(round(new_len,2))
+            for w in self.parent.walk():
+                if isinstance(w,LinkData): #bit dodgy but seems to work
+                    if w.ref == self.ref:
+                        w.len_txt = str(round(new_len,2))
         return new_len
 
 
@@ -202,17 +252,12 @@ class BiKinematicsApp(App):
     def build(self):
 
         self.screen_manager = ScreenManager()
-
         self.main_page = MainPage()
         screen = Screen(name = "Main")
         screen.add_widget(self.main_page)
         self.screen_manager.add_widget(screen)
 
         return self.screen_manager
-
-    def update_graphics(self):
-        #maybe put all the linked update stuff in here??
-        pass
 
 if __name__ == '__main__':
     app = BiKinematicsApp()
