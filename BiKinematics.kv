@@ -95,10 +95,13 @@
 
             TopbarButton:
                 text: 'Load Geo Data'
-                on_release:
+                on_release: root.open_load_dialog()
+            TopbarButton:
+                text: 'Save Geo Data'
+                on_release: root.open_save_dialog()
             TopbarButton:
                 text: 'Load Image'
-                on_release:
+                on_release: 
             TopbarButton:
                 text: 'Add Point'
                 on_release: root.point_mode()
@@ -190,24 +193,46 @@
 
         Button:
             text: "Add"
-            on_release: root.add(root.touch,point_ref.text,point_typ.text)
+            on_release: root.add(point_ref.text,point_typ.text,root.touch.pos)
 
 <LoadDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    FileChooserListView:
+        id: filechooser
+        path: root.get_dir()
+
     BoxLayout:
-        size: root.size
-        pos: root.pos
-        orientation: "vertical"
-        FileChooserListView:
-            id: filechooser
-            path: root.get_dir()
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
 
-        BoxLayout:
-            size_hint_y: None
-            height: 30
-            Button:
-                text: "Cancel"
-                on_release: root.cancel()
+        Button:
+            text: "Load"
+            on_release: root.load(filechooser.path, filechooser.selection)
 
-            Button:
-                text: "Load"
-                on_release: root.load(filechooser.path, filechooser.selection)
+<SaveDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    FileChooserListView:
+        id: filechooser
+        on_selection: filename_input.text = self.selection and self.selection[0] or ''
+        path: root.get_dir()
+    TextInput:
+        id: filename_input
+        size_hint_y: None
+        height: 30
+        multiline: False
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
+        Button:
+            text: "Save"
+            on_release: root.save(filename_input.text)
