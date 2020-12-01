@@ -1,0 +1,36 @@
+{
+  "Point_1": {
+    "object": "GeoPoint",
+    "type": "ground",
+    "position": [
+      87.99999999999996,
+      379.9999999999999
+    ]
+  },
+  "Point_1_Point_2": {
+    "object": "Link",
+    "a": "Point_1",
+    "b": "Point_2"
+  },
+  "Point_3_Point_2": {
+    "object": "Link",
+    "a": "Point_3",
+    "b": "Point_2"
+  },
+  "Point_2": {
+    "object": "GeoPoint",
+    "type": "ground",
+    "position": [
+      230.00000000000003,
+      259.0
+    ]
+  },
+  "Point_3": {
+    "object": "GeoPoint",
+    "type": "ground",
+    "position": [
+      263.0,
+      401.00000000000006
+    ]
+  }
+}
