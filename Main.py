@@ -71,7 +71,7 @@ class MainPage(FloatLayout):
                 if data[key]['object']=="Link":
                     a_ref = data[key]['a']
                     b_ref = data[key]['b']
-                    for w in self.walk():
+                    for w in self.walk(): #find points corresponding to ref string
                         if isinstance(w,GeoPoint):
                             if w.ref == a_ref:
                                 a = w
@@ -115,6 +115,10 @@ class MainPage(FloatLayout):
         #Called on add link button press (see .kv)
         self.mode = 'Add_Point'
         self.info = ': click to add point'
+
+    def delete_point_mode(self):
+        self.mode = 'Del_Point'
+        self.info = ': click to delete point (must be no link attached)'
     
     def open_point_dialog(self,touch):
         content = PointDialog(add=self.add_point,cancel = self.dismiss_popup,touch = touch)
@@ -130,10 +134,23 @@ class MainPage(FloatLayout):
         self.dismiss_popup()
         self.info = ': point \'{}\' added'.format(new_point.ref)
 
+    def delete_point(self,point):
+        self.remove_widget(point)
+        for wid in self.walk():
+            if isinstance(wid,Coords):
+                if wid.ref==point.ref:
+                    self.ids['coords_list'].remove_widget(wid)
+        self.info = ': point \'{}\' removed'.format(point.ref)
+        self.mode = 'Main'
+
     #Add link methods
     def link_mode(self):
         self.mode = 'Add_Link'
         self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
+
+    def delete_link_mode(self):
+        self.mode = 'Del_Link'
+        self.info = ': click to delete Link'
          
     def on_link_points(self,instance,value):
         objs = value
@@ -153,6 +170,16 @@ class MainPage(FloatLayout):
         self.add_widget(new_link)
         self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
         self.info = ': link \'{}\' added'.format(new_link.ref)
+
+    def delete_link(self,link):
+        self.remove_widget(link)
+        for wid in self.walk():
+            if isinstance(wid,LinkData):
+                if wid.ref==link.ref:
+                    self.ids['links_list'].remove_widget(wid)
+        self.info = ': link \'{}\' removed'.format(link.ref)
+        self.mode = 'Main'
+
 
 class LoadDialog(BoxLayout):
     load = ObjectProperty(None)
@@ -207,7 +234,7 @@ class GeoPoint(Scatter):
         self.update_coords()
 
     def update_coords(self):
-        ##Update the associated coordinate display
+        ##Update the associated coordinate display and links
         if self.parent != None:
             for w in self.parent.walk():
                 if isinstance(w,Coords):
@@ -224,9 +251,11 @@ class GeoPoint(Scatter):
     def on_touch_down(self,touch):
         #custom touch behaviour
         if self.collide_point(touch.x,touch.y):
-            #print('touch '+self.ref)
+            print('touch '+self.ref)
             if self.parent.mode == 'Add_Link': #if in Add_Link mode, add this to the selection list
                 self.parent.link_points.append(self)
+            if self.parent.mode =='Del_Point':
+                self.parent.delete_point(self)
         return super(GeoPoint,self).on_touch_down(touch) #do standard scatter touch behaviour
 
 class Link(Widget):
@@ -236,15 +265,27 @@ class Link(Widget):
     points = ListProperty()
     length = NumericProperty()
     ref = StringProperty()
+    midpoint = ListProperty([0,0])
 
     def update_length(self):
         new_len = float(np.linalg.norm([self.a.x-self.b.x,self.a.y-self.b.y]))
+        self.length = new_len
+        self.midpoint = self.a.x+(self.b.x-self.a.x)/2,self.a.y+(self.b.y-self.a.y)/2
         if self.parent != None:
             for w in self.parent.walk():
-                if isinstance(w,LinkData): #bit dodgy but seems to work
+                if isinstance(w,LinkData):
                     if w.ref == self.ref:
                         w.len_txt = str(round(new_len,2))
         return new_len
+
+    
+    def on_touch_down(self,touch):
+        #custom touch behaviour
+        if self.collide_point(touch.x,touch.y):
+            print('touch '+self.ref)
+            if self.parent.mode == 'Del_Link': #if in Add_Link mode, add this to the selection list
+                self.parent.delete_link(self)
+        return super(Link,self).on_touch_down(touch) #do standard scatter touch behaviour
 
 
 class BiKinematicsApp(App):
