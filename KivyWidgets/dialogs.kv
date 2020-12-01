@@ -1,0 +1,72 @@
+#:kivy 1.11.1 
+
+<PointDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    BoxLayout:
+        orientation: 'horizontal'
+        Label:
+            text: 'Name'
+        TextInput:
+            id: point_ref
+    BoxLayout:
+        orientation: 'horizontal'
+        Label:
+            text: 'Point Type'
+        Spinner:
+            id: point_typ
+            text: 'ground'
+            values: 'ground', 'joint', 'end_eff'
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
+
+        Button:
+            text: "Add"
+            on_release: root.add(point_ref.text,point_typ.text,root.touch.pos)
+
+<LoadDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    FileChooserListView:
+        id: filechooser
+        path: root.get_dir()
+
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
+
+        Button:
+            text: "Load"
+            on_release: root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    FileChooserListView:
+        id: filechooser
+        on_selection: filename_input.text = self.selection and self.selection[0] or ''
+        path: root.get_dir()
+    TextInput:
+        id: filename_input
+        size_hint_y: None
+        height: 30
+        multiline: False
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: "Cancel"
+            on_release: root.cancel()
+        Button:
+            text: "Save"
+            on_release: root.save(filename_input.text)
