@@ -100,7 +100,7 @@
                 text: 'Save Geo Data'
                 on_release: root.open_save_dialog()
             TopbarButton:
-                text: 'Load Image'
+                text: 'Load Image (wip)'
                 on_release: 
             TopbarButton:
                 text: 'Add Point'
@@ -108,6 +108,12 @@
             TopbarButton:
                 text: 'Add Link'
                 on_release: root.link_mode()
+            TopbarButton:
+                text: 'Delete Point'
+                on_release: root.delete_point_mode()
+            TopbarButton:
+                text: 'Delete Link'
+                on_release: root.delete_link_mode()
 
 
 
@@ -157,14 +163,23 @@
         size: self.texture_size
 
 <Link>:
-    length: self.update_length()
+    size_hint:  None,None
+    size: 10,10
+    center: self.midpoint
     ref: self.a.ref+'_'+self.b.ref
-    canvas:
+    canvas.after:
+        Color:
+            rgba: 1,0,0,0.5
+        Rectangle:
+            id: handle
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: 1,1,1,1
         Line:
             points: self.points
 
 <TopbarButton@Button>:    
-
 
 <PointDialog@BoxLayout>:
     size: root.size
