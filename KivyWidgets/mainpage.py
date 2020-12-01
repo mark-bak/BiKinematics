@@ -157,7 +157,7 @@ class MainPage(FloatLayout):
         new_link = Link(a = a, b = b)
         new_link.points = [a.pos,b.pos]
         self.add_widget(new_link)
-        self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(new_link.length)))
+        self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(round(new_link.length,2))))
         self.info = ': link \'{}\' added'.format(new_link.ref)
 
     def delete_link(self,link):
