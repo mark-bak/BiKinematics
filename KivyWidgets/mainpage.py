@@ -41,6 +41,13 @@ class MainPage(FloatLayout):
         self.mode = 'Main'
         self._popup.dismiss()
 
+    def clear_all(self):
+        for wid in self.walk():
+            if isinstance(wid,Point):
+                self.delete_point(wid)
+            if isinstance(wid,Link):
+                self.delete_link(wid)
+
     #User input methods
     def on_touch_down(self,touch):
         #custom touch behaviour
@@ -68,9 +75,9 @@ class MainPage(FloatLayout):
                     b_ref = data[key]['b']
                     for w in self.walk(): #find points corresponding to ref string
                         if isinstance(w,Point):
-                            if w.ref == a_ref:
+                            if w.name == a_ref:
                                 a = w
-                            if w.ref == b_ref:
+                            if w.name == b_ref:
                                 b = w
                     self.add_link(a=a,b=b)
         self.dismiss_popup()
@@ -82,7 +89,7 @@ class MainPage(FloatLayout):
                             size_hint=(0.9, 0.9))
         self._popup.open()
     
-    def save_bike_data(self,filename):
+    def save_bike_data(self,filename,path):
         ind = filename.find('.')
         if ind != -1:
             filename = filename[0:ind]
@@ -91,11 +98,11 @@ class MainPage(FloatLayout):
         for w in self.walk():
             if isinstance(w,Point):
                 properties={'object':'GeoPoint','type':w.point_type,'position':w.pos}
-                save_data[w.ref]= properties
+                save_data[w.name]= properties
             if isinstance(w,Link):
-                properties={'object':'Link','a':w.a.ref,'b':w.b.ref}
-                save_data[w.ref]= properties
-        with open(filename,'w') as f:
+                properties={'object':'Link','a':w.a.name,'b':w.b.name}
+                save_data[w.name]= properties
+        with open(path+'/'+filename,'w') as f:
             json.dump(save_data,f,indent=2)
         self.dismiss_popup()
 
@@ -115,21 +122,20 @@ class MainPage(FloatLayout):
                             size_hint=(0.6, 0.3))
         self._popup.open()
 
-    def add_point(self,ref,typ,pos):
-        #Called on add button press in point dialog popup (see .kv)
-        new_point = Point(ref = ref,point_type = typ,pos = pos)
+    def add_point(self,name,typ,pos):
+        #Called on Add button press in point dialog popup (see dialogs.kv)
+        new_point = Point(name = name,point_type = typ,pos = pos)
+        new_point_data = PointData(point = new_point,name=name,point_type=typ)
+        new_point.point_data = new_point_data
         self.add_widget(new_point)
-        self.ids['coords_list'].add_widget(PointData(ref=ref,point_type=typ))
+        self.ids['points_list'].add_widget(new_point_data)
         self.dismiss_popup()
-        self.info = ': point \'{}\' added'.format(new_point.ref)
+        self.info = ': point \'{}\' added'.format(new_point.name)
 
     def delete_point(self,point):
+        self.ids['points_list'].remove_widget(point.point_data)
         self.remove_widget(point)
-        for wid in self.walk():
-            if isinstance(wid,PointData):
-                if wid.ref==point.ref:
-                    self.ids['coords_list'].remove_widget(wid)
-        self.info = ': point \'{}\' removed'.format(point.ref)
+        self.info = ': point \'{}\' removed'.format(point.name)
         self.mode = 'Main'
 
     #Add link methods
@@ -154,17 +160,18 @@ class MainPage(FloatLayout):
             self.mode = 'Main'
 
     def add_link(self,a,b):
+        #called on Add Link button press - see .kv
         new_link = Link(a = a, b = b)
-        new_link.points = [a.pos,b.pos]
+        new_link_data = LinkData(link = new_link)
+        new_link.link_data = new_link_data
+
         self.add_widget(new_link)
-        self.ids['links_list'].add_widget(LinkData(ref = new_link.ref, len_txt = str(round(new_link.length,2))))
-        self.info = ': link \'{}\' added'.format(new_link.ref)
+        self.ids['links_list'].add_widget(new_link_data)
+        self.info = ': link \'{}\' added'.format(new_link.name)
 
     def delete_link(self,link):
+        self.ids['links_list'].remove_widget(link.link_data)
         self.remove_widget(link)
-        for wid in self.walk():
-            if isinstance(wid,LinkData):
-                if wid.ref==link.ref:
-                    self.ids['links_list'].remove_widget(wid)
-        self.info = ': link \'{}\' removed'.format(link.ref)
         self.mode = 'Main'
+
+    
