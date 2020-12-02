@@ -1,0 +1,39 @@
+#:kivy 1.11.1 
+
+<Point>:
+#Geometry point
+    size_hint: None,None
+    size: lbl.size
+    canvas.after:
+        Color:
+            rgba: 0,1,0,0.5
+        Rectangle:
+            size: self.size
+            pos: self.pos 
+        Color:
+            rgba: 1,0,0,1
+        Ellipse:
+            size: 5,5
+            pos: self.pos[0]-2.5,self.pos[1]-2.5
+    Label:
+        id:lbl
+        text: root.name
+        size: self.texture_size
+
+<PointData>:
+#Coordinate readout box
+    orientation: "horizontal"
+    size_hint_y:None
+    height: sidebar_coords_height
+    txt_x: str(round(self.point.x,2))
+    txt_y: str(round(self.point.y,2))
+    Label:
+        text: root.name
+    Label:
+        text: root.point_type
+        on_touch_down: root.type_dropdown()
+    TextInput:
+        text: root.txt_x
+    TextInput:
+        text: root.txt_y
+
