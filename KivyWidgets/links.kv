@@ -1,0 +1,32 @@
+#:kivy 1.11.1 
+
+<Link>:
+    size_hint:  None,None
+    size: 10,10
+    center: self.midpoint
+    name: self.a.name+'_'+self.b.name
+    points: [self.a.pos,self.b.pos]
+
+    canvas.after:
+        Color:
+            rgba: 1,0,0,0.5
+        Rectangle:
+            id: handle
+            size: self.size
+            pos: self.pos
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            points: self.points
+
+<LinkData>:
+    #Coordinate readout box
+    orientation: "horizontal"
+    size_hint_y:None
+    height: sidebar_coords_height
+
+    len_txt: str(round(self.link.length,2))
+    Label:
+        text: root.link.name
+    TextInput:
+        text: root.len_txt

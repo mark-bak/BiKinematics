@@ -27,7 +27,7 @@
             size_hint_y: None
             height: root.height - topbar_height
             BoxLayout: #Sidebar button layout
-                id: coords_list
+                id: points_list
                 orientation: "vertical"
                 size_hint_x: None
                 width: sidebar_width
@@ -114,140 +114,8 @@
             TopbarButton:
                 text: 'Delete Link'
                 on_release: root.delete_link_mode()
-
-
-
-<Coords>:
-#Coordinate readout box
-    orientation: "horizontal"
-    size_hint_y:None
-    height: sidebar_coords_height
-    Label:
-        text: root.ref
-    Label:
-        text: root.point_type
-        on_touch_down: root.type_dropdown()
-    TextInput:
-        text: root.txt_x
-    TextInput:
-        text: root.txt_y
-
-<LinkData>:
-    #Coordinate readout box
-    orientation: "horizontal"
-    size_hint_y:None
-    height: sidebar_coords_height
-    Label:
-        text: root.ref
-    TextInput:
-        text: root.len_txt
-
-<GeoPoint>:
-#Geometry point
-    size_hint: None,None
-    size: lbl.size
-    canvas.after:
-        Color:
-            rgba: 0,1,0,0.5
-        Rectangle:
-            size: self.size
-            pos: self.pos 
-        Color:
-            rgba: 1,0,0,1
-        Ellipse:
-            size: 5,5
-            pos: self.pos[0]-2.5,self.pos[1]-2.5
-    Label:
-        id:lbl
-        text: root.ref
-        size: self.texture_size
-
-<Link>:
-    size_hint:  None,None
-    size: 10,10
-    center: self.midpoint
-    ref: self.a.ref+'_'+self.b.ref
-    canvas.after:
-        Color:
-            rgba: 1,0,0,0.5
-        Rectangle:
-            id: handle
-            size: self.size
-            pos: self.pos
-        Color:
-            rgba: 1,1,1,1
-        Line:
-            points: self.points
+            TopbarButton:
+                text: 'Clear All'
+                on_release: root.clear_all()
 
 <TopbarButton@Button>:    
-
-<PointDialog@BoxLayout>:
-    size: root.size
-    pos: root.pos
-    orientation: "vertical"
-    BoxLayout:
-        orientation: 'horizontal'
-        Label:
-            text: 'Name'
-        TextInput:
-            id: point_ref
-    BoxLayout:
-        orientation: 'horizontal'
-        Label:
-            text: 'Point Type'
-        Spinner:
-            id: point_typ
-            text: 'ground'
-            values: 'ground', 'joint', 'end_eff'
-    BoxLayout:
-        size_hint_y: None
-        height: 30
-        Button:
-            text: "Cancel"
-            on_release: root.cancel()
-
-        Button:
-            text: "Add"
-            on_release: root.add(point_ref.text,point_typ.text,root.touch.pos)
-
-<LoadDialog>:
-    size: root.size
-    pos: root.pos
-    orientation: "vertical"
-    FileChooserListView:
-        id: filechooser
-        path: root.get_dir()
-
-    BoxLayout:
-        size_hint_y: None
-        height: 30
-        Button:
-            text: "Cancel"
-            on_release: root.cancel()
-
-        Button:
-            text: "Load"
-            on_release: root.load(filechooser.path, filechooser.selection)
-
-<SaveDialog>:
-    size: root.size
-    pos: root.pos
-    orientation: "vertical"
-    FileChooserListView:
-        id: filechooser
-        on_selection: filename_input.text = self.selection and self.selection[0] or ''
-        path: root.get_dir()
-    TextInput:
-        id: filename_input
-        size_hint_y: None
-        height: 30
-        multiline: False
-    BoxLayout:
-        size_hint_y: None
-        height: 30
-        Button:
-            text: "Cancel"
-            on_release: root.cancel()
-        Button:
-            text: "Save"
-            on_release: root.save(filename_input.text)
