@@ -27,7 +27,7 @@
             size_hint_y: None
             height: root.height - topbar_height
             BoxLayout: #Sidebar button layout
-                id: coords_list
+                id: points_list
                 orientation: "vertical"
                 size_hint_x: None
                 width: sidebar_width
@@ -114,5 +114,8 @@
             TopbarButton:
                 text: 'Delete Link'
                 on_release: root.delete_link_mode()
+            TopbarButton:
+                text: 'Clear All'
+                on_release: root.clear_all()
 
 <TopbarButton@Button>:    

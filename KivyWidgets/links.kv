@@ -4,7 +4,9 @@
     size_hint:  None,None
     size: 10,10
     center: self.midpoint
-    ref: self.a.ref+'_'+self.b.ref
+    name: self.a.name+'_'+self.b.name
+    points: [self.a.pos,self.b.pos]
+
     canvas.after:
         Color:
             rgba: 1,0,0,0.5
@@ -22,7 +24,9 @@
     orientation: "horizontal"
     size_hint_y:None
     height: sidebar_coords_height
+
+    len_txt: str(round(self.link.length,2))
     Label:
-        text: root.ref
+        text: root.link.name
     TextInput:
         text: root.len_txt
