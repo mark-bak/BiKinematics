@@ -11,6 +11,8 @@ from KivyWidgets.dialogs import PointDialog
 from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
 
+from Solver.bike import kivy_to_bike,Bike
+
 #Kivy Layouts
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
@@ -47,6 +49,22 @@ class MainPage(FloatLayout):
                 self.delete_point(wid)
             if isinstance(wid,Link):
                 self.delete_link(wid)
+
+    def goto_plot(self):
+        points_list = []
+        links_list = []
+        for wid in self.walk():
+            if isinstance(wid,Point):
+                point_info = {'name':wid.name,'type':wid.point_type,'pos':list(wid.pos)}
+                points_list.append(point_info)
+            if isinstance(wid,Link):
+                link_info = {'name':wid.name,'a':wid.a.name,'b':wid.b.name}
+                links_list.append(link_info)
+        #bike_data = kivy_to_bike(points_list,links_list,300,1250)
+        bike = Bike(points_list,links_list,1200)
+        path = bike.find_kinematic_loop()
+        print(path)
+        self.parent.manager.current = 'Plot' #lol what a mess this line is
 
     #User input methods
     def on_touch_down(self,touch):
@@ -102,7 +120,7 @@ class MainPage(FloatLayout):
             if isinstance(w,Link):
                 properties={'object':'Link','a':w.a.name,'b':w.b.name}
                 save_data[w.name]= properties
-        with open(path+'/'+filename,'w') as f:
+        with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
         self.dismiss_popup()
 

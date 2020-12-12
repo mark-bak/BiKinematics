@@ -1,0 +1,30 @@
+#:kivy 1.11.1 
+
+#general layout properties
+#: set sidebar_width 420
+#: set sidebar_coords_height 30
+#: set topbar_height 50
+
+<PlotPage>:
+    AnchorLayout: #Top button anchor      
+        anchor_y: "top"
+        anchor_x: "left"
+        BoxLayout: #Topbar button layout
+            size_hint_y: None
+            height: topbar_height
+            id: topbar
+            orientation: "horizontal"
+            # canvas.after:
+            #     Color:
+            #         rgba: 0,0,1,0.5
+            #     Rectangle:
+            #         size: self.size
+            #         pos: self.pos
+
+            TopbarButton:
+                text: 'Return'
+                on_release: app.sm.current = 'Main'
+    BoxLayout:
+        id: graph_frame
+        size_hint_y: None
+        height: root.height-topbar_height

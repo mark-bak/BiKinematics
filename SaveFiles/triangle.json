@@ -9,13 +9,15 @@
     "a": "t1",
     "b": "t2"
   },
-  "t2": {
-    "object": "GeoPoint",
-    "type": "ground",
-    "position": [
-      495.00000000000006,
-      258.99999999999994
-    ]
+  "t3_t1": {
+    "object": "Link",
+    "a": "t3",
+    "b": "t1"
+  },
+  "o_t3": {
+    "object": "Link",
+    "a": "o",
+    "b": "t3"
   },
   "t3": {
     "object": "GeoPoint",
@@ -25,9 +27,9 @@
       509.9999999999999
     ]
   },
-  "t3_t1": {
+  "o_t1": {
     "object": "Link",
-    "a": "t3",
+    "a": "o",
     "b": "t1"
   },
   "t1": {
@@ -36,6 +38,27 @@
     "position": [
       320.0,
       661.0
+    ]
+  },
+  "o": {
+    "object": "GeoPoint",
+    "type": "origin",
+    "position": [
+      520.0,
+      479.0000000000001
+    ]
+  },
+  "o_t2": {
+    "object": "Link",
+    "a": "o",
+    "b": "t2"
+  },
+  "t2": {
+    "object": "GeoPoint",
+    "type": "ground",
+    "position": [
+      495.00000000000006,
+      258.99999999999994
     ]
   }
 }
