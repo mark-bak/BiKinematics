@@ -19,12 +19,7 @@ class Bike():
         for p in self.points: # add nodes
             g.add_node(p['name'])
         for link in self.links: # add links
-            for p in self.points:
-                if p['name'] == link['a']:
-                    p_a = p['name']
-                if p['name'] == link['b']:
-                    p_b = p['name']               
-            g.add_edge(p_a,p_b,1)
+            g.add_edge(link['a'],link['b'],1)
         ground = [p['name'] for p in self.points if p['type']=='ground'] # this is dirty
         path = find_path(g,ground[0],ground[1])
         return path
