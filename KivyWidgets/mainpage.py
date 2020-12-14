@@ -62,8 +62,7 @@ class MainPage(FloatLayout):
                 links_list.append(link_info)
         #bike_data = kivy_to_bike(points_list,links_list,300,1250)
         bike = Bike(points_list,links_list,1200)
-        path = bike.find_kinematic_loop()
-        print(path)
+        bike.solve_leverage_ratio(165)
         self.parent.manager.current = 'Plot' #lol what a mess this line is
 
     #User input methods
