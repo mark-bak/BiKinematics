@@ -1,4 +1,52 @@
 {
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "end_eff",
+    "position": [
+      371.0,
+      404.0000000000001
+    ]
+  },
+  "Rocker_Piv": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      936.9999999999999,
+      466.9999999999999
+    ]
+  },
+  "Horst": {
+    "object": "Point",
+    "type": "joint",
+    "position": [
+      432.0,
+      368.99999999999983
+    ]
+  },
+  "Seatstay": {
+    "object": "Point",
+    "type": "joint",
+    "position": [
+      893.0,
+      520.0
+    ]
+  },
+  "Shock_Pusher": {
+    "object": "Point",
+    "type": "end_eff",
+    "position": [
+      1029.0,
+      523.0000000000001
+    ]
+  },
+  "Main_Piv": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      877.0,
+      238.00000000000006
+    ]
+  },
   "Horst_Main_Piv": {
     "object": "Link",
     "a": "Horst",
@@ -19,14 +67,6 @@
     "a": "Seatstay",
     "b": "Rear_Wheel"
   },
-  "Rear_Wheel": {
-    "object": "GeoPoint",
-    "type": "end_eff",
-    "position": [
-      371.0,
-      404.0000000000001
-    ]
-  },
   "Seatstay_Rocker_Piv": {
     "object": "Link",
     "a": "Seatstay",
@@ -41,45 +81,5 @@
     "object": "Link",
     "a": "Shock_Pusher",
     "b": "Rocker_Piv"
-  },
-  "Rocker_Piv": {
-    "object": "GeoPoint",
-    "type": "ground",
-    "position": [
-      936.9999999999999,
-      466.9999999999999
-    ]
-  },
-  "Horst": {
-    "object": "GeoPoint",
-    "type": "joint",
-    "position": [
-      432.0,
-      368.99999999999983
-    ]
-  },
-  "Seatstay": {
-    "object": "GeoPoint",
-    "type": "joint",
-    "position": [
-      893.0,
-      520.0
-    ]
-  },
-  "Shock_Pusher": {
-    "object": "GeoPoint",
-    "type": "end_eff",
-    "position": [
-      1029.0,
-      523.0000000000001
-    ]
-  },
-  "Main_Piv": {
-    "object": "GeoPoint",
-    "type": "ground",
-    "position": [
-      877.0,
-      238.00000000000006
-    ]
   }
 }

@@ -1,18 +1,23 @@
 {
-  "t1": {
-    "object": "GeoPoint",
+  "test": {
+    "object": "Point",
     "type": "ground",
     "position": [
-      93.0,
-      373.00000000000006
+      210.00000000000003,
+      449.0
     ]
   },
-  "t2": {
-    "object": "GeoPoint",
+  "test_test2": {
+    "object": "Link",
+    "a": "test",
+    "b": "test2"
+  },
+  "test2": {
+    "object": "Point",
     "type": "ground",
     "position": [
-      262.0,
-      237.99999999999997
+      140.99999999999997,
+      285.99999999999983
     ]
   }
 }
