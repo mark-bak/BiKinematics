@@ -1,5 +1,6 @@
 #Standard Imports
 import json
+import os
 
 #Custom Widget Imports
 #pylint: disable=import-error
@@ -51,18 +52,9 @@ class MainPage(FloatLayout):
                 self.delete_link(wid)
 
     def goto_plot(self):
-        points_list = []
-        links_list = []
-        for wid in self.walk():
-            if isinstance(wid,Point):
-                point_info = {'name':wid.name,'type':wid.point_type,'pos':list(wid.pos)}
-                points_list.append(point_info)
-            if isinstance(wid,Link):
-                link_info = {'name':wid.name,'a':wid.a.name,'b':wid.b.name}
-                links_list.append(link_info)
-        #bike_data = kivy_to_bike(points_list,links_list,300,1250)
-        bike = Bike(points_list,links_list,1200)
-        bike.solve_leverage_ratio(165)
+        bike_data = self.create_bike_data()
+        bike = Bike(bike_data)
+
         self.parent.manager.current = 'Plot' #lol what a mess this line is
 
     #User input methods
@@ -84,7 +76,7 @@ class MainPage(FloatLayout):
         with open(filename) as f:
             data = json.load(f)
             for key in data:
-                if data[key]['object']=="GeoPoint":
+                if data[key]['object']=="Point":
                     self.add_point(key,data[key]['type'],data[key]['position'])
             for key in data: # needs new loop as all points must be created before links
                 if data[key]['object']=="Link":
@@ -111,17 +103,21 @@ class MainPage(FloatLayout):
         if ind != -1:
             filename = filename[0:ind]
         filename = filename+'.json'
-        save_data = {}
-        for w in self.walk():
-            if isinstance(w,Point):
-                properties={'object':'GeoPoint','type':w.point_type,'position':w.pos}
-                save_data[w.name]= properties
-            if isinstance(w,Link):
-                properties={'object':'Link','a':w.a.name,'b':w.b.name}
-                save_data[w.name]= properties
+        save_data = self.create_bike_data()
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
         self.dismiss_popup()
+
+    def create_bike_data(self):
+        data = {}
+        for w in self.walk():
+            if isinstance(w,Point):
+                properties={'object':'Point','type':w.point_type,'position':w.pos}
+                data[w.name]= properties
+            if isinstance(w,Link):
+                properties={'object':'Link','a':w.a.name,'b':w.b.name}
+                data[w.name]= properties
+        return data
 
     #Add point methods
     def point_mode(self):
