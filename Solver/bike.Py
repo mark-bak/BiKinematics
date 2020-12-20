@@ -6,8 +6,6 @@ import math
 from collections import namedtuple
 import json
 
-##Todo - Really clean up all the data structures
-
 class Bike():
     def __init__(self,data):
 
@@ -16,9 +14,17 @@ class Bike():
         self.kinematic_loop_points = []
         self.end_eff_points = []
 
-        self.parse_input_data(data)     
-  
+        #initialise internal variables
+        self.parse_input_data(data)
+        self.find_kinematic_loop()
+        self.find_end_eff_points()
+
+    ## Functions to process input data
     def parse_input_data(self,data):
+        """
+        This fcn takes input data, and populates the self.points{} and self.links{} dictionaries with point and
+        link data represented as nametdtuples
+        """  
         Point = namedtuple('Point',['name','type','pos'])
         Link = namedtuple('Link',['a','b','length'])
 
@@ -40,6 +46,11 @@ class Bike():
                 self.links[name] = L
 
     def find_kinematic_loop(self):
+        """
+        Finds the kinematic loop or linkage of the suspension in multi-bar suspension systems and adds the point names (str)
+        to the list self.kinemamatic_loop_points[]
+        Uses shortest path algorithm along the links between the two points of type 'ground'
+        """  
         g = Graph(undirected=True)
         ground =[]
         for name in self.points: # add nodes
@@ -49,17 +60,24 @@ class Bike():
         ground = [name for name in self.points if self.points[name].type=='ground'] # this is dirty
         path = find_path(g,ground[0],ground[1])
         self.kinematic_loop_points = path.nodes
-        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
         return path
 
+    def find_end_eff_points(self):
+        """
+        Populates the list of point names (str) not on the 'kinematic loop' in self.end_eff_points[]
+        """
+        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
+
     def get_solution_space_vectors(self):
-        #this needs commenting
+        """
+        Comment later
+        """
         klp = np.array([self.points[name].pos for name in self.kinematic_loop_points],dtype=float) # vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
         eep = np.array([self.points[name].pos for name in self.end_eff_points],dtype=float)
 
         klp_off = klp[0,:] 
-        klp_ss = cartesian_to_link_space(klp[0,:],np.vstack([klp[1:,:],klp[0,:]]))
-
+        klp_ss = cartesian_to_link_space(klp,'loop')
+        
         eep_posn=[]
         eep_ss =np.zeros(eep.shape[0]*2)
         for end_eff_index in range(len(self.end_eff_points)):
@@ -67,9 +85,9 @@ class Bike():
             attach_point_index = self.find_end_eff_attach_point(self.end_eff_points[end_eff_index])
             eep_posn.append(attach_point_index)
 
-            ret = cartesian_to_link_space(klp[attach_point_index],eep[end_eff_index])
-            eep_ss[end_eff_index] = ret[0]
-            eep_ss[eep.shape[0]+end_eff_index] = ret[1]
+            Th,L = cartesian_to_link_space([klp[attach_point_index],eep[end_eff_index]])
+            eep_ss[end_eff_index] = Th
+            eep_ss[eep.shape[0]+end_eff_index] = L
 
         return klp_off,klp_ss,eep_posn,eep_ss
 
@@ -81,13 +99,16 @@ class Bike():
                 return self.kinematic_loop_points.index(link.a.name)
 
     def solve_kinematic_loop(self,loop_ls):
-        #expects vector of form vector of form [th1,...,thn,L1,...,Ln]
+        """
+        expects vector of form vector of form [th1,...,thn,L1,...,Ln]
+        """
         mid = int(loop_ls.shape[0]/2)
         x = loop_ls[1:mid-1] #angles to be found by optimiser (this defo works for 4-bar need to test higher dims...)
-        geo = np.hstack([loop_ls[0],loop_ls[mid-1:]])
+        geo = np.vstack([loop_ls[0],loop_ls[mid-1:]])
         res = sp.optimize.minimize(self.constraint_eqn,x,geo)
+
         #option here for verbose solver stuf maybe
-        x_sol = res.x
+        x_sol = np.vstack(res.x)
         sol = loop_ls
         sol[1:mid-1] = x_sol
         return sol
@@ -101,9 +122,10 @@ class Bike():
         stheta = np.sin(theta)
         thetas = np.vstack([ctheta,stheta])
         L = args[q-len(x):]
-        u = np.matmul(thetas,L.transpose())
-        res = round(np.linalg.norm(u),3)
-        return res
+        u = np.matmul(thetas,L)
+        err = np.linalg.norm(u)
+        #print(err)
+        return err
 
     def solve_leverage_ratio(self,travel):
         #find angle for required travel
@@ -111,21 +133,38 @@ class Bike():
 
 
 #Functions
-def cartesian_to_link_space(orign,points_vector):
-    diff = np.diff(np.vstack([orign,points_vector]),axis=0)
-    Theta_0 = np.arctan2(diff[:,1],diff[:,0]) #vector of angles [th1,th2,...,thn]
-    L_0 = np.linalg.norm(diff,ord = 2,axis=1) #vector of lengths [L1,L2,...,Ln]
-    v = np.concatenate([Theta_0,L_0]) #return vector of form [th1,...,thn,L1,...,Ln]
-    return v
+def cartesian_to_link_space(v,*params):
+    """
+    Takes a (nx2) vector of points in form v = [[x1,y1],[x2,y2],...,[xn,yn]], and converts to generalised coord: angles from horizontal Theta,
+    and magnitdues L, measured from  successive points/joints. Return is (2(n-1)x1) vector of form [th1,th2,...,th(n-1),L1,L2,...,L(n-1)]
+    If 'loop' is passed as a parameter, the generalised coord to return from the last point in v to the first is also included, returning a (2nx1) vector
+    of form [th1,th2,...,thn,L1,L2,...,Ln]
+    """
 
-def link_space_to_cartesian(offset,link_space_vector):
-    n = link_space_vector.shape[0]
-    v = np.zeros((int(n/2),2)) #vector of form vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
+    if 'loop' in params:
+        v = np.concatenate([v,[v[0,:]]])
+
+    diff = np.diff(v,axis=0)
+    Theta = np.vstack(np.arctan2(diff[:,1],diff[:,0])) #vector of angles [th1,th2,...,thn]
+    L = np.vstack(np.linalg.norm(diff,ord = 2,axis=1)) #vector of lengths [L1,L2,...,Ln]
+    ls = np.vstack([Theta,L])
+    return ls
+
+def link_space_to_cartesian(offset,ls):
+    """
+    Takes a (nx2) vector of points in form v = [[x1,y1],[x2,y2],...,[xn,yn]], and converts to generalised coord: angles from horizontal Theta,
+    and magnitdues L, measured from  successive points/joints. Return is (2nx1) vector of form [th1,th2,...,thn,L1,L2,...,Ln]
+    """
+    N = int(ls.shape[0]/2)
+    Theta = ls[0:N]
+    L = ls[N:]
+    n = Theta.shape[0]
+    v = np.zeros((n,2)) #vector of form vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
     v[0,:] = np.array([0,0]) + offset #first point is origin of loop
     for i in range(0,v.shape[0]-1):
-        Lcos = link_space_vector[int(n/2)+i]*np.cos(link_space_vector[i])
-        Lsin = link_space_vector[int(n/2)+i]*np.sin(link_space_vector[i])
-        v[i+1,:] = v[i,:] + [Lcos,Lsin] #go round kinematic loop to find cartesian coords
+        Lcos = L[i]*np.cos(Theta[i])
+        Lsin = L[i]*np.sin(Theta[i])
+        v[i+1,:] = v[i,:] + np.hstack([Lcos,Lsin]) #loop to find cartesian coords
     return v
 
 
@@ -144,14 +183,14 @@ def load_json(filename):
 if __name__ == '__main__':
     #check cartesian and link space conversions
     print('Checking coordinate conversion:')
-    c = np.random.rand(4,2)
+    c = 10*np.random.rand(4,2)
     offset=c[0,:]
-    l_s = cartesian_to_link_space(c[0,:],np.vstack([c[1:,:],c[0,:]])) 
-    c_check = link_space_to_cartesian(offset,l_s)
+    ls = cartesian_to_link_space(c,'loop') 
+    c_check = link_space_to_cartesian(offset,ls)
 
     origin = [0,0]
     point = [1,1]
-    res = cartesian_to_link_space(origin,point)
+    res = cartesian_to_link_space([origin,point])
     if c.all() == c_check.all() and res[0]-np.pi/2<0.01 and res[1]-np.sqrt(2)<0.01:
         print('--passed--')
     else:
@@ -162,10 +201,13 @@ if __name__ == '__main__':
     b = Bike(data)
     path = b.find_kinematic_loop()
     klp_off,klp_ss,eep_posn,eep_ss = b.get_solution_space_vectors()
+    print(klp_ss)
     print(path)
     print(klp_off)
-    print(klp_ss)
     print(eep_posn)
     print(eep_ss)
 
+    klp_ss[0] = 3
+    sol = b.solve_kinematic_loop(klp_ss)
+    print(sol)
 
