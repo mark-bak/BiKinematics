@@ -74,7 +74,7 @@ class Bike():
         """
         klp = np.array([self.points[name].pos for name in self.kinematic_loop_points],dtype=float) # vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
         eep = np.array([self.points[name].pos for name in self.end_eff_points],dtype=float)
-
+        print(np.vstack([klp,eep]))
         klp_off = klp[0,:] 
         klp_ss = cartesian_to_link_space(klp,'loop')
         
@@ -113,11 +113,22 @@ class Bike():
         sol[1:mid-1] = x_sol
         return sol
 
+    def solution_to_cartesian(self,klp_off,klp_sol,eep_ss,eep_posn):
+        klp_v = link_space_to_cartesian(klp_off,klp_sol)
+        
+        mid = int(eep_ss.shape[0]/2)
+        eep_v = np.zeros((mid,2))
+        for i in range(mid):
+            pos = link_space_to_cartesian(klp_v[eep_posn[i],:],np.vstack([eep_ss[i],eep_ss[mid+i]]))
+            eep_v[i,:]=pos
+        return np.vstack([klp_v,eep_v])
+
     def constraint_eqn(self,x,args):
         geo = args
         n = len(x)+len(args)
         q = int(n/2)
-        theta = np.hstack([geo[0],x,geo[q-1]])
+        theta = np.vstack([geo[0],np.reshape(x,(len(x),1)),geo[1:q-len(x)]])
+        theta = theta.transpose()
         ctheta = np.cos(theta)
         stheta = np.sin(theta)
         thetas = np.vstack([ctheta,stheta])
@@ -152,8 +163,7 @@ def cartesian_to_link_space(v,*params):
 
 def link_space_to_cartesian(offset,ls):
     """
-    Takes a (nx2) vector of points in form v = [[x1,y1],[x2,y2],...,[xn,yn]], and converts to generalised coord: angles from horizontal Theta,
-    and magnitdues L, measured from  successive points/joints. Return is (2nx1) vector of form [th1,th2,...,thn,L1,L2,...,Ln]
+    comment later
     """
     N = int(ls.shape[0]/2)
     Theta = ls[0:N]
@@ -183,7 +193,7 @@ def load_json(filename):
 if __name__ == '__main__':
     #check cartesian and link space conversions
     print('Checking coordinate conversion:')
-    c = 10*np.random.rand(4,2)
+    c = 100*np.random.rand(4,2)
     offset=c[0,:]
     ls = cartesian_to_link_space(c,'loop') 
     c_check = link_space_to_cartesian(offset,ls)
@@ -201,13 +211,11 @@ if __name__ == '__main__':
     b = Bike(data)
     path = b.find_kinematic_loop()
     klp_off,klp_ss,eep_posn,eep_ss = b.get_solution_space_vectors()
-    print(klp_ss)
-    print(path)
-    print(klp_off)
-    print(eep_posn)
-    print(eep_ss)
 
+    #print(klp_ss)
     klp_ss[0] = 3
     sol = b.solve_kinematic_loop(klp_ss)
-    print(sol)
+    r = b.solution_to_cartesian(klp_off,sol,eep_ss,eep_posn)
+    #print(sol)
+    print(r)
 
