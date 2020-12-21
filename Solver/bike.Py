@@ -14,6 +14,8 @@ class Bike():
         self.kinematic_loop_points = []
         self.end_eff_points = []
 
+        self.solution = {}
+
         #initialise internal variables
         self.parse_input_data(data)
         self.find_kinematic_loop()
@@ -68,13 +70,14 @@ class Bike():
         """
         self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
 
+    ## Solver functions - need to check how these are programmed at some point
     def get_solution_space_vectors(self):
         """
         Comment later
         """
         klp = np.array([self.points[name].pos for name in self.kinematic_loop_points],dtype=float) # vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
         eep = np.array([self.points[name].pos for name in self.end_eff_points],dtype=float)
-        print(np.vstack([klp,eep]))
+        #print(np.vstack([klp,eep]))
         klp_off = klp[0,:] 
         klp_ss = cartesian_to_link_space(klp,'loop')
         
@@ -89,7 +92,7 @@ class Bike():
             eep_ss[end_eff_index] = Th
             eep_ss[eep.shape[0]+end_eff_index] = L
 
-        return klp_off,klp_ss,eep_posn,eep_ss
+        return klp_off,klp_ss,eep_ss,eep_posn
 
     def find_end_eff_attach_point(self,end_eff_point):
         for link in self.links.values():
@@ -119,8 +122,9 @@ class Bike():
         mid = int(eep_ss.shape[0]/2)
         eep_v = np.zeros((mid,2))
         for i in range(mid):
-            pos = link_space_to_cartesian(klp_v[eep_posn[i],:],np.vstack([eep_ss[i],eep_ss[mid+i]]))
-            eep_v[i,:]=pos
+            pos = link_space_to_cartesian(klp_v[eep_posn[i],:],np.vstack([eep_ss[i],0,eep_ss[mid+i],0]))# this needs fixed - maybe some options for loop or not in the 
+            #ls->cart function
+            eep_v[i,:]=pos[1]
         return np.vstack([klp_v,eep_v])
 
     def constraint_eqn(self,x,args):
@@ -139,9 +143,57 @@ class Bike():
         return err
 
     def solve_leverage_ratio(self,travel):
-        #find angle for required travel
-        pass
+        klp_off,klp_ss,eep_ss,eep_posn = self.get_solution_space_vectors()
+        input_angles = self.find_input_angle_range(travel,klp_off,klp_ss,eep_ss,eep_posn)
+        print([input_angles[0],input_angles[-1]])
+        point_results= np.zeros(( len(self.kinematic_loop_points)+len(self.end_eff_points) , 2 , input_angles.shape[0]))
+        for i in range(len(input_angles)):
+            klp_ss[0]=input_angles[i]
+            klp_sol = self.solve_kinematic_loop(klp_ss)
+            point_results[:,:,i] = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn)
+            #klp_ss = klp_sol
 
+        points_list = self.kinematic_loop_points + self.end_eff_points
+        Pos_Result = namedtuple('Pos_Result',['x','y'])
+        for i in range(point_results.shape[0]):
+            name = points_list[i]
+            self.solution[name] = Pos_Result(point_results[i,0,:],point_results[i,1,:])
+
+
+    def find_input_angle_range(self,travel,klp_off,klp_ss,eep_ss,eep_posn):
+
+        for name,point in self.points.items():
+            if point.type == 'rear_wheel':
+                rear_wheel_name = name
+                rear_wheel_init_x = point.pos[0]
+
+        r_w_ind = self.end_eff_points.index(rear_wheel_name)+len(self.kinematic_loop_points)
+
+        desired_x = rear_wheel_init_x+travel
+        
+        th_in_0 = float(klp_ss[0])
+
+        res = sp.optimize.minimize(self.travel_find_eqn,th_in_0,[desired_x,r_w_ind,klp_off,klp_ss,eep_ss,eep_posn],options={'disp':True})
+        
+        th_in_end = res.x
+        input_angles = np.linspace(th_in_0,th_in_end,num=10)
+        return input_angles
+        
+    def travel_find_eqn(self,x,args):
+        desired_x = args[0]
+        r_w_ind = args[1]
+        klp_off = args[2]
+        klp_ss = args[3]
+        eep_ss = args[4]
+        eep_posn = args[5]
+
+        klp_ss[0]=x
+        klp_sol = self.solve_kinematic_loop(klp_ss)
+
+        sol_cartesian = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn)
+        x = sol_cartesian[r_w_ind,0]
+        err = np.abs(desired_x-x)
+        return err
 
 #Functions
 def cartesian_to_link_space(v,*params):
@@ -209,13 +261,7 @@ if __name__ == '__main__':
     #example import from GUI
     data = load_json("C:/Users/Mark/Documents/Programming/BiKinematics/SaveFiles/Horst_Example.json")
     b = Bike(data)
-    path = b.find_kinematic_loop()
-    klp_off,klp_ss,eep_posn,eep_ss = b.get_solution_space_vectors()
+    b.solve_leverage_ratio(10)
+    
 
-    #print(klp_ss)
-    klp_ss[0] = 3
-    sol = b.solve_kinematic_loop(klp_ss)
-    r = b.solution_to_cartesian(klp_off,sol,eep_ss,eep_posn)
-    #print(sol)
-    print(r)
 
