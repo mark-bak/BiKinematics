@@ -57,9 +57,10 @@ class Bike():
 
     def find_kinematic_loop(self):
         """
-        Finds the kinematic loop or linkage of the suspension in multi-bar suspension systems and adds the point names (str)
+        Finds the kinematic loop or linkage of the suspension and adds the point names (str format)
         to the list self.kinemamatic_loop_points[]
-        Uses shortest path algorithm along the links between the two points of type 'ground'
+        Uses shortest path algorithm to find path between two points of type 'ground', along the minimum
+        number of links
         """  
         g = Graph(undirected=True)
         ground =[]
@@ -81,12 +82,22 @@ class Bike():
     ## Solver functions - need to check how these are programmed at some point
 
     def add_kinematic_solver(self):
+        """
+        Adds the kinematic solver which can be used to calculate suspension motion
+        Currently adds a solver that uses Scipy minimisation fcns to numerically solve
+        linkage constraint eqns, however more solvers will likely need to be created for
+        single pivots, and maybe a freudenstein eqn 4-bar solver could also be made
+        """
         self.kinematic_solver = Kinematic_Solver(self.points,
                                                 self.links,
                                                 self.kinematic_loop_points,
                                                 self.end_eff_points)
 
     def get_suspension_motion(self,travel):
+        """
+        Runs the kinematic solver class attached to this instance, and returns the suspension motion
+        throughout the specified travel in self.solution
+        """
         sol = self.kinematic_solver.solve_suspension_motion(travel)
         self.solution =sol
 
