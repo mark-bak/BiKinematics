@@ -5,6 +5,8 @@ from scipy.optimize import minimize
 import math
 from collections import namedtuple
 import json
+import matplotlib
+import matplotlib.pyplot as plt
 
 class Bike():
     def __init__(self,data):
@@ -139,7 +141,7 @@ class Bike():
         L = args[q-len(x):]
         u = np.matmul(thetas,L)
         err = np.linalg.norm(u)
-        #print(err)
+
         return err
 
     def solve_leverage_ratio(self,travel):
@@ -165,22 +167,21 @@ class Bike():
         for name,point in self.points.items():
             if point.type == 'rear_wheel':
                 rear_wheel_name = name
-                rear_wheel_init_x = point.pos[0]
-
+                rear_wheel_init_y = point.pos[1]
         r_w_ind = self.end_eff_points.index(rear_wheel_name)+len(self.kinematic_loop_points)
 
-        desired_x = rear_wheel_init_x+travel
+        desired_y = rear_wheel_init_y+travel
         
         th_in_0 = float(klp_ss[0])
 
-        res = sp.optimize.minimize(self.travel_find_eqn,th_in_0,[desired_x,r_w_ind,klp_off,klp_ss,eep_ss,eep_posn],options={'disp':True})
+        res = sp.optimize.minimize(self.travel_find_eqn,th_in_0,[desired_y,r_w_ind,klp_off,klp_ss,eep_ss,eep_posn],method = 'Nelder-Mead',options={'disp':True})
         
         th_in_end = res.x
-        input_angles = np.linspace(th_in_0,th_in_end,num=10)
+        input_angles = np.linspace(th_in_0,th_in_end,num=100)
         return input_angles
         
     def travel_find_eqn(self,x,args):
-        desired_x = args[0]
+        desired_y = args[0]
         r_w_ind = args[1]
         klp_off = args[2]
         klp_ss = args[3]
@@ -191,8 +192,9 @@ class Bike():
         klp_sol = self.solve_kinematic_loop(klp_ss)
 
         sol_cartesian = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn)
-        x = sol_cartesian[r_w_ind,0]
-        err = np.abs(desired_x-x)
+        y = sol_cartesian[r_w_ind,1]
+        err = np.abs(desired_y-y)
+        #print(err)
         return err
 
 #Functions
@@ -261,7 +263,13 @@ if __name__ == '__main__':
     #example import from GUI
     data = load_json("C:/Users/Mark/Documents/Programming/BiKinematics/SaveFiles/Horst_Example.json")
     b = Bike(data)
-    b.solve_leverage_ratio(10)
+    b.solve_leverage_ratio(100)
+    fig, ax = plt.subplots()
+    x = b.solution['Rear_Wheel'].x
+    y = b.solution['Rear_Wheel'].y
+    ax.plot(x, y)
+    ax.set_title('Rear Axle Path')
+    plt.show()
     
 
 

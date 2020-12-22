@@ -54,7 +54,8 @@ class MainPage(FloatLayout):
     def goto_plot(self):
         bike_data = self.create_bike_data()
         bike = Bike(bike_data)
-
+        bike.solve_leverage_ratio(20)
+        
         self.parent.manager.current = 'Plot' #lol what a mess this line is
 
     #User input methods
