@@ -93,13 +93,16 @@ class Bike():
                                                 self.kinematic_loop_points,
                                                 self.end_eff_points)
 
-    def get_suspension_motion(self,travel):
+    def get_suspension_motion(self,travel,name):
         """
         Runs the kinematic solver class attached to this instance, and returns the suspension motion
         throughout the specified travel in self.solution
         """
         sol = self.kinematic_solver.solve_suspension_motion(travel)
-        self.solution =sol
+        self.solution[name] = sol
+
+    def save_solution_csv(self,solution_name):
+        pass
 
 #MISC FUNCTIONS KICKING AROUND FOR NOW
 def kivy_to_bike(points,links,wheelbase_px,wheelbase_mm):
@@ -135,10 +138,10 @@ if __name__ == '__main__':
         print('--failed--')
 
     #plot example rear axle path
-    b.get_suspension_motion(100)
+    b.get_suspension_motion(100,'test')
     fig, ax = plt.subplots()
-    x = b.solution['Rear_Wheel'].x
-    y = b.solution['Rear_Wheel'].y
+    x = b.solution['test']['Rear_Wheel'].x
+    y = b.solution['test']['Rear_Wheel'].y
     ax.plot(x, y)
     ax.set_title('Rear Axle Path')
     plt.show()

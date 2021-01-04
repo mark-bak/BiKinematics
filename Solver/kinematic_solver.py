@@ -11,6 +11,9 @@ import matplotlib.pyplot as plt
 
 class Kinematic_Solver():
     def __init__(self,points,links,kin_loop_points,end_eff_points):
+        """
+        Copy over relevant variables from Bike representation
+        """
         self.points = points
         self.links = links
         self.kinematic_loop_points = kin_loop_points
@@ -18,28 +21,58 @@ class Kinematic_Solver():
 
     def get_solution_space_vectors(self):
         """
-        Comment later
+        Returns vectors in solution space form, ready for solving. This form is the following:
+
+        1st return: klp_off - a point of form [x,y], denoting the offset of the linkage loop origin from the
+        origin used in the cartesian representation of the bike (currently the bottom left screen pixel)
+
+        2nd return: klp_ss - a vector containing the angle and length generalised coords of the linkage of the format:
+        [th12,th23,...,th(n-1)(n),th(n)1 , L12,L23,...,L(n-1)(n),L(n)1], i.e the magnitude and angle of the vectors
+        between the points of the loop.
+
+        Note - These are ordered with respect to self.kinematic_loop_points list, where in the notation used
+        in this fcn description the first entry (self.kinematic_loop_points[0]) will be the name of the point 
+        with coords [x1,y1]
+
+        3rd return: eep_ss - a vector containing the angle and length offset of a particular end effector from
+        linkage point given in eep_posn. This vector has form [th,L]
+
+        4th return: eep_posn - the index of the linkage point that the end effector is offset from
+
+        Note - These are ordered with respect to self.end_eff_points list, where in the notation used
+        in this fcn description the first entry (self.end_eff_points[0]) will be the name of the end effector 
+        with offset given by eep_ss[0] from linkage point self.kinematic_loop_points(eep_posn[0]) 
+
         """
-        klp = np.array([self.points[name].pos for name in self.kinematic_loop_points],dtype=float) # vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
-        eep = np.array([self.points[name].pos for name in self.end_eff_points],dtype=float)
-        #print(np.vstack([klp,eep]))
+        klp = np.array([self.points[name].pos for name in self.kinematic_loop_points],dtype=float) #vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
+        eep = np.array([self.points[name].pos for name in self.end_eff_points],dtype=float) #vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
+
+        #Convert loop 
         klp_off = klp[0,:] 
         klp_ss = self.cartesian_to_link_space(klp,'loop')
         
+        #Convert end effectors
         eep_posn=[]
-        eep_ss =np.zeros(eep.shape[0]*2)
-        for end_eff_index in range(len(self.end_eff_points)):
+        eep_ss =np.zeros(eep.shape[0]*2) # Converting (n x 2) [[x1,y1]...[xn,yn]] shape to [th1...thn,L1...Ln] (2n x 1) shape
 
+        for end_eff_index in range(len(self.end_eff_points)): #Loop through end eff points and find attachment point and offset            
+            #Find attach point
             attach_point_index = self.find_end_eff_attach_point(self.end_eff_points[end_eff_index])
-            eep_posn.append(attach_point_index)
-
+            #Find offset from attach point to end effector
             Th,L = self.cartesian_to_link_space([klp[attach_point_index],eep[end_eff_index]])
+
+            #Store in expected format
+            eep_posn.append(attach_point_index)
             eep_ss[end_eff_index] = Th
-            eep_ss[eep.shape[0]+end_eff_index] = L
+            eep_ss[eep.shape[0]+end_eff_index] = L # Converting (n x 2) [[x1,y1]...[xn,yn]] shape to [th1...thn,L1...Ln] (2n x 1)  shape
 
         return klp_off,klp_ss,eep_ss,eep_posn
 
     def find_end_eff_attach_point(self,end_eff_point):
+        """
+        Returns index of linkage point attachment (via link) for given end_eff point. If end effector is attached to multiple linkage points,
+        this will return the first it comes across. Needs error checking written if no attachment at all.
+        """
         for link in self.links.values():
             if link.a.name == end_eff_point:
                 return self.kinematic_loop_points.index(link.b.name)
@@ -48,22 +81,36 @@ class Kinematic_Solver():
 
     def solve_kinematic_loop(self,loop_ls):
         """
-        expects vector of form vector of form [th1,...,thn,L1,...,Ln]
-        """
-        mid = int(loop_ls.shape[0]/2)
-        x = loop_ls[1:mid-1] #angles to be found by optimiser (this defo works for 4-bar need to test higher dims...)
-        geo = np.vstack([loop_ls[0],loop_ls[mid-1:]])
-        res = sp.optimize.minimize(self.constraint_eqn,x,geo)
+        Expects (2n x 1) input vector of form v = [th1,...,th(n),L1,...,L(n)]. Typical usage is to set the input angle,
+        th1 to desired value, then pass to this function to find new solution vector for this input angle.
 
-        #option here for verbose solver stuf maybe
+        Returns (2n x 1) solution vector s = [th1,...,th(n),L1,...,L(n)] satisfying the linkage constraint equation
+        """
+        #Process input data for solver
+        mid = int(loop_ls.shape[0]/2)
+        x = loop_ls[1:mid-1] #Constrained coordinates to be found by optimiser (this defo works for 4-bar need to test higher dims...)
+        geo = np.vstack([loop_ls[0],loop_ls[mid-1:]]) #Constant generalised coords (Link lengths, ground angle)
+
+        #Solve by minimising error in linkage constraint equation
+        res = sp.optimize.minimize(self.constraint_eqn,x,geo) #This solves by minimsing error in the linkage loop equation
+
+        #Return solution in expected format
         x_sol = np.vstack(res.x)
         sol = loop_ls
         sol[1:mid-1] = x_sol
         return sol
 
     def solution_to_cartesian(self,klp_off,klp_sol,eep_ss,eep_posn):
+        """
+        Takes klp_off,klp_sol,eep_ss,eep_posn as described in self.get_solution_space_vectors, and returns cartesian coords of form:
+        [[xl1,yl1],...,[xl(nl),yl(nl)],[xe1,ye1],...,[xe(ne),ye(ne)]], where nl and ne denote number of kinematic loop and end effector
+        points respectively
+        """
+
+        #Linkage loop points can be directly converted
         klp_v = self.link_space_to_cartesian(klp_off,klp_sol)
         
+        #End effector points need dealt with 
         mid = int(eep_ss.shape[0]/2)
         eep_v = np.zeros((mid,2))
         for i in range(mid):
@@ -143,10 +190,10 @@ class Kinematic_Solver():
 
     def cartesian_to_link_space(self,v,*params):
         """
-        Takes a (nx2) vector of points in form v = [[x1,y1],[x2,y2],...,[xn,yn]], and converts to generalised coord: angles from horizontal Theta,
-        and magnitdues L, measured from  successive points/joints. Return is (2(n-1)x1) vector of form [th1,th2,...,th(n-1),L1,L2,...,L(n-1)]
-        If 'loop' is passed as a parameter, the generalised coord to return from the last point in v to the first is also included, returning a (2nx1) vector
-        of form [th1,th2,...,thn,L1,L2,...,Ln]
+        Takes a (n x 2) vector of points in form v = [[x1,y1],[x2,y2],...,[x(n),y(n)]], and converts to generalised coord: angles from horizontal Theta,
+        and magnitdues L, measured from  successive points/joints. Return is (2(n-1) x 1) vector of form [th12,th23,...,th(n-1)(n),L12,L23,...,L(n-1)(n)]
+        If 'loop' is passed as a parameter, the generalised coord to return from the last point in v to the first is also included, returning a (2n x 1) vector
+        of form [th12,th23,...,th(n-1)(n),th(n)1,L12,L23,...,L(n-1)(n),L(n)1]
         """
 
         if 'loop' in params:
