@@ -92,7 +92,9 @@ class Kinematic_Solver():
         geo = np.vstack([loop_ls[0],loop_ls[mid-1:]]) #Constant generalised coords (Link lengths, ground angle)
 
         #Solve by minimising error in linkage constraint equation
-        res = sp.optimize.minimize(self.constraint_eqn,x,geo) #This solves by minimsing error in the linkage loop equation
+        res = sp.optimize.minimize(self.constraint_eqn,
+                                   x,
+                                   geo) #This solves by minimsing error in the linkage loop equation
 
         #Return solution in expected format
         x_sol = np.vstack(res.x)
@@ -106,45 +108,68 @@ class Kinematic_Solver():
         [[xl1,yl1],...,[xl(nl),yl(nl)],[xe1,ye1],...,[xe(ne),ye(ne)]], where nl and ne denote number of kinematic loop and end effector
         points respectively
         """
-
         #Linkage loop points can be directly converted
-        klp_v = self.link_space_to_cartesian(klp_off,klp_sol)
+        klp_v = self.link_space_to_cartesian(klp_off,
+                                             klp_sol,
+                                             'loop')
         
         #End effector points need dealt with 
         mid = int(eep_ss.shape[0]/2)
-        eep_v = np.zeros((mid,2))
-        for i in range(mid):
-            pos = self.link_space_to_cartesian(klp_v[eep_posn[i],:],np.vstack([eep_ss[i],0,eep_ss[mid+i],0]))# this needs fixed - maybe some options for loop or not in the 
-            #ls->cart function
-            eep_v[i,:]=pos[1]
+        eep_v = np.zeros((mid,2)) #Reshape (2n x 1)-> (n x 2)
+        for i in range(mid): #Loop through ee generalised coords and get position in cartesian space
+            pos = self.link_space_to_cartesian(klp_v[eep_posn[i],:], #Offset is attach point
+                                               np.vstack([eep_ss[i],eep_ss[mid+i]])) #Gets representation in form [th(n),L(n)]
+            eep_v[i,:]=pos[1] #Don't need attachemnt coords, only end effector coords
+
+        #Return expected format
         return np.vstack([klp_v,eep_v])
 
     def constraint_eqn(self,x,args):
+        """
+        Finds vector u = [u_x,u_y], given by u_x = sum(lcos(th)), and u_y = sum(lsin(th)) by some neat matrix multiplication
+        Then finds magnitude of this vector and returns it -> this signifies the error in the linkage constraint
+        """
+        #Data setup
         geo = args
         n = len(x)+len(args)
         q = int(n/2)
         theta = np.vstack([geo[0],np.reshape(x,(len(x),1)),geo[1:q-len(x)]])
         theta = theta.transpose()
+
+        #Constraint eqn
         ctheta = np.cos(theta)
         stheta = np.sin(theta)
         thetas = np.vstack([ctheta,stheta])
         L = args[q-len(x):]
         u = np.matmul(thetas,L)
+        #Error
         err = np.linalg.norm(u)
 
         return err
 
     def solve_suspension_motion(self,travel):
+        """
+        Solves the suspension motion for a desired travel in PIXELS AT THE MOMENT THIS NEEDS TO CHANGE,
+        This is the one you want to run and it calls all the other functions as needed - probably a better stylistic way to represent this??
+
+        Returns a solution as a dictionary of NamedTuples with x and y data, for example to get x data for point with name Name use solution[Name].x
+        This returns a N long vector/list/np_thingy where N is the number of solver steps
+        """
+
+        #Convert data into link space coordinates for solving
         klp_off,klp_ss,eep_ss,eep_posn = self.get_solution_space_vectors()
+        
+        #Find the input angles in form [current input angle,......, angle required to acheive desired simulation travel] 
         input_angles = self.find_input_angle_range(travel,klp_off,klp_ss,eep_ss,eep_posn)
-        print([input_angles[0],input_angles[-1]])
-        point_results= np.zeros(( len(self.kinematic_loop_points)+len(self.end_eff_points) , 2 , input_angles.shape[0]))
-        for i in range(len(input_angles)):
+        #print([input_angles[0],input_angles[-1]])
+
+        point_results= np.zeros(( len(self.kinematic_loop_points)+len(self.end_eff_points) , 2 , input_angles.shape[0])) #Result vector
+        for i in range(len(input_angles)): #Solve the linkage at each angle of the input link, and convert to cartesian (see note)
             klp_ss[0]=input_angles[i]
             klp_sol = self.solve_kinematic_loop(klp_ss)
-            point_results[:,:,i] = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn)
-            #klp_ss = klp_sol
+            point_results[:,:,i] = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn) # (this is probably slow in here - can move out later if performance issues)
 
+        #Convert data to solution format
         points_list = self.kinematic_loop_points + self.end_eff_points
         Pos_Result = namedtuple('Pos_Result',['x','y'])
         solution = {}
@@ -168,7 +193,7 @@ class Kinematic_Solver():
         res = sp.optimize.minimize(self.travel_find_eqn,th_in_0,[desired_y,r_w_ind,klp_off,klp_ss,eep_ss,eep_posn],method = 'Nelder-Mead',options={'disp':True})
         
         th_in_end = res.x
-        input_angles = np.linspace(th_in_0,th_in_end,num=100)
+        input_angles = np.linspace(th_in_0,th_in_end,num=100) #Unhardcode this number at some point
         return input_angles
         
     def travel_find_eqn(self,x,args):
@@ -196,28 +221,41 @@ class Kinematic_Solver():
         of form [th12,th23,...,th(n-1)(n),th(n)1,L12,L23,...,L(n-1)(n),L(n)1]
         """
 
+        #Add first point to end of list again if 'loop'is specified
         if 'loop' in params:
             v = np.concatenate([v,[v[0,:]]])
 
+        #Perform conversion
         diff = np.diff(v,axis=0)
-        Theta = np.vstack(np.arctan2(diff[:,1],diff[:,0])) #vector of angles [th1,th2,...,thn]
-        L = np.vstack(np.linalg.norm(diff,ord = 2,axis=1)) #vector of lengths [L1,L2,...,Ln]
+        Theta = np.vstack(np.arctan2(diff[:,1],diff[:,0])) #Vector of angles [th1,th2,...,thn]
+        L = np.vstack(np.linalg.norm(diff,ord = 2,axis=1)) #Vector of lengths [L1,L2,...,Ln]
         ls = np.vstack([Theta,L])
         return ls
 
-    def link_space_to_cartesian(self,offset,ls):
+    def link_space_to_cartesian(self,offset,ls,*params):
         """
-        comment later
+        Takes set of link space generalised coordinates of form [th12,th23,...,th(n-1)(n),L12,L23,...,L(n-1)(n)], and an offset coordinate [x0,y0] and 
+        returns cartesian coords of form [[x1,y1],[x2,y2],...,[x(n),y(n)]]. For loops use the 'loop' in *params otherwise it will return the origin of the loop
+        twice - at the start and the end.
         """
+
+        #Data sizing fun
         N = int(ls.shape[0]/2)
         Theta = ls[0:N]
         L = ls[N:]
         n = Theta.shape[0]
-        v = np.zeros((n,2)) #vector of form vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
-        v[0,:] = np.array([0,0]) + offset #first point is origin of loop
-        for i in range(0,v.shape[0]-1):
+        #Shape return vector depending on loop or not
+        if 'loop' in params:
+            v = np.zeros((n,2)) #Vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
+        else:
+            v = np.zeros((n+1,2)) #Vector of points in form [[x1,y1],[x2,y2],...,[xn,yn]]
+
+        #Conversion
+        v[0,:] = np.array([0,0]) + offset #First point is offset (some weird numpy stuff going on here as well :) )
+        for i in range(0,v.shape[0]-1): #Loop through -> next coords are [xold,yold] + [lcos(th),Lsin(th)]
             Lcos = L[i]*np.cos(Theta[i])
             Lsin = L[i]*np.sin(Theta[i])
             v[i+1,:] = v[i,:] + np.hstack([Lcos,Lsin]) #loop to find cartesian coords
+        
         return v
 
