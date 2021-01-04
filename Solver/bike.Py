@@ -23,13 +23,13 @@ class Bike():
 
         self.solution = {}
 
-        #initialise internal variables
+        #Initialise internal variables
         self.parse_input_data(data)
         self.find_kinematic_loop()
         self.find_end_eff_points()
         self.add_kinematic_solver()
 
-    ## Functions to process input data
+    ##Functions to process input data
     def parse_input_data(self,data):
         """
         This fcn takes input data, and populates the self.points{} and self.links{} dictionaries with point and
@@ -79,8 +79,7 @@ class Bike():
         """
         self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
 
-    ## Solver functions - need to check how these are programmed at some point
-
+    ##Solver functions
     def add_kinematic_solver(self):
         """
         Adds the kinematic solver which can be used to calculate suspension motion
@@ -101,7 +100,11 @@ class Bike():
         sol = self.kinematic_solver.solve_suspension_motion(travel)
         self.solution[name] = sol
 
+    ##Data i/o functions
     def save_solution_csv(self,solution_name):
+        """
+        Not implemented yet - fcn to save solution data as a csv
+        """
         pass
 
 #MISC FUNCTIONS KICKING AROUND FOR NOW
@@ -115,7 +118,7 @@ def load_json(filename):
         data = json.load(f)
     return data
 
-#tests
+##Tests - requires Horst_Example.json - need to distribute this in the Github
 if __name__ == '__main__':
 
     #example import from GUI
@@ -127,7 +130,7 @@ if __name__ == '__main__':
     c = 100*np.random.rand(4,2)
     offset=c[0,:]
     ls = b.kinematic_solver.cartesian_to_link_space(c,'loop') 
-    c_check = b.kinematic_solver.link_space_to_cartesian(offset,ls)
+    c_check = b.kinematic_solver.link_space_to_cartesian(offset,ls,'loop')
 
     origin = [0,0]
     point = [1,1]
