@@ -1,4 +1,6 @@
 #Library imports
+import os
+import csv
 from dijkstar import Graph, find_path
 import numpy as np
 import scipy as sp
@@ -10,7 +12,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 #Local imports
-from kinematic_solver import Kinematic_Solver
+from kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
 
 class Bike():
     def __init__(self,data):
@@ -19,7 +21,8 @@ class Bike():
         self.links = {}
         self.kinematic_loop_points = []
         self.end_eff_points = []
-        self.kinematic_solver = None
+        
+        self.kinematic_solver = None #Added later in add_kinematic_solver
 
         self.solution = {}
 
@@ -27,8 +30,16 @@ class Bike():
         self.parse_input_data(data)
         self.find_kinematic_loop()
         self.find_end_eff_points()
-        self.add_kinematic_solver()
 
+        #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
+        #linkage constraint eqns, however more solvers will likely need to be created for
+        #single pivots, and maybe a freudenstein eqn 4-bar solver could also be made
+        default_Solver = Kinematic_Solver_Scipy_Min(self.points,
+                                                    self.links,
+                                                    self.kinematic_loop_points,
+                                                    self.end_eff_points)
+        self.set_kinematic_solver(default_Solver)
+        
     ##Functions to process input data
     def parse_input_data(self,data):
         """
@@ -79,18 +90,11 @@ class Bike():
         """
         self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
 
-    ##Solver functions
-    def add_kinematic_solver(self):
+    def set_kinematic_solver(self,Solver):
         """
         Adds the kinematic solver which can be used to calculate suspension motion
-        Currently adds a solver that uses Scipy minimisation fcns to numerically solve
-        linkage constraint eqns, however more solvers will likely need to be created for
-        single pivots, and maybe a freudenstein eqn 4-bar solver could also be made
         """
-        self.kinematic_solver = Kinematic_Solver(self.points,
-                                                self.links,
-                                                self.kinematic_loop_points,
-                                                self.end_eff_points)
+        self.kinematic_solver = Solver
 
     def get_suspension_motion(self,travel,name):
         """
@@ -105,7 +109,15 @@ class Bike():
         """
         Not implemented yet - fcn to save solution data as a csv
         """
-        pass
+        filename = solution_name + '.csv'
+        with open(filename, 'w', newline ='') as f:
+            writer = csv.writer(f, delimiter=',',
+            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+            for point_name in self.solution[solution_name]:
+                writer.writerow([point_name+'_x',self.solution[solution_name][point_name].x])
+                writer.writerow([point_name+'_y',self.solution[solution_name][point_name].y])
+
+
 
 #MISC FUNCTIONS KICKING AROUND FOR NOW
 def kivy_to_bike(points,links,wheelbase_px,wheelbase_mm):
@@ -147,7 +159,8 @@ if __name__ == '__main__':
     y = b.solution['test']['Rear_Wheel'].y
     ax.plot(x, y)
     ax.set_title('Rear Axle Path')
-    plt.show()
+    #plt.show()
+    b.save_solution_csv('test')
     
 
 
