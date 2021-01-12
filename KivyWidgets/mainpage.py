@@ -80,7 +80,7 @@ class MainPage(FloatLayout):
     #Load methods
     def open_load_dialog(self):
         content = LoadDialog(load=self.load_bike_data, cancel=self.dismiss_popup)
-        self._popup = Popup(title="Load file", content=content,
+        self._popup = ThemePopup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
    
@@ -107,7 +107,7 @@ class MainPage(FloatLayout):
     #Save methods
     def open_save_dialog(self):
         content = SaveDialog(save = self.save_bike_data,cancel = self.dismiss_popup)
-        self._popup = Popup(title="Save file", content=content,
+        self._popup = ThemePopup(title="Save file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
     
@@ -144,8 +144,10 @@ class MainPage(FloatLayout):
     
     def open_point_dialog(self,touch):
         content = PointDialog(add=self.add_point,cancel = self.dismiss_popup,touch = touch)
-        self._popup = Popup(title="Add Point", content=content,
-                            size_hint=(0.6, 0.3))
+        self._popup = ThemePopup(title="Add Point", content=content,
+                            size_hint=(None,None),size = (400,150),
+                            pos_hint={  'x': touch.x / self.width, 
+                                        'y': touch.y / self.height}) 
         self._popup.open()
 
     def add_point(self,name,typ,pos):
@@ -205,4 +207,10 @@ class LoadDropDown(DropDown):
 
 class AddGeoDropDown(DropDown):
     mp = ObjectProperty(None) 
+
+class ThemePopup(Popup):
+    bg_color = ListProperty([0,0,0,1])
+    pass
+
+
 
