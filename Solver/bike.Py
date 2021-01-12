@@ -114,8 +114,8 @@ class Bike():
             writer = csv.writer(f, delimiter=',',
             quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for point_name in self.solution[solution_name]:
-                writer.writerow([point_name+'_x',self.solution[solution_name][point_name].x])
-                writer.writerow([point_name+'_y',self.solution[solution_name][point_name].y])
+                writer.writerow([point_name+'_x']+list(self.solution[solution_name][point_name].x))
+                writer.writerow([point_name+'_y']+list(self.solution[solution_name][point_name].y))
 
 
 
