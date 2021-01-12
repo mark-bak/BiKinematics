@@ -9,7 +9,7 @@ import json
 import matplotlib
 import matplotlib.pyplot as plt
 
-class Kinematic_Solver():
+class Kinematic_Solver_Scipy_Min():
     def __init__(self,points,links,kin_loop_points,end_eff_points):
         """
         Copy over relevant variables from Bike representation
@@ -179,24 +179,43 @@ class Kinematic_Solver():
         return solution
 
     def find_input_angle_range(self,travel,klp_off,klp_ss,eep_ss,eep_posn):
+        """
+        Takes desired simulation travel and solution space vectors, and returns a range of input angles from [th0,...,tht], where th0 is the starting angle
+        at zero suspension travel, and tht is the angle of the input link that gives the desired simulation travel. The number of angles in the 
+        range is currently hardcoded at 100, but I will change this at some point.
 
+        Currently no error checking for unachievable angles - needs implemented likely based off whether optimisation target < 1e-2 or something similar  
+        """
+
+        #Find rear wheel initial vertical position
         for name,point in self.points.items():
             if point.type == 'rear_wheel':
                 rear_wheel_name = name
                 rear_wheel_init_y = point.pos[1]
-        r_w_ind = self.end_eff_points.index(rear_wheel_name)+len(self.kinematic_loop_points)
+        r_w_ind = self.end_eff_points.index(rear_wheel_name) + len(self.kinematic_loop_points) #List index of rear wheel point coordinates
 
+        #Setup up solver to find angle that minimises error between desired y position (at specified travel), and y position of rear wheel
+        #found from linkage solver
         desired_y = rear_wheel_init_y+travel
-        
         th_in_0 = float(klp_ss[0])
-
-        res = sp.optimize.minimize(self.travel_find_eqn,th_in_0,[desired_y,r_w_ind,klp_off,klp_ss,eep_ss,eep_posn],method = 'Nelder-Mead',options={'disp':True})
+        res = sp.optimize.minimize(self.travel_find_eqn,
+                                   th_in_0,
+                                   [desired_y, r_w_ind,klp_off, klp_ss,eep_ss, eep_posn],
+                                   method = 'Nelder-Mead',
+                                   options={'disp':True})
         
+        #Create return vector from initial and final angles
         th_in_end = res.x
         input_angles = np.linspace(th_in_0,th_in_end,num=100) #Unhardcode this number at some point
         return input_angles
         
     def travel_find_eqn(self,x,args):
+        """
+        Solves the linkage equation with the input solution space vectors, and returns the (absolute!) error between the rear wheel y position and the desired.
+
+        Maybe need to look at the fcn input to make more clear, but last time it tried it didn't work so well with the sp.optimize.minimize this is passed to
+        """
+        #This is a bit ugly for now, maybe find a neater way to pass through the variables??
         desired_y = args[0]
         r_w_ind = args[1]
         klp_off = args[2]
@@ -204,9 +223,10 @@ class Kinematic_Solver():
         eep_ss = args[4]
         eep_posn = args[5]
 
-        klp_ss[0]=x
-        klp_sol = self.solve_kinematic_loop(klp_ss)
+        klp_ss[0]= x #The optimisation variable is the input angle of the linkage
+        klp_sol = self.solve_kinematic_loop(klp_ss) #Solve linkage with this angle
 
+        #Convert to cartesian and find error between desired and actual rear wheel y position
         sol_cartesian = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn)
         y = sol_cartesian[r_w_ind,1]
         err = np.abs(desired_y-y)
