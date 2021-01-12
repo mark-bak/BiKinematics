@@ -1,0 +1,23 @@
+{
+  "test": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      210.00000000000003,
+      449.0
+    ]
+  },
+  "test_test2": {
+    "object": "Link",
+    "a": "test",
+    "b": "test2"
+  },
+  "test2": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      140.99999999999997,
+      285.99999999999983
+    ]
+  }
+}
