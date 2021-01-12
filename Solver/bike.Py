@@ -134,7 +134,7 @@ def load_json(filename):
 if __name__ == '__main__':
 
     #example import from GUI
-    data = load_json("C:/Users/Mark/Documents/Programming/BiKinematics/SaveFiles/Horst_Example.json")
+    data = load_json("Horst_Example.json")
     b = Bike(data)
 
     #check cartesian and link space conversions
