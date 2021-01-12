@@ -1,33 +1,45 @@
 #:kivy 1.11.1 
+#:import Factory kivy.factory.Factory
+
+#: set dialog_button_height 30
 
 <PointDialog>:
     size: root.size
-    pos: root.pos
+    pos: self.touch.pos
     orientation: "vertical"
     BoxLayout:
+        size_hint_y: None
+        height: dialog_button_height
         orientation: 'horizontal'
         Label:
             text: 'Name'
         TextInput:
             id: point_name
     BoxLayout:
+        size_hint_y: None
+        height: dialog_button_height       
         orientation: 'horizontal'
         Label:
             text: 'Point Type'
-        Spinner:
+        DialogSpinner:
             id: point_typ
             text: 'ground'
             values: 'ground', 'joint', 'end_eff','rear_wheel','front_wheel'
     BoxLayout:
+        canvas.after:
+            Color:
+                rgba: Colour_1
+            Line:
+                points: [(self.x+self.width/2,self.y),(self.x+self.width/2,self.y+self.height)]
         size_hint_y: None
-        height: 30
-        Button:
+        height: dialog_button_height
+        DialogButton:
             text: "Cancel"
             on_release: root.cancel()
-
-        Button:
+        DialogButton:
             text: "Add"
             on_release: root.add(point_name.text,point_typ.text,root.touch.pos)
+
 
 <LoadDialog>:
     size: root.size
@@ -36,17 +48,22 @@
     FileChooserListView:
         id: filechooser
         path: root.get_dir()
-
+        color: Colour_1
     BoxLayout:
+        canvas.after:
+            Color:
+                rgba: Colour_1
+            Line:
+                points: [(self.x+self.width/2,self.y),(self.x+self.width/2,self.y+self.height)]
         size_hint_y: None
         height: 30
-        Button:
+        DialogButton:
             text: "Cancel"
             on_release: root.cancel()
-
-        Button:
+        DialogButton:
             text: "Load"
             on_release: root.load(filechooser.path, filechooser.selection)
+
 
 <SaveDialog>:
     size: root.size
@@ -62,11 +79,39 @@
         height: 30
         multiline: False
     BoxLayout:
+        canvas.after:
+            Color:
+                rgba: Colour_1
+            Line:
+                points: [(self.x+self.width/2,self.y),(self.x+self.width/2,self.y+self.height)]
         size_hint_y: None
         height: 30
-        Button:
+        DialogButton:
             text: "Cancel"
             on_release: root.cancel()
-        Button:
+        DialogButton:
             text: "Save"
             on_release: root.save(filename_input.text,filechooser.path)
+
+
+<DialogButton@Button>:
+    color: Colour_1
+    background_normal: ''
+    background_color: Colour_3
+    canvas.after:
+        Color:
+            rgba: Colour_1
+        Line:
+            points: [(self.x,self.y+self.height),(self.x+self.width,self.y+self.height)]
+
+<SpinnerOptions@SpinnerOption>:
+    color: Colour_1
+    background_normal: ''
+    background_color: Colour_3
+
+<DialogSpinner@Spinner>:
+    color: Colour_1
+    background_normal: ''
+    background_color: Colour_3
+    option_cls: Factory.SpinnerOptions
+

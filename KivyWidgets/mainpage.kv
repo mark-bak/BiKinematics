@@ -8,7 +8,7 @@
 #: set topbar_btn_width 150
 
 #: set Colour_1 rgba("#f7f2f5")
-#: set Colour_2 rgba("#9fa2b2")
+#: set Colour_2 rgba("#6e8e9e")
 #: set Colour_3 rgba("#3c7a89")
 #: set Colour_4 rgba("#2e4756")
 #: set Colour_5 rgba("#1b2f37")
@@ -165,26 +165,76 @@
         text: 'Load Geo Data'
         size_hint_y: None
         height: topbar_height
+        on_release:root.dismiss()
         on_release: root.mp.open_load_dialog()
     TopbarButton:
         text: 'Save Geo Data'
         size_hint_y: None
         height: topbar_height
+        on_release:root.dismiss()
         on_release: root.mp.open_save_dialog()
     TopbarButton:
         text: 'Load Image (wip)'
         size_hint_y: None
         height: topbar_height
-        on_release: 
+        on_release:root.dismiss()
 
 <AddGeoDropDown>:
     TopbarButton:
         text: 'Add Point'
         size_hint_y: None
         height: topbar_height
+        on_release:root.dismiss()
         on_release: root.mp.point_mode()
     TopbarButton:
         text: 'Add Link'
         size_hint_y: None
         height: topbar_height
+        on_release:root.dismiss()
         on_release: root.mp.link_mode()
+
+<-ThemePopup>:
+    title_color: Colour_1
+    bg_color: Colour_2
+    
+    #Mega hack I got from stackoverflow so that you cna change the bg colour....
+    _container: container
+    GridLayout:
+        padding: '12dp'
+        cols: 1
+        size_hint: None, None
+        pos: root.pos
+        size: root.size
+        Label:
+            canvas.before:
+                Color:
+                    rgba: root.bg_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+            text: root.title
+            color: root.title_color
+            size_hint_y: None
+            height: self.texture_size[1] + dp(16)
+            text_size: self.width - dp(16), None
+            font_size: root.title_size
+            font_name: root.title_font
+            halign: root.title_align
+
+        Widget:
+            size_hint_y: None
+            height: dp(4)
+            canvas.before:
+                Color:
+                    rgba: root.bg_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
+        BoxLayout:
+            canvas.before:
+                Color:
+                    rgba: root.bg_color
+                Rectangle:
+                    pos: self.pos
+                    size: self.size 
+            id: container

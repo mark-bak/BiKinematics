@@ -5,18 +5,20 @@
     size_hint: None,None
     size: lbl.size
     canvas.after:
+        # Color:
+        #     rgba: Colour_2
+        #     alpha: 0.5
+        # Rectangle:
+        #     size: self.size
+        #     pos: self.pos 
         Color:
-            rgba: 0,1,0,0.5
-        Rectangle:
-            size: self.size
-            pos: self.pos 
-        Color:
-            rgba: 1,0,0,1
+            rgba: Colour_1
         Ellipse:
             size: 5,5
             pos: self.pos[0]-2.5,self.pos[1]-2.5
     Label:
         id:lbl
+        color: 0,0,0,1
         text: root.name
         size: self.texture_size
 
