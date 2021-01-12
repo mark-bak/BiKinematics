@@ -11,6 +11,8 @@ from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
 from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
+from kivy.uix.dropdown import DropDown
+from kivy.uix.button import Button
 
 from Solver.bike import kivy_to_bike,Bike
 
@@ -57,6 +59,16 @@ class MainPage(FloatLayout):
         bike.solve_leverage_ratio(20)
         
         self.parent.manager.current = 'Plot' #lol what a mess this line is
+
+    def show_load_dropdown(self,wid):
+        dropdown = LoadDropDown()
+        dropdown.mp = self
+        dropdown.open(wid)
+
+    def show_add_geo_dropdown(self,wid):
+        dropdown = AddGeoDropDown()
+        dropdown.mp = self
+        dropdown.open(wid)
 
     #User input methods
     def on_touch_down(self,touch):
@@ -188,4 +200,9 @@ class MainPage(FloatLayout):
         self.remove_widget(link)
         self.mode = 'Main'
 
-    
+class LoadDropDown(DropDown):
+    mp = ObjectProperty(None)  
+
+class AddGeoDropDown(DropDown):
+    mp = ObjectProperty(None) 
+
