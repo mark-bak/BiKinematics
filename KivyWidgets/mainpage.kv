@@ -1,11 +1,40 @@
 #:kivy 1.11.1 
+#:import rgba kivy.utils.get_color_from_hex
 
 #general layout properties
 #: set sidebar_width 420
 #: set sidebar_coords_height 30
 #: set topbar_height 50
+#: set topbar_btn_width 150
+
+#: set Colour_1 rgba("#f7f2f5")
+#: set Colour_2 rgba("#9fa2b2")
+#: set Colour_3 rgba("#3c7a89")
+#: set Colour_4 rgba("#2e4756")
+#: set Colour_5 rgba("#1b2f37")
 
 <MainPage>:
+    canvas.before:
+        Color:
+            rgba: Colour_5
+        Rectangle:
+            pos: self.pos
+            size:self.size
+        Color:
+            rgba: Colour_3
+        Rectangle:
+            pos: (self.x,self.height-topbar_height)
+            size: (self.width,topbar_height)
+        Color:
+            rgba: Colour_4
+        Rectangle:
+            pos: (self.width-sidebar_width,0)
+            size: (sidebar_width,self.height-topbar_height)
+    canvas.after:
+        Color:
+            rgba: Colour_1
+        Line:
+            points: [(self.width-sidebar_width,0),(self.width-sidebar_width,self.height-topbar_height)]
     AnchorLayout:
         id: current_mode
         anchor_x: "left"
@@ -15,6 +44,7 @@
         Label:
             id: lbl
             text: root.mode + root.info
+            color: Colour_1
             size: self.texture_size  
             
     AnchorLayout:     
@@ -26,56 +56,51 @@
             width: sidebar_width
             size_hint_y: None
             height: root.height - topbar_height
+
             BoxLayout: #Sidebar button layout
                 id: points_list
                 orientation: "vertical"
-                size_hint_x: None
+                size_hint: (None,None)
                 width: sidebar_width
-                canvas.after:
+                height: self.minimum_height
+                canvas.before:
                     Color:
-                        rgba: 1,1,1,1
-                    Line:
-                        points: [(self.x,self.y),(self.x,self.y+self.height)]
-                #     Color:
-                #         rgba: 1,0,0,0.5
-                #     Rectangle:
-                #         size: self.size
-                #         pos: self.pos  
+                        rgba: Colour_4
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos  
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y:None
                     height: sidebar_coords_height
-                    Label:
+                    SidebarLabel:
                         text: "Point"
-                    Label:
+                    SidebarLabel:
                         text: "Type"
-                    Label:
+                    SidebarLabel:
                         text: "x_pos"
-                    Label:
+                    SidebarLabel:
                         text: "y_pos" 
 
             BoxLayout:
                 id: links_list
                 orientation: "vertical"
-                size_hint_x: None
+                size_hint: (None,None)
+                height: self.minimum_height
                 width: sidebar_width
-                canvas.after:
+                canvas.before:
                     Color:
-                        rgba: 1,1,1,1
-                    Line:
-                        points: [(self.x,self.y),(self.x,self.y+self.height)]
-                    # Color:
-                    #     rgba: 0,1,0,0.5
-                    # Rectangle:
-                    #     size: self.size
-                    #     pos: self.pos  
+                        rgba: Colour_4
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos  
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y:None
                     height: sidebar_coords_height
-                    Label:
+                    SidebarLabel:
                         text: "Link"
-                    Label:
+                    SidebarLabel:
                         text: "Length"
 
     AnchorLayout: #Top button anchor      
@@ -92,22 +117,13 @@
             #     Rectangle:
             #         size: self.size
             #         pos: self.pos
+            TopbarButton:
+                text: 'Load...'
+                on_release: root.show_load_dropdown(self)
+            TopbarButton:
+                text: 'Add Geo...'
+                on_release: root.show_add_geo_dropdown(self)
 
-            TopbarButton:
-                text: 'Load Geo Data'
-                on_release: root.open_load_dialog()
-            TopbarButton:
-                text: 'Save Geo Data'
-                on_release: root.open_save_dialog()
-            TopbarButton:
-                text: 'Load Image (wip)'
-                on_release: 
-            TopbarButton:
-                text: 'Add Point'
-                on_release: root.point_mode()
-            TopbarButton:
-                text: 'Add Link'
-                on_release: root.link_mode()
             TopbarButton:
                 text: 'Delete Point'
                 on_release: root.delete_point_mode()
@@ -120,5 +136,55 @@
             TopbarButton:
                 text: 'Plot'
                 on_release: root.goto_plot()
+            Label:
 
-<TopbarButton@Button>:    
+<TopbarButton@Button>:
+    color: Colour_1
+    background_normal: ''
+    background_color: Colour_3
+    size_hint_x: None
+    width: topbar_btn_width
+    canvas.after:
+        Color:
+            rgba: Colour_1
+        Line:
+            points: [(self.pos),(self.x,self.y+self.height)]
+        Line:
+            points: [(self.x+self.width,self.y),(self.x+self.width,self.y+self.height)]
+
+<SidebarLabel@Label>:
+    color: Colour_1
+    canvas.after:
+        Color:
+            rgba: Colour_1
+        Line:
+            points: [(self.pos),(self.x+self.width,self.y)]
+
+<LoadDropDown>:
+    TopbarButton:
+        text: 'Load Geo Data'
+        size_hint_y: None
+        height: topbar_height
+        on_release: root.mp.open_load_dialog()
+    TopbarButton:
+        text: 'Save Geo Data'
+        size_hint_y: None
+        height: topbar_height
+        on_release: root.mp.open_save_dialog()
+    TopbarButton:
+        text: 'Load Image (wip)'
+        size_hint_y: None
+        height: topbar_height
+        on_release: 
+
+<AddGeoDropDown>:
+    TopbarButton:
+        text: 'Add Point'
+        size_hint_y: None
+        height: topbar_height
+        on_release: root.mp.point_mode()
+    TopbarButton:
+        text: 'Add Link'
+        size_hint_y: None
+        height: topbar_height
+        on_release: root.mp.link_mode()
