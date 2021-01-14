@@ -123,16 +123,11 @@
             TopbarButton:
                 text: 'Add Geo...'
                 on_release: root.show_add_geo_dropdown(self)
+            TopbarButton:
+                text: 'Delete...'
+                on_release: root.show_delete_dropdown(self)
 
-            TopbarButton:
-                text: 'Delete Point'
-                on_release: root.delete_point_mode()
-            TopbarButton:
-                text: 'Delete Link'
-                on_release: root.delete_link_mode()
-            TopbarButton:
-                text: 'Clear All'
-                on_release: root.clear_all()
+
             TopbarButton:
                 text: 'Plot'
                 on_release: root.goto_plot()
@@ -192,6 +187,26 @@
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.link_mode()
+
+<DeleteDropDown>:
+    TopbarButton:
+        text: 'Delete Point'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.delete_point_mode()
+    TopbarButton:
+        text: 'Delete Link'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.delete_link_mode()
+    TopbarButton:
+        text: 'Clear All'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.clear_all()
 
 <-ThemePopup>:
     title_color: Colour_1

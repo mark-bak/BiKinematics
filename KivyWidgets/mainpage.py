@@ -54,21 +54,23 @@ class MainPage(FloatLayout):
                 self.delete_link(wid)
 
     def goto_plot(self):
-        bike_data = self.create_bike_data()
-        bike = Bike(bike_data)
-        bike.solve_leverage_ratio(20)
-        
+        #  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
 
-    def show_load_dropdown(self,wid):
+    def show_load_dropdown(self,parent):
         dropdown = LoadDropDown()
         dropdown.mp = self
-        dropdown.open(wid)
+        dropdown.open(parent)
 
-    def show_add_geo_dropdown(self,wid):
+    def show_add_geo_dropdown(self,parent):
         dropdown = AddGeoDropDown()
         dropdown.mp = self
-        dropdown.open(wid)
+        dropdown.open(parent)
+
+    def show_delete_dropdown(self,parent):
+        dropdown = DeleteDropDown()
+        dropdown.mp = self
+        dropdown.open(parent)
 
     #User input methods
     def on_touch_down(self,touch):
@@ -208,9 +210,11 @@ class LoadDropDown(DropDown):
 class AddGeoDropDown(DropDown):
     mp = ObjectProperty(None) 
 
+class DeleteDropDown(DropDown):
+    mp = ObjectProperty(None)
+
 class ThemePopup(Popup):
     bg_color = ListProperty([0,0,0,1])
-    pass
 
 
 
