@@ -46,7 +46,13 @@
             text: root.mode + root.info
             color: Colour_1
             size: self.texture_size  
-            
+    
+    FloatLayout:
+        pos: (0,current_mode.height)
+        id:image_frame
+        size_hint: (None,None)
+        size: (root.width-sidebar_width,root.height-topbar_height-current_mode.height)
+
     AnchorLayout:     
         anchor_x: "right"
         anchor_y: "bottom"
@@ -118,7 +124,7 @@
             #         size: self.size
             #         pos: self.pos
             TopbarButton:
-                text: 'Load...'
+                text: 'Load/Save...'
                 on_release: root.show_load_dropdown(self)
             TopbarButton:
                 text: 'Add Geo...'
@@ -173,6 +179,7 @@
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
+        on_release: root.mp.open_image_dialog()
 
 <AddGeoDropDown>:
     TopbarButton:
@@ -207,6 +214,7 @@
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.clear_all()
+
 
 <-ThemePopup>:
     title_color: Colour_1
