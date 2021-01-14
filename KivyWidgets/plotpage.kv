@@ -14,12 +14,12 @@
             height: topbar_height
             id: topbar
             orientation: "horizontal"
-            # canvas.after:
-            #     Color:
-            #         rgba: 0,0,1,0.5
-            #     Rectangle:
-            #         size: self.size
-            #         pos: self.pos
+            canvas.before:
+                Color:
+                    rgba: Colour_3
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
 
             TopbarButton:
                 text: 'Return'
