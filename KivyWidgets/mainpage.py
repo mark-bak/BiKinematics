@@ -13,6 +13,7 @@ from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
+from kivy.uix.image import Image
 
 from Solver.bike import kivy_to_bike,Bike
 
@@ -56,7 +57,8 @@ class MainPage(FloatLayout):
     def goto_plot(self):
         #  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
-
+    
+    #Top menu dropdown load functions
     def show_load_dropdown(self,parent):
         dropdown = LoadDropDown()
         dropdown.mp = self
@@ -133,6 +135,18 @@ class MainPage(FloatLayout):
                 properties={'object':'Link','a':w.a.name,'b':w.b.name}
                 data[w.name]= properties
         return data
+
+    def open_image_dialog(self):
+        content = LoadDialog(load=self.load_image, cancel=self.dismiss_popup)
+        self._popup = ThemePopup(title="Load file", content=content,
+                    size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load_image(self,path,selection):
+        filename = selection[0]
+        self.ids['image_frame'].add_widget(Image(source=filename,
+                                                 pos=self.ids['image_frame'].pos))
+        self.dismiss_popup()
 
     #Add point methods
     def point_mode(self):
