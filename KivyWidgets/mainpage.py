@@ -49,6 +49,9 @@ class MainPage(FloatLayout):
     mode = StringProperty('Main')
     info = StringProperty()
     link_points = ListProperty()
+
+    px_to_mm = NumericProperty(1)
+
     cur_width = NumericProperty(Window.width)
     cur_height = NumericProperty(Window.height)
     sidebar_width = NumericProperty()
@@ -67,14 +70,14 @@ class MainPage(FloatLayout):
             if isinstance(wid,Link):
                 self.delete_link(wid)
 
-    def on_window_resize(self, window, width, height):
+    def on_window_resize(self, window, width, height): #Resizes geo elements on window resize
         cur_imf_width = self.cur_width - self.sidebar_width 
         new_imf_width = width - self.sidebar_width
 
-        cur_imf_height = self.cur_height - self.topbar_height - self.info_text_height 
-        new_imf_height = height - self.topbar_height - self.info_text_height
+        cur_imf_height = self.cur_height - self.topbar_height 
+        new_imf_height = height - self.topbar_height
 
-        height_offset = self.info_text_height
+        height_offset = 0
 
         for w in self.walk():
             if isinstance(w,Point):
@@ -86,6 +89,29 @@ class MainPage(FloatLayout):
 
         self.cur_width = width
         self.cur_height = height
+
+        self.update_px_mm_conversion()
+
+    def update_px_mm_conversion(self):
+        fw = None
+        rw = None
+        for wid in self.children:
+            if isinstance(wid,Point):
+                if wid.point_type == 'front_wheel':
+                    fw = wid
+                if wid.point_type == 'rear_wheel':
+                    rw = wid
+        if fw != None and rw != None:
+            wbase_px = fw.x-rw.x
+            try:
+                wbase_mm = float(self.ids['params_list'].wheelbase)
+            except:
+                wbase_mm = 0
+            self.px_to_mm = wbase_mm / wbase_px
+        else:
+            self.px_to_mm = 1
+        
+        print(self.px_to_mm)
 
     def goto_plot(self):
         #  
@@ -219,12 +245,14 @@ class MainPage(FloatLayout):
         self.ids['points_list'].add_widget(new_point_data)
         self.dismiss_popup()
         self.info = ': point \'{}\' added'.format(new_point.name)
+        self.update_px_mm_conversion()
 
     def delete_point(self,point):
         self.ids['points_list'].remove_widget(point.point_data)
         self.remove_widget(point)
         self.info = ': point \'{}\' removed'.format(point.name)
         self.mode = 'Main'
+        self.update_px_mm_conversion()
 
     #Add link methods
     def link_mode(self):
@@ -250,7 +278,7 @@ class MainPage(FloatLayout):
     def add_link(self,a,b):
         #called on Add Link button press - see .kv
         new_link = Link(a = a, b = b)
-        new_link_data = LinkData(link = new_link)
+        new_link_data = LinkData(link = new_link,mp=self)
         new_link.link_data = new_link_data
 
         self.add_widget(new_link)

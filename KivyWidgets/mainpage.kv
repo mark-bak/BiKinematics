@@ -37,25 +37,34 @@
             points: [(self.width-sidebar_width,0),(self.width-sidebar_width,self.height-topbar_height)]
     AnchorLayout:
         id: current_mode
-        anchor_x: "left"
-        anchor_y: "bottom"
-        size_hint: None,None
-        size: lbl.size 
+        anchor_x: "right"
+        anchor_y: "top"
+        #size_hint: None,None
+        #size: lbl.size 
+    
         Label:
+            canvas.before:
+                Color:
+                    rgba: 1,0,0,0.5
+                Rectangle:
+                    size: self.size
+                    pos: self.pos
             id: lbl
             text: root.mode + root.info
             color: Colour_1
+            size_hint: None,None
             size: self.texture_size  
     
     FloatLayout:
         id:image_frame
-        pos: (0,current_mode.height)
+        pos: (0,0)
         size_hint: (None,None)
-        size: (root.width-sidebar_width,root.height-topbar_height-current_mode.height)
+        size: (root.width-sidebar_width,root.height-topbar_height)
 
     AnchorLayout:     
         anchor_x: "right"
         anchor_y: "bottom"
+
         BoxLayout:
             id: sidebar
             orientation: "vertical"
@@ -64,18 +73,50 @@
             size_hint_y: None
             height: root.height - topbar_height
 
+            BoxLayout:
+                id: params_list
+                orientation: "vertical"
+                size_hint: (None,None)
+                width: sidebar_width
+                height: self.minimum_height
+
+                wheelbase: wheelbase_value.text
+                on_wheelbase: root.update_px_mm_conversion()
+                # canvas.before:
+                #     Color:
+                #         rgba: Colour_4
+                #     Rectangle:
+                #         size: self.size
+                #         pos: self.pos 
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    SidebarLabel:
+                        text: "Parameter"
+                    SidebarLabel:
+                        text: "Value"
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: 'Wheelbase (mm)'
+                    TextInput:
+                        id: wheelbase_value
+
             BoxLayout: #Sidebar button layout
                 id: points_list
                 orientation: "vertical"
                 size_hint: (None,None)
                 width: sidebar_width
                 height: self.minimum_height
-                canvas.before:
-                    Color:
-                        rgba: Colour_4
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos  
+                # canvas.before:
+                #     Color:
+                #         rgba: Colour_4
+                #     Rectangle:
+                #         size: self.size
+                #         pos: self.pos  
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y:None
@@ -95,12 +136,12 @@
                 size_hint: (None,None)
                 height: self.minimum_height
                 width: sidebar_width
-                canvas.before:
-                    Color:
-                        rgba: Colour_4
-                    Rectangle:
-                        size: self.size
-                        pos: self.pos  
+                # canvas.before:
+                #     Color:
+                #         rgba: Colour_4
+                #     Rectangle:
+                #         size: self.size
+                #         pos: self.pos  
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y:None

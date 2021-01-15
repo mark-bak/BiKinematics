@@ -51,5 +51,6 @@ class LinkData(BoxLayout):
         super().__init__(**kwargs)
     
     #Properties
+    mp = ObjectProperty(None)
     len_txt = StringProperty()
     link = ObjectProperty(None)

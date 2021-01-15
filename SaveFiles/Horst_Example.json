@@ -24,62 +24,78 @@
     "a": "Seatstay",
     "b": "Rocker_Piv"
   },
-  "Seatstay_Shock_Pusher": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Shock_Pusher"
-  },
-  "Shock_Pusher_Rocker_Piv": {
-    "object": "Link",
-    "a": "Shock_Pusher",
-    "b": "Rocker_Piv"
-  },
-  "Seatstay": {
+  "Main_Piv": {
     "object": "Point",
-    "type": "joint",
+    "type": "ground",
     "position": [
-      631.0,
-      406.00000000000017
+      630.0,
+      302.00000000000006
+    ]
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1099.0,
+      303.0000000000001
     ]
   },
   "Rear_Wheel": {
     "object": "Point",
     "type": "rear_wheel",
     "position": [
-      379.0,
-      296.00000000000006
+      370.0,
+      283.0
     ]
   },
   "Horst": {
     "object": "Point",
     "type": "joint",
     "position": [
-      409.0,
-      288.99999999999994
+      406.0,
+      276.9999999999999
     ]
   },
-  "Main_Piv": {
+  "Shock_Frame": {
     "object": "Point",
-    "type": "ground",
+    "type": "shock_frame",
     "position": [
-      636.0,
-      319.0000000000001
+      746.0,
+      474.0
     ]
   },
-  "Shock_Pusher": {
-    "object": "Point",
-    "type": "end_eff",
-    "position": [
-      647.9999999999999,
-      405.00000000000006
-    ]
+  "Seatstay_Shock_Linkage": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Shock_Linkage"
   },
   "Rocker_Piv": {
     "object": "Point",
     "type": "ground",
     "position": [
-      625.9999999999998,
-      443.00000000000006
+      623.9999999999998,
+      434.00000000000006
+    ]
+  },
+  "Rocker_Piv_Shock_Linkage": {
+    "object": "Link",
+    "a": "Rocker_Piv",
+    "b": "Shock_Linkage"
+  },
+  "Shock_Linkage": {
+    "object": "Point",
+    "type": "shock_linkage",
+    "position": [
+      647.0,
+      395.9999999999999
+    ]
+  },
+  "Seatstay": {
+    "object": "Point",
+    "type": "joint",
+    "position": [
+      629.0,
+      393.0000000000001
     ]
   }
 }

@@ -25,7 +25,7 @@
     size_hint_y:None
     height: sidebar_coords_height
 
-    len_txt: str(round(self.link.length,2))
+    len_txt: str(round(self.link.length*self.mp.px_to_mm,2))
     Label:
         text: root.link.name
     TextInput:
