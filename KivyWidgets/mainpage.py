@@ -73,6 +73,11 @@ class MainPage(FloatLayout):
         dropdown = DeleteDropDown()
         dropdown.mp = self
         dropdown.open(parent)
+    
+    def show_anal_dropdown(self,parent):
+        dropdown = AnalDropDown()
+        dropdown.mp = self
+        dropdown.open(parent)
 
     #User input methods
     def on_touch_down(self,touch):
@@ -136,6 +141,7 @@ class MainPage(FloatLayout):
                 data[w.name]= properties
         return data
 
+    #Image methods
     def open_image_dialog(self):
         content = LoadDialog(load=self.load_image, cancel=self.dismiss_popup)
         self._popup = ThemePopup(title="Load file", content=content,
@@ -144,9 +150,14 @@ class MainPage(FloatLayout):
 
     def load_image(self,path,selection):
         filename = selection[0]
+        self.clear_image()
         self.ids['image_frame'].add_widget(Image(source=filename,
                                                  pos=self.ids['image_frame'].pos))
         self.dismiss_popup()
+
+    def clear_image(self):
+        for child in self.ids['image_frame'].children:
+            self.ids['image_frame'].remove_widget(child)
 
     #Add point methods
     def point_mode(self):
@@ -225,6 +236,9 @@ class AddGeoDropDown(DropDown):
     mp = ObjectProperty(None) 
 
 class DeleteDropDown(DropDown):
+    mp = ObjectProperty(None)
+
+class AnalDropDown(DropDown):
     mp = ObjectProperty(None)
 
 class ThemePopup(Popup):
