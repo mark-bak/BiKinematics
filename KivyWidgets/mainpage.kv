@@ -132,11 +132,9 @@
             TopbarButton:
                 text: 'Delete...'
                 on_release: root.show_delete_dropdown(self)
-
-
             TopbarButton:
-                text: 'Plot'
-                on_release: root.goto_plot()
+                text: 'Analysis...'
+                on_release: root.show_anal_dropdown(self)
             Label:
 
 <TopbarButton@Button>:
@@ -169,17 +167,18 @@
         on_release:root.dismiss()
         on_release: root.mp.open_load_dialog()
     TopbarButton:
+        text: 'Load Image'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.open_image_dialog()
+    TopbarButton:
         text: 'Save Geo Data'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.open_save_dialog()
-    TopbarButton:
-        text: 'Load Image (wip)'
-        size_hint_y: None
-        height: topbar_height
-        on_release:root.dismiss()
-        on_release: root.mp.open_image_dialog()
+
 
 <AddGeoDropDown>:
     TopbarButton:
@@ -209,12 +208,31 @@
         on_release:root.dismiss()
         on_release: root.mp.delete_link_mode()
     TopbarButton:
-        text: 'Clear All'
+        text: 'Clear All Geo'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.clear_all()
 
+    TopbarButton:
+        text: 'Clear Image'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.clear_image()
+
+<AnalDropDown>:
+    TopbarButton:
+        text: 'Simulate'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+    TopbarButton:
+        text: 'Plot'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()  
+        on_release: root.mp.goto_plot()
 
 <-ThemePopup>:
     title_color: Colour_1

@@ -19,7 +19,6 @@ class BiKinematicsApp(App):
         screen = Screen(name = "Main")
         screen.add_widget(self.main_page)
         self.sm.add_widget(screen)
- 
         screen = Screen(name = "Plot")
         screen.add_widget(self.plot_page)
         self.sm.add_widget(screen)
