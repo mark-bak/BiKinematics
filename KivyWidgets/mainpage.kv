@@ -48,8 +48,8 @@
             size: self.texture_size  
     
     FloatLayout:
-        pos: (0,current_mode.height)
         id:image_frame
+        pos: (0,current_mode.height)
         size_hint: (None,None)
         size: (root.width-sidebar_width,root.height-topbar_height-current_mode.height)
 
@@ -57,6 +57,7 @@
         anchor_x: "right"
         anchor_y: "bottom"
         BoxLayout:
+            id: sidebar
             orientation: "vertical"
             size_hint_x: None
             width: sidebar_width

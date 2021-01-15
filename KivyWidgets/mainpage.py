@@ -13,7 +13,7 @@ from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
-from kivy.uix.image import Image
+
 
 from Solver.bike import kivy_to_bike,Bike
 
@@ -21,26 +21,39 @@ from Solver.bike import kivy_to_bike,Bike
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.popup import Popup
+from kivy.uix.image import Image
 
 #Kivy Properties
 #pylint: disable=no-name-in-module
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.properties import ListProperty
+from kivy.properties import NumericProperty
 
 #Kivy Language Tools
 from kivy.lang.builder import Builder
+from kivy.core.window import Window
 
 Builder.load_file("KivyWidgets/mainpage.kv")
 
 class MainPage(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        #Window.maximize()
+        Window.bind(on_resize=self.on_window_resize)
+        self.sidebar_width = self.ids['sidebar'].width
+        self.topbar_height = self.ids['topbar'].height
+        self.info_text_height = self.ids['current_mode'].height
 
     #Kivy properties
     mode = StringProperty('Main')
     info = StringProperty()
     link_points = ListProperty()
+    cur_width = NumericProperty(Window.width)
+    cur_height = NumericProperty(Window.height)
+    sidebar_width = NumericProperty()
+    topbar_height = NumericProperty()
+    info_text_height = NumericProperty()
 
     #General methods
     def dismiss_popup(self):
@@ -53,6 +66,26 @@ class MainPage(FloatLayout):
                 self.delete_point(wid)
             if isinstance(wid,Link):
                 self.delete_link(wid)
+
+    def on_window_resize(self, window, width, height):
+        cur_imf_width = self.cur_width - self.sidebar_width 
+        new_imf_width = width - self.sidebar_width
+
+        cur_imf_height = self.cur_height - self.topbar_height - self.info_text_height 
+        new_imf_height = height - self.topbar_height - self.info_text_height
+
+        height_offset = self.info_text_height
+
+        for w in self.walk():
+            if isinstance(w,Point):
+                w.scale_with_window(cur_imf_width,
+                                    new_imf_width,
+                                    cur_imf_height,
+                                    new_imf_height,
+                                    height_offset,)
+
+        self.cur_width = width
+        self.cur_height = height
 
     def goto_plot(self):
         #  
