@@ -12,6 +12,8 @@ from kivy.uix.scatter import Scatter
 #pylint: disable=no-name-in-module
 from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
+from kivy.properties import NumericProperty
+from kivy.properties import ReferenceListProperty
 
 #Kivy Language Tools
 from kivy.lang.builder import Builder
@@ -35,6 +37,12 @@ class Point(Scatter):
             if self.parent.mode =='Del_Point':
                 self.parent.delete_point(self)
         return super(Point,self).on_touch_down(touch) #do standard scatter touch behaviour
+
+    def scale_with_window(self,cur_width,new_width,cur_height,new_height,height_offset):
+        scale_x = new_width/cur_width
+        scale_y = new_height/cur_height
+        self.x = self.x * scale_x
+        self.y = height_offset + (self.y-height_offset) * scale_y
 
 class PointData(BoxLayout):
     ##Coordinate box - layout in .kv file
