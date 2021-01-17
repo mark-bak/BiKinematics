@@ -122,23 +122,19 @@ class MainPage(FloatLayout):
     #Top menu dropdown load functions - can probably condense this into
     #one function but had trouble with calling desired dropdown class from .kv file
     def show_load_dropdown(self,parent):
-        dropdown = LoadDropDown()
-        dropdown.mp = self
+        dropdown = LoadDropDown(mp=self)
         dropdown.open(parent)
 
     def show_add_geo_dropdown(self,parent):
-        dropdown = AddGeoDropDown()
-        dropdown.mp = self
+        dropdown = AddGeoDropDown(mp=self)
         dropdown.open(parent)
 
     def show_delete_dropdown(self,parent):
-        dropdown = DeleteDropDown()
-        dropdown.mp = self
+        dropdown = DeleteDropDown(mp=self)
         dropdown.open(parent)
     
     def show_anal_dropdown(self,parent):
-        dropdown = AnalDropDown()
-        dropdown.mp = self
+        dropdown = AnalDropDown(mp=self)
         dropdown.open(parent)
 
     #User input methods
@@ -326,6 +322,9 @@ class AnalDropDown(DropDown):
 #Custom popup hacky thing - see .kv
 class ThemePopup(Popup):
     bg_color = ListProperty([0,0,0,1])
+
+class TopbarButton(Button):
+    pass
 
 
 

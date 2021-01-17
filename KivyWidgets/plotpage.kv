@@ -25,8 +25,35 @@
                 text: 'Return'
                 on_release: app.sm.current = 'Main'
             TopbarButton:
-                text: root.results_file
+                width: topbar_btn_width * 1.5
+                text: root.results_filename
                 on_release: root.open_results_dialog()
+            BoxLayout:
+                size_hint_x: None
+                width: pl.width
+                pos: self.pos
+                orientation: 'vertical'
+                PlotLabel:
+                    id: pl
+                    text: 'x data:'
+                TopbarButton:
+                    background_color: Colour_2
+                    text: root.x_data_name
+                    on_release: root.show_data_dropdown(self,'x')
+            BoxLayout:
+                size_hint_x: None
+                width: pl.width
+                width: self.minimum_width
+                orientation: 'vertical'
+                PlotLabel:
+                    text: 'y data:'
+                TopbarButton:
+                    background_color: Colour_2
+                    text: root.y_data_name
+                    on_release: root.show_data_dropdown(self,'y')
+            TopbarButton:
+                text: 'Plot_Results'
+                on_release: root.plot()
 
 
     BoxLayout:
@@ -34,4 +61,18 @@
         size_hint_y: None
         height: root.height-topbar_height
 
+<PlotLabel@Label>:
+    color: Colour_1
+    background_normal: ''
+    background_color: Colour_3
+    size_hint_x: None
+    width: topbar_btn_width
+    canvas.after:
+        Color:
+            rgba: Colour_1
+        Line:
+            points: [(self.pos),(self.x,self.y+self.height)]
+        Line:
+            points: [(self.x+self.width,self.y),(self.x+self.width,self.y+self.height)]
 
+<DataDropDown>:
