@@ -8,13 +8,14 @@ from scipy.optimize import minimize
 import math
 from collections import namedtuple
 import json
-import matplotlib
-import matplotlib.pyplot as plt
 
  
 #Local imports
 # pylint: disable = import-error
 if __name__ == '__main__':
+    import matplotlib
+    import matplotlib.pyplot as plt
+
     from kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
 else:
     from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
@@ -170,7 +171,7 @@ if __name__ == '__main__':
     y = b.solution['test']['Rear_Wheel'].y
     ax.plot(x, y)
     ax.set_title('Rear Axle Path')
-    #plt.show()
+    plt.show()
     b.save_solution_csv('test','test_file')
     
 
