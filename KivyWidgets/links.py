@@ -16,7 +16,7 @@ from kivy.properties import StringProperty
 #Kivy Language Tools
 from kivy.lang.builder import Builder
 
-Builder.load_file("KivyWidgets/links.kv")
+Builder.load_file("KivyWidgets\\links.kv")
 
 class Link(Widget):
     def __init__(self,**kwargs):

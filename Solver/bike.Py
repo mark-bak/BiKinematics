@@ -26,6 +26,7 @@ class Bike():
         self.links = {}
         self.kinematic_loop_points = []
         self.end_eff_points = []
+        self.ground_points = []
         
         self.kinematic_solver = None #Added later in set_kinematic_solver
 
@@ -34,6 +35,7 @@ class Bike():
         #Initialise internal variables
         self.parse_input_data(data)
         self.find_kinematic_loop()
+        self.find_ground_points()
         self.find_end_eff_points()
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
@@ -89,11 +91,14 @@ class Bike():
         self.kinematic_loop_points = path.nodes
         return path
 
+    def find_ground_points(self):
+        self.ground_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "shock_frame"]
+
     def find_end_eff_points(self):
         """
         Populates the list of point names (str) not on the 'kinematic loop' in self.end_eff_points[]
         """
-        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points]
+        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points and not name in self.ground_points]
 
     def set_kinematic_solver(self,Solver):
         """
@@ -118,7 +123,7 @@ class Bike():
         ind = filename.find('.')
         if ind != -1:
             filename = filename[0:ind]
-        filename = filename+'.csv'
+        filename = "Results\\{}.csv".format(filename)
 
         #Save data
         with open(filename, 'w', newline ='') as f:
@@ -129,22 +134,18 @@ class Bike():
                 writer.writerow([point_name+'_y']+list(self.solution[solution_name][point_name].y))
 
 
-#MISC FUNCTIONS KICKING AROUND FOR NOW
-def kivy_to_bike(points,links,wheelbase_px,wheelbase_mm):
-    scale = wheelbase_mm/wheelbase_px
-    for p in points:
-        p['pos'] = [c*scale for c in p['pos'] ]
 
+
+##Tests - requires Horst_Example.json - need to distribute this in the Github
 def load_json(filename):
     with open(filename) as f:
         data = json.load(f)
     return data
 
-##Tests - requires Horst_Example.json - need to distribute this in the Github
 if __name__ == '__main__':
 
     #example import from GUI
-    data = load_json("Horst_Example.json")
+    data = load_json("VitusSommetGeo.json")
     b = Bike(data)
 
     #check cartesian and link space conversions

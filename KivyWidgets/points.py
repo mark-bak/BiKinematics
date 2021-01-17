@@ -18,7 +18,7 @@ from kivy.properties import ReferenceListProperty
 #Kivy Language Tools
 from kivy.lang.builder import Builder
 
-Builder.load_file("KivyWidgets/points.kv")
+Builder.load_file("KivyWidgets\\points.kv")
 
 class Point(Scatter):
     ##Draggable point of bike geo
