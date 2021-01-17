@@ -9,6 +9,7 @@ import math
 from collections import namedtuple
 import json
 
+
  
 #Local imports
 # pylint: disable = import-error
@@ -16,9 +17,9 @@ if __name__ == '__main__':
     import matplotlib
     import matplotlib.pyplot as plt
 
-    from kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
+    from kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
 else:
-    from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
+    from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
 
 class Bike():
     def __init__(self,data):
@@ -27,7 +28,7 @@ class Bike():
         self.links = {}
         self.kinematic_loop_points = []
         self.end_eff_points = []
-        self.ground_points = []
+        self.static_points = []
         
         self.kinematic_solver = None #Added later in set_kinematic_solver
 
@@ -47,6 +48,7 @@ class Bike():
                                                     self.kinematic_loop_points,
                                                     self.end_eff_points)
         self.set_kinematic_solver(default_Solver)
+
         
     ##Functions to process input data
     def parse_input_data(self,data):
@@ -93,13 +95,13 @@ class Bike():
         return path
 
     def find_ground_points(self):
-        self.ground_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "shock_frame"]
+        self.static_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "shock_frame"]
 
     def find_end_eff_points(self):
         """
         Populates the list of point names (str) not on the 'kinematic loop' in self.end_eff_points[]
         """
-        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points and not name in self.ground_points]
+        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points and not name in self.static_points]
 
     def set_kinematic_solver(self,Solver):
         """
@@ -114,6 +116,41 @@ class Bike():
         """
         sol = self.kinematic_solver.solve_suspension_motion(travel)
         self.solution[name] = sol
+
+    def calculate_suspension_characteristics(self,sol_name):
+        
+        
+        #Static Points
+        for point_name in self.static_points: 
+            x = np.ones(np.size(list(self.solution[sol_name].values())[0].x)) * self.points[point_name].pos[0]
+            y = np.ones(np.size(list(self.solution[sol_name].values())[0].y)) * self.points[point_name].pos[1]
+            self.solution[sol_name][point_name] = Pos_Result(x,y)
+
+        #Travels and leverage ratio
+        for name in self.points:
+            if self.points[name].type == 'rear_wheel':
+                rw_name = name 
+            if self.points[name].type == 'shock_linkage':
+                sl_name = name
+            if self.points[name].type == 'shock_frame':
+                sf_name = name
+        
+        Vertical_Travel = self.solution[sol_name][rw_name].y - np.ones(np.size(self.solution[sol_name][rw_name].y)) * self.solution[sol_name][rw_name].y[0]
+        shock_delta_x = np.subtract(self.solution[sol_name][sl_name].x, self.solution[sol_name][sf_name].x)
+        shock_delta_y = np.subtract(self.solution[sol_name][sl_name].y, self.solution[sol_name][sf_name].y)
+        Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0)
+        Shock_Length = np.abs(Shock_Length - np.ones(np.size(Shock_Length)) * Shock_Length[0])
+
+        delta_shock_length = np.diff(Shock_Length)
+        delta_vertical_travel = np.diff(Vertical_Travel)
+
+               
+        Leverage_Ratio = np.divide(delta_vertical_travel, delta_shock_length)
+        Leverage_Ratio = np.hstack([Leverage_Ratio,Leverage_Ratio[-1]]) 
+        
+        self.solution[sol_name]['Vertical_Travel'] = Vertical_Travel
+        self.solution[sol_name]['Shock_length'] = Shock_Length
+        self.solution[sol_name]['LeverageRatio'] = Leverage_Ratio
 
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):
@@ -131,8 +168,12 @@ class Bike():
             writer = csv.writer(f, delimiter=',',
             quotechar='|', quoting=csv.QUOTE_MINIMAL)
             for point_name in self.solution[solution_name]:
-                writer.writerow([point_name+'_x']+list(self.solution[solution_name][point_name].x))
-                writer.writerow([point_name+'_y']+list(self.solution[solution_name][point_name].y))
+                if isinstance(self.solution[solution_name][point_name],Pos_Result):
+                    writer.writerow([point_name+'_x']+list(self.solution[solution_name][point_name].x))
+                    writer.writerow([point_name+'_y']+list(self.solution[solution_name][point_name].y))
+                else:
+                    writer.writerow([point_name]+list(self.solution[solution_name][point_name]))
+                    pass
 
 
 
@@ -166,12 +207,13 @@ if __name__ == '__main__':
 
     #plot example rear axle path
     b.get_suspension_motion(100,'test')
+    b.calculate_suspension_characteristics('test')
     fig, ax = plt.subplots()
     x = b.solution['test']['Rear_Wheel'].x
     y = b.solution['test']['Rear_Wheel'].y
     ax.plot(x, y)
     ax.set_title('Rear Axle Path')
-    plt.show()
+    #plt.show()
     b.save_solution_csv('test','test_file')
     
 

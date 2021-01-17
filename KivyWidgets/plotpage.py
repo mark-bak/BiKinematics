@@ -24,9 +24,6 @@ import matplotlib
 import matplotlib.pyplot as plt
 from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
-
-
-
 Builder.load_file("KivyWidgets/plotpage.kv")
 
 class PlotPage(FloatLayout): 
@@ -86,11 +83,12 @@ class PlotPage(FloatLayout):
             self.y_data_name = selection
             self.y_plot_data = self.results[selection]
 
-
     def plot(self):
         try:
             self.ax.clear()
             self.ax.plot(self.x_plot_data, self.y_plot_data)
+            self.ax.set_xlabel(self.x_data_name)
+            self.ax.set_ylabel(self.y_data_name) 
             self.fig.canvas.draw()
             self.ax.autoscale()
         except:
