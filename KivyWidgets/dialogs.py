@@ -17,13 +17,13 @@ class LoadDialog(BoxLayout):
     load = ObjectProperty(None)
     cancel = ObjectProperty(None)
     def get_dir(self):
-        return os.getcwd()+'/SaveFiles'
+        return os.getcwd()+'\\SaveFiles'
 
 class SaveDialog(BoxLayout):
     save = ObjectProperty(None)
     cancel = ObjectProperty(None)
     def get_dir(self):
-        return os.getcwd()+'/SaveFiles'
+        return os.getcwd()+'\\SaveFiles'
 
 class PointDialog(BoxLayout):
     add = ObjectProperty(None)

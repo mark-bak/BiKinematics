@@ -71,7 +71,7 @@
     orientation: "vertical"
     FileChooserListView:
         id: filechooser
-        on_selection: filename_input.text = self.selection and self.selection[0] or ''
+        on_selection: filename_input.text = self.selection[-1]
         path: root.get_dir()
     TextInput:
         id: filename_input
