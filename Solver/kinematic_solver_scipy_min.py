@@ -7,6 +7,7 @@ import math
 from collections import namedtuple
 import json
 
+Pos_Result = namedtuple('Pos_Result',['x','y'])
 
 class Kinematic_Solver_Scipy_Min():
     def __init__(self,points,links,kin_loop_points,end_eff_points):
@@ -17,6 +18,8 @@ class Kinematic_Solver_Scipy_Min():
         self.links = links
         self.kinematic_loop_points = kin_loop_points
         self.end_eff_points = end_eff_points
+
+        self.kinematic_links =[]
 
     def get_solution_space_vectors(self):
         """
@@ -59,6 +62,7 @@ class Kinematic_Solver_Scipy_Min():
             attach_point_index = self.find_end_eff_attach_point(self.end_eff_points[end_eff_index])
             #Find offset from attach point to end effector
             Th,L = self.cartesian_to_link_space([klp[attach_point_index],eep[end_eff_index]])
+            Th = klp_ss[attach_point_index] - Th
 
             #Store in expected format
             eep_posn.append(attach_point_index)
@@ -72,11 +76,14 @@ class Kinematic_Solver_Scipy_Min():
         Returns index of linkage point attachment (via link) for given end_eff point. If end effector is attached to multiple linkage points,
         this will return the first it comes across. Needs error checking written if no attachment at all.
         """
-        for link in self.links.values():
+        possible_links = []
+        for link in self.links.values():   
             if link.a.name == end_eff_point:
-                return self.kinematic_loop_points.index(link.b.name)
+                possible_links.append(self.kinematic_loop_points.index(link.b.name))
             if link.b.name == end_eff_point:
-                return self.kinematic_loop_points.index(link.a.name)
+                possible_links.append(self.kinematic_loop_points.index(link.a.name))
+        
+        return min(possible_links)
 
     def solve_kinematic_loop(self,loop_ls):
         """
@@ -117,7 +124,7 @@ class Kinematic_Solver_Scipy_Min():
         eep_v = np.zeros((mid,2)) #Reshape (2n x 1)-> (n x 2)
         for i in range(mid): #Loop through ee generalised coords and get position in cartesian space
             pos = self.link_space_to_cartesian(klp_v[eep_posn[i],:], #Offset is attach point
-                                               np.vstack([eep_ss[i],eep_ss[mid+i]])) #Gets representation in form [th(n),L(n)]
+                                               np.vstack([klp_sol[eep_posn[i]]-eep_ss[i],eep_ss[mid+i]])) #Gets representation in form [th(n),L(n)]
             eep_v[i,:]=pos[1] #Don't need attachemnt coords, only end effector coords
 
         #Return expected format
@@ -170,7 +177,6 @@ class Kinematic_Solver_Scipy_Min():
 
         #Convert data to solution format
         points_list = self.kinematic_loop_points + self.end_eff_points
-        Pos_Result = namedtuple('Pos_Result',['x','y'])
         solution = {}
         for i in range(point_results.shape[0]):
             name = points_list[i]

@@ -302,6 +302,7 @@ class MainPage(FloatLayout):
         b = Bike(sim_data)
         sol_name = 'Single_Sim'
         b.get_suspension_motion(desired_travel,sol_name)
+        b.calculate_suspension_characteristics(sol_name)
         b.save_solution_csv(sol_name,filename)
         self.dismiss_popup()
         self.info = ': Simulation: {} complete'.format(filename)
