@@ -9,13 +9,15 @@ from KivyWidgets.links import LinkData
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
+from KivyWidgets.dialogs import SimulateDialog
 from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
+from Solver.bike import Bike
 
 
-from Solver.bike import kivy_to_bike,Bike
+from Solver.bike import Bike
 
 #Kivy Layouts
 from kivy.uix.boxlayout import BoxLayout
@@ -117,7 +119,8 @@ class MainPage(FloatLayout):
         #  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
     
-    #Top menu dropdown load functions
+    #Top menu dropdown load functions - can probably condense this into
+    #one function but had trouble with calling desired dropdown class from .kv file
     def show_load_dropdown(self,parent):
         dropdown = LoadDropDown()
         dropdown.mp = self
@@ -147,7 +150,7 @@ class MainPage(FloatLayout):
 
     #Load methods
     def open_load_dialog(self):
-        content = LoadDialog(load=self.load_bike_data, cancel=self.dismiss_popup)
+        content = LoadDialog(load=self.load_bike_data, cancel=self.dismiss_popup,directory = "\\SaveFiles")
         self._popup = ThemePopup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
@@ -184,17 +187,17 @@ class MainPage(FloatLayout):
         ind = filename.find('.') #remove file extension
         if ind != -1:
             filename = filename[0:ind]
-        filename = "SaveFiles\\" + filename + '.json' #put in SaveFiles folder with .json ext
-        save_data = self.create_bike_data()
+        filename = "{}\\{}.json".format(path,filename) #put in path with .json ext
+        save_data = self.create_bike_data(sf=1)
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
         self.dismiss_popup()
 
-    def create_bike_data(self):
+    def create_bike_data(self,sf):
         data = {}
         for w in self.walk():
             if isinstance(w,Point):
-                properties={'object':'Point','type':w.point_type,'position':w.pos}
+                properties={'object':'Point','type':w.point_type,'position':tuple([w.x*sf,w.y*sf])}
                 data[w.name]= properties
             if isinstance(w,Link):
                 properties={'object':'Link','a':w.a.name,'b':w.b.name}
@@ -203,13 +206,13 @@ class MainPage(FloatLayout):
 
     #Image methods
     def open_image_dialog(self):
-        content = LoadDialog(load=self.load_image, cancel=self.dismiss_popup)
+        content = LoadDialog(load=self.load_image, cancel=self.dismiss_popup,directory = "\\ImageFiles")
         self._popup = ThemePopup(title="Load file", content=content,
                     size_hint=(0.9, 0.9))
         self._popup.open()
 
     def load_image(self,path,selection):
-        filename = selection[0]
+        filename = selection[-1]
         self.clear_image()
         self.ids['image_frame'].add_widget(Image(source=filename,
                                                  pos=self.ids['image_frame'].pos))
@@ -277,7 +280,6 @@ class MainPage(FloatLayout):
             self.mode = 'Main'
 
     def add_link(self,a,b):
-        #called on Add Link button press - see .kv
         new_link = Link(a = a, b = b)
         new_link_data = LinkData(link = new_link,mp=self)
         new_link.link_data = new_link_data
@@ -291,6 +293,24 @@ class MainPage(FloatLayout):
         self.remove_widget(link)
         self.mode = 'Main'
 
+    #Simulate methods
+    def open_sim_dialog(self):
+        content = SimulateDialog(simulate=self.simulate,cancel = self.dismiss_popup)
+        self._popup = ThemePopup(title="Simulate", content=content,
+                            size_hint=(None,None),size = (400,150)) 
+        self._popup.open()
+
+    def simulate(self,filename,desired_travel):
+        desired_travel = float(desired_travel)
+        sim_data = self.create_bike_data(sf = self.px_to_mm)
+        b = Bike(sim_data)
+        sol_name = 'Single_Sim'
+        b.get_suspension_motion(desired_travel,sol_name)
+        b.save_solution_csv(sol_name,filename)
+        self.dismiss_popup()
+        self.info = ': Simulation: {} complete'.format(filename)
+
+#Dropdown style classes - see.kv for formatting
 class LoadDropDown(DropDown):
     mp = ObjectProperty(None)  
 
@@ -303,6 +323,7 @@ class DeleteDropDown(DropDown):
 class AnalDropDown(DropDown):
     mp = ObjectProperty(None)
 
+#Custom popup hacky thing - see .kv
 class ThemePopup(Popup):
     bg_color = ListProperty([0,0,0,1])
 

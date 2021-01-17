@@ -241,26 +241,26 @@
         text: 'Delete Point'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()
+        on_release: root.dismiss()
         on_release: root.mp.delete_point_mode()
     TopbarButton:
         text: 'Delete Link'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()
+        on_release: root.dismiss()
         on_release: root.mp.delete_link_mode()
     TopbarButton:
         text: 'Clear All Geo'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()
+        on_release: root.dismiss()
         on_release: root.mp.clear_all()
 
     TopbarButton:
         text: 'Clear Image'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()
+        on_release: root.dismiss()
         on_release: root.mp.clear_image()
 
 <AnalDropDown>:
@@ -268,19 +268,20 @@
         text: 'Simulate'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()
+        on_release: root.dismiss()
+        on_release: root.mp.open_sim_dialog()
     TopbarButton:
         text: 'Plot'
         size_hint_y: None
         height: topbar_height
-        on_release:root.dismiss()  
+        on_release: root.dismiss()  
         on_release: root.mp.goto_plot()
 
 <-ThemePopup>:
     title_color: Colour_1
     bg_color: Colour_2
     
-    #Mega hack I got from stackoverflow so that you cna change the bg colour....
+    #Mega hack I got from stackoverflow so that you can change the bg colour....
     _container: container
     GridLayout:
         padding: '12dp'

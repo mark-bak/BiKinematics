@@ -93,6 +93,42 @@
             text: "Save"
             on_release: root.save(filename_input.text,filechooser.path)
 
+<SimulateDialog>:
+    size: root.size
+    pos: root.pos
+    orientation: "vertical"
+    BoxLayout:
+        size_hint_y: None
+        height: dialog_button_height
+        orientation: 'horizontal'
+        Label:
+            text: 'Filename'
+        TextInput:
+            id: sim_filename
+    BoxLayout:
+        size_hint_y: None
+        height: dialog_button_height       
+        orientation: 'horizontal'
+        Label:
+            text: 'Simulation Travel (mm)'
+        TextInput:
+            id: desired_travel
+            
+    BoxLayout:
+        canvas.after:
+            Color:
+                rgba: Colour_1
+            Line:
+                points: [(self.x+self.width/2,self.y),(self.x+self.width/2,self.y+self.height)]
+        size_hint_y: None
+        height: dialog_button_height
+        DialogButton:
+            text: "Cancel"
+            on_release: root.cancel()
+        DialogButton:
+            text: "Simulate"
+            on_release: root.simulate(sim_filename.text,desired_travel.text)
+
 
 <DialogButton@Button>:
     color: Colour_1
