@@ -34,7 +34,7 @@ from kivy.properties import NumericProperty
 from kivy.lang.builder import Builder
 from kivy.core.window import Window
 
-Builder.load_file("KivyWidgets/mainpage.kv")
+Builder.load_file("KivyWidgets\\mainpage.kv")
 
 class MainPage(FloatLayout):
     def __init__(self,**kwargs):
@@ -159,7 +159,7 @@ class MainPage(FloatLayout):
             for key in data:
                 if data[key]['object']=="Point":
                     self.add_point(key,data[key]['type'],data[key]['position'])
-            for key in data: # needs new loop as all points must be created before links
+            for key in data: #needs new loop as all points must be created before links
                 if data[key]['object']=="Link":
                     a_ref = data[key]['a']
                     b_ref = data[key]['b']
@@ -180,10 +180,11 @@ class MainPage(FloatLayout):
         self._popup.open()
     
     def save_bike_data(self,filename,path):
-        ind = filename.find('.')
+        filename = filename.replace(path+"\\","") #remove path from filename
+        ind = filename.find('.') #remove file extension
         if ind != -1:
             filename = filename[0:ind]
-        filename = filename+'.json'
+        filename = "SaveFiles\\" + filename + '.json' #put in SaveFiles folder with .json ext
         save_data = self.create_bike_data()
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
