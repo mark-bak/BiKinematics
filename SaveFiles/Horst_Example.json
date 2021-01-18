@@ -1,29 +1,4 @@
 {
-  "Horst_Main_Piv": {
-    "object": "Link",
-    "a": "Horst",
-    "b": "Main_Piv"
-  },
-  "Horst_Seatstay": {
-    "object": "Link",
-    "a": "Horst",
-    "b": "Seatstay"
-  },
-  "Horst_Rear_Wheel": {
-    "object": "Link",
-    "a": "Horst",
-    "b": "Rear_Wheel"
-  },
-  "Seatstay_Rear_Wheel": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Rear_Wheel"
-  },
-  "Seatstay_Rocker_Piv": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Rocker_Piv"
-  },
   "Main_Piv": {
     "object": "Point",
     "type": "ground",
@@ -64,11 +39,6 @@
       474.0
     ]
   },
-  "Seatstay_Shock_Linkage": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Shock_Linkage"
-  },
   "Rocker_Piv": {
     "object": "Point",
     "type": "ground",
@@ -76,11 +46,6 @@
       623.9999999999998,
       434.00000000000006
     ]
-  },
-  "Rocker_Piv_Shock_Linkage": {
-    "object": "Link",
-    "a": "Rocker_Piv",
-    "b": "Shock_Linkage"
   },
   "Shock_Linkage": {
     "object": "Point",
@@ -97,5 +62,40 @@
       629.0,
       393.0000000000001
     ]
+  },
+  "Horst_Main_Piv": {
+    "object": "Link",
+    "a": "Horst",
+    "b": "Main_Piv"
+  },
+  "Horst_Seatstay": {
+    "object": "Link",
+    "a": "Horst",
+    "b": "Seatstay"
+  },
+  "Horst_Rear_Wheel": {
+    "object": "Link",
+    "a": "Horst",
+    "b": "Rear_Wheel"
+  },
+  "Seatstay_Rear_Wheel": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Rear_Wheel"
+  },
+  "Seatstay_Rocker_Piv": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Rocker_Piv"
+  },
+  "Seatstay_Shock_Linkage": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Shock_Linkage"
+  },
+  "Rocker_Piv_Shock_Linkage": {
+    "object": "Link",
+    "a": "Rocker_Piv",
+    "b": "Shock_Linkage"
   }
 }
