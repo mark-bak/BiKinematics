@@ -49,6 +49,12 @@ class MainPage(FloatLayout):
         self.topbar_height = self.ids['topbar'].height
         self.info_text_height = self.ids['current_mode'].height
 
+        #Set dropdown widgets
+        self.LoadDropDown = LoadDropDown(mp = self)
+        self.AddGeoDropDown = AddGeoDropDown(mp = self)
+        self.DeleteDropDown = DeleteDropDown(mp = self)
+        self.AnalDropDown = AnalDropDown(mp = self)
+
     ##Kivy properties
     #Info text
     mode = StringProperty('Main')
@@ -56,6 +62,9 @@ class MainPage(FloatLayout):
 
     #Link creation list
     link_points = ListProperty()
+
+    #Image filename
+    image_file = StringProperty()
 
     #Unit and window scaling
     px_to_mm = NumericProperty(1)
@@ -67,7 +76,11 @@ class MainPage(FloatLayout):
     topbar_height = NumericProperty()
     info_text_height = NumericProperty()
 
-    #
+    #Dropdown widgets
+    LoadDropDown = ObjectProperty()
+    AddGeoDropDown = ObjectProperty()
+    DeleteDropDown = ObjectProperty()
+    AnalDropDown = ObjectProperty()
 
     ##General methods
     def dismiss_popup(self):
@@ -91,27 +104,42 @@ class MainPage(FloatLayout):
         """
         Resizes geo elements on window resize
         """
-        #Gets size of image frame before resize
-        cur_imf_width = self.cur_width - self.sidebar_width 
-        cur_imf_height = self.cur_height - self.topbar_height
-
-        #Gets size of image frame after resize
-        new_imf_width = width - self.sidebar_width 
-        new_imf_height = height - self.topbar_height
+        old_width = self.cur_width
+        old_height = self.cur_height
 
         height_offset = 0
         #Rescale all point widgets:
-        for w in self.walk():
-            if isinstance(w,Point):
-                w.scale_with_window(cur_imf_width,
-                                    new_imf_width,
-                                    cur_imf_height,
-                                    new_imf_height,
-                                    height_offset,)
+        self.rescale_geo(old_width,
+                         width,
+                         old_height,
+                         height,
+                         height_offset)
         
         #Update stored 'old' value of window width
         self.cur_width = width
         self.cur_height = height
+
+    def rescale_geo(self, old_width, new_width, old_height, new_height,height_offset=0):
+        """
+        Walks all points and rescales according to window changes
+        """
+        #Gets size of image frame before resize
+        old_imf_width = old_width - self.sidebar_width 
+        old_imf_height = old_height - self.topbar_height
+
+        #Gets size of image frame after resize
+        new_imf_width = new_width - self.sidebar_width 
+        new_imf_height = new_height - self.topbar_height
+
+        #Walk points and rescale
+        for w in self.walk():
+            if isinstance(w,Point):
+                w.scale_with_window(old_imf_width,
+                                    new_imf_width,
+                                    old_imf_height,
+                                    new_imf_height,
+                                    height_offset)
+        
         #Update scaling factor from pixels to mm
         self.update_px_mm_conversion()
 
@@ -148,78 +176,115 @@ class MainPage(FloatLayout):
         """  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
     
-    #Top menu dropdown load functions - can probably condense this into
-    #one function but had trouble with calling desired dropdown class from .kv file
-    def show_load_dropdown(self,parent):
-        dropdown = LoadDropDown(mp=self)
+    #Top menu dropdown load functions 
+    def show_dropdown(self,dropdown,parent):
+        """
+        Opens dropdown, attaching to parent widget
+        """
         dropdown.open(parent)
 
-    def show_add_geo_dropdown(self,parent):
-        dropdown = AddGeoDropDown(mp=self)
-        dropdown.open(parent)
-
-    def show_delete_dropdown(self,parent):
-        dropdown = DeleteDropDown(mp=self)
-        dropdown.open(parent)
-    
-    def show_anal_dropdown(self,parent):
-        dropdown = AnalDropDown(mp=self)
-        dropdown.open(parent)
-
-    #User input methods
+    ##User input methods
     def on_touch_down(self,touch):
-        #custom touch behaviour
-        if self.mode == 'Add_Point' and self.collide_point(touch.x,touch.y):
+        """
+        Custom touch behaviour
+        """
+        if self.mode == 'Add_Point' and self.collide_point(touch.x,touch.y): #Add points if in Add_Point mode
             self.open_point_dialog(touch)
-        return super(MainPage,self).on_touch_down(touch) #do standard touch behaviour
+        return super(MainPage,self).on_touch_down(touch) #Do standard touch behaviour
 
-    #Load methods
+    ##Load methods
     def open_load_dialog(self):
+        """
+        Opens a LoadDialog, with selection passed to self.load_bike_data
+        """
         content = LoadDialog(load=self.load_bike_data, cancel=self.dismiss_popup,directory = "\\SaveFiles")
         self._popup = ThemePopup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
    
     def load_bike_data(self, path, selection):
-        filename = selection[0]
+        """
+        Load bike savedata in json format, and convert to GUI geometry widgets
+        """
+        filename = selection[-1]
         with open(filename) as f:
             data = json.load(f)
+
+            ##Geometry  Loading
+            #Add all Points
             for key in data:
                 if data[key]['object']=="Point":
                     self.add_point(key,data[key]['type'],data[key]['position'])
-            for key in data: #needs new loop as all points must be created before links
+
+            #Add links between the points - needs new loop as all points must be created before links      
+            for key in data:
                 if data[key]['object']=="Link":
                     a_ref = data[key]['a']
                     b_ref = data[key]['b']
-                    for w in self.walk(): #find points corresponding to ref string
+                    for w in self.walk(): #Find points corresponding to ref string
                         if isinstance(w,Point):
                             if w.name == a_ref:
                                 a = w
                             if w.name == b_ref:
                                 b = w
-                    self.add_link(a=a,b=b)
+                    self.add_link(a=a,b=b) #Create link with corresponding points
+            
+            ##Parameter Loading
+            self.ids['wheelbase_value'].text = str(data['wheelbase']['value'])
+            #Rescaling
+            new_width = Window.width
+            new_height = Window.height
+            old_width = data['window_width']['value']
+            old_height = data['window_height']['value']
+            self.rescale_geo(old_width,
+                             new_width,
+                             old_height, 
+                             new_height)
+            #Image Loading
+            if data['image_file']['value']:
+                self.load_image('',data['image_file']['value'])
+        
         self.dismiss_popup()
 
     #Save methods
     def open_save_dialog(self):
+        """
+        Opens a SaveDialog, with selection passed to self.save_bike_data
+        """
         content = SaveDialog(save = self.save_bike_data,cancel = self.dismiss_popup)
         self._popup = ThemePopup(title="Save file", content=content,
                             size_hint=(0.9, 0.9))
         self._popup.open()
     
     def save_bike_data(self,filename,path):
-        filename = filename.replace(path+"\\","") #remove path from filename
-        ind = filename.find('.') #remove file extension
-        if ind != -1:
+        """
+        Saves a json at path\\filename.json, with info describing the geometry objects and constants needed to define the bike.
+        """
+        #Filename parsing
+        filename = filename.replace(path+"\\","") #Remove path from filename
+        ind = filename.find('.') #Find whether there is file ext
+        if ind != -1: 
+            #Remove file ext if present
             filename = filename[0:ind]
-        filename = "{}\\{}.json".format(path,filename) #put in path with .json ext
+        filename = "{}\\{}.json".format(path,filename) #Put in path with .json extension
+        
+        #Save bike data
         save_data = self.create_bike_data(sf=1)
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
+        
         self.dismiss_popup()
 
-    def create_bike_data(self,sf):
+    def create_bike_data(self,sf=1):
+        """
+        Creates simple json file with info describing the geometry objects and constants needed to define the bike.
+        This file is typically 'keyed' by the name of the widget/point/link
+
+        The geometry positions will be scaled by sf (defualt value 1 - no scaling).
+        """
         data = {}
+
+        ##Add geometry object/widget data
         for w in self.walk():
             if isinstance(w,Point):
                 properties={'object':'Point','type':w.point_type,'position':tuple([w.x*sf,w.y*sf])}
@@ -227,23 +292,45 @@ class MainPage(FloatLayout):
             if isinstance(w,Link):
                 properties={'object':'Link','a':w.a.name,'b':w.b.name}
                 data[w.name]= properties
+        
+        ##Add other parameters
+        values = [['wheelbase',          float(self.ids['params_list'].wheelbase)],
+                  ['window_width',       self.cur_width                          ],
+                  ['window_height',      self.cur_height                         ],
+                  ['image_file',         self.image_file                         ]]
+                  
+        for par in values:
+            properties = {'object':'Parameter','value':par[1]}
+            data[par[0]] = properties
+
         return data
 
-    #Image methods
+    ##Image methods
     def open_image_dialog(self):
+        """
+        Opens a LoadDialog, with selection passed to self.load_image
+        """
         content = LoadDialog(load=self.load_image, cancel=self.dismiss_popup,directory = "\\ImageFiles")
         self._popup = ThemePopup(title="Load file", content=content,
                     size_hint=(0.9, 0.9))
         self._popup.open()
 
-    def load_image(self,path,selection):
-        filename = selection[-1]
+    def load_image(self,path,filename):
+        """
+        Adds a widget image to the image frame bit of GUI, from filename
+        """
+        if isinstance(filename,list):
+            filename = filename[-1]
         self.clear_image()
+        self.image_file = filename
         self.ids['image_frame'].add_widget(Image(source=filename,
                                                  pos=self.ids['image_frame'].pos))
         self.dismiss_popup()
 
     def clear_image(self):
+        """
+        Clears image from image frame
+        """
         for child in self.ids['image_frame'].children:
             self.ids['image_frame'].remove_widget(child)
 

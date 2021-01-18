@@ -167,16 +167,16 @@
             #         pos: self.pos
             TopbarButton:
                 text: 'Load/Save...'
-                on_release: root.show_load_dropdown(self)
+                on_release: root.show_dropdown(root.LoadDropDown,self)
             TopbarButton:
                 text: 'Add Geo...'
-                on_release: root.show_add_geo_dropdown(self)
+                on_release: root.show_dropdown(root.AddGeoDropDown,self)
             TopbarButton:
                 text: 'Delete...'
-                on_release: root.show_delete_dropdown(self)
+                on_release: root.show_dropdown(root.DeleteDropDown,self)
             TopbarButton:
                 text: 'Analysis...'
-                on_release: root.show_anal_dropdown(self)
+                on_release: root.show_dropdown(root.AnalDropDown,self)
             Label:
 
 <TopbarButton@Button>:
@@ -215,7 +215,7 @@
         on_release:root.dismiss()
         on_release: root.mp.open_image_dialog()
     TopbarButton:
-        text: 'Save Geo Data'
+        text: 'Save'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
