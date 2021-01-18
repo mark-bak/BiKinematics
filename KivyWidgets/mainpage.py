@@ -172,11 +172,10 @@ class MainPage(FloatLayout):
         
     def goto_plot(self):
         """
-        Displays plotpage....
+        Displays plotpage
         """  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
     
-    #Top menu dropdown load functions 
     def show_dropdown(self,dropdown,parent):
         """
         Opens dropdown, attaching to parent widget
@@ -405,7 +404,7 @@ class MainPage(FloatLayout):
         self.remove_widget(link)
         self.mode = 'Main'
 
-    #Simulate methods
+    ##Simulate methods
     def open_sim_dialog(self):
         content = SimulateDialog(simulate=self.simulate,cancel = self.dismiss_popup)
         self._popup = ThemePopup(title="Simulate", content=content,
@@ -423,7 +422,8 @@ class MainPage(FloatLayout):
         self.dismiss_popup()
         self.info = ': Simulation: {} complete'.format(filename)
 
-#Dropdown style classes - see.kv for formatting
+##Other widgets used for UI - see .kv for formatting
+#Dropdown style classes
 class LoadDropDown(DropDown):
     mp = ObjectProperty(None)  
 
@@ -440,6 +440,7 @@ class AnalDropDown(DropDown):
 class ThemePopup(Popup):
     bg_color = ListProperty([0,0,0,1])
 
+#Button theme
 class TopbarButton(Button):
     pass
 

@@ -23,7 +23,8 @@ else:
 
 class Bike():
     def __init__(self,data):
-
+        
+        #Required bike geo values
         self.points = {}
         self.links = {}
         self.kinematic_loop_points = []
@@ -37,7 +38,7 @@ class Bike():
         #Initialise internal variables
         self.parse_input_data(data)
         self.find_kinematic_loop()
-        self.find_ground_points()
+        self.find_static_points()
         self.find_end_eff_points()
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
@@ -94,12 +95,15 @@ class Bike():
         self.kinematic_loop_points = path.nodes
         return path
 
-    def find_ground_points(self):
+    def find_static_points(self):
+        """
+        Populates the list of point names (str) that do not move relative to frame in self.end_static_points[]
+        """   
         self.static_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "shock_frame"]
 
     def find_end_eff_points(self):
         """
-        Populates the list of point names (str) not on the 'kinematic loop' in self.end_eff_points[]
+        Populates the list of point names (str) that are attached to kinematic loop in self.end_eff_points[]
         """
         self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points and not name in self.static_points]
 
@@ -116,17 +120,24 @@ class Bike():
         """
         sol = self.kinematic_solver.solve_suspension_motion(travel)
         self.solution[name] = sol
+        return sol
 
     def calculate_suspension_characteristics(self,sol_name):
-        
-        
-        #Static Points
+        """
+        Calculates derived suspension characteristics such as leverage ratio, from a solution result, sol_name.
+
+        Directly modifies self.solution[sol_name]
+        """
+
+        ##Static Points
         for point_name in self.static_points: 
             x = np.ones(np.size(list(self.solution[sol_name].values())[0].x)) * self.points[point_name].pos[0]
             y = np.ones(np.size(list(self.solution[sol_name].values())[0].y)) * self.points[point_name].pos[1]
             self.solution[sol_name][point_name] = Pos_Result(x,y)
 
-        #Travels and leverage ratio
+        ##Travels and leverage ratio
+
+        #Find points of interest
         for name in self.points:
             if self.points[name].type == 'rear_wheel':
                 rw_name = name 
@@ -135,19 +146,20 @@ class Bike():
             if self.points[name].type == 'shock_frame':
                 sf_name = name
         
+        #Maths
         Vertical_Travel = self.solution[sol_name][rw_name].y - np.ones(np.size(self.solution[sol_name][rw_name].y)) * self.solution[sol_name][rw_name].y[0]
         shock_delta_x = np.subtract(self.solution[sol_name][sl_name].x, self.solution[sol_name][sf_name].x)
         shock_delta_y = np.subtract(self.solution[sol_name][sl_name].y, self.solution[sol_name][sf_name].y)
         Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0)
-        Shock_Length = np.abs(Shock_Length - np.ones(np.size(Shock_Length)) * Shock_Length[0])
-
+        #Shock_Length = np.abs(Shock_Length - np.ones(np.size(Shock_Length)) * Shock_Length[0])
+        
+        #Numerical derivative (shoddy rn, do a better one!!)
         delta_shock_length = np.diff(Shock_Length)
-        delta_vertical_travel = np.diff(Vertical_Travel)
-
-               
+        delta_vertical_travel = np.diff(Vertical_Travel)             
         Leverage_Ratio = np.divide(delta_vertical_travel, delta_shock_length)
         Leverage_Ratio = np.hstack([Leverage_Ratio,Leverage_Ratio[-1]]) 
         
+        #Derived suspension characeristics
         self.solution[sol_name]['Vertical_Travel'] = Vertical_Travel
         self.solution[sol_name]['Shock_length'] = Shock_Length
         self.solution[sol_name]['LeverageRatio'] = Leverage_Ratio
@@ -155,7 +167,7 @@ class Bike():
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):
         """
-        Not implemented yet - fcn to save solution data as a csv
+        Fcn to save solution data, solution_name, as a csv called filename
         """
         #Ensure correct filetype
         ind = filename.find('.')
@@ -174,9 +186,6 @@ class Bike():
                 else:
                     writer.writerow([point_name]+list(self.solution[solution_name][point_name]))
                     pass
-
-
-
 
 ##Tests - requires Horst_Example.json - need to distribute this in the Github
 def load_json(filename):

@@ -19,6 +19,37 @@ class Kinematic_Solver_Scipy_Min():
         self.kinematic_loop_points = kin_loop_points
         self.end_eff_points = end_eff_points
 
+    def solve_suspension_motion(self,travel):
+        """
+        Solves the suspension motion for a desired travel.
+        This is the one you want to run and it calls all the other functions as needed - probably a better stylistic way to represent this??
+
+        Returns a solution as a dictionary of NamedTuples with x and y data, for example to get x data for point with name Name use solution[Name].x
+        This returns a N long vector/list/np_thingy where N is the number of solver steps
+        """
+
+        #Convert data into link space coordinates for solving
+        klp_off,klp_ss,eep_ss,eep_posn = self.get_solution_space_vectors()
+        
+        #Find the input angles in form [current input angle,......, angle required to acheive desired simulation travel] 
+        input_angles = self.find_input_angle_range(travel,klp_off,klp_ss,eep_ss,eep_posn)
+        #print([input_angles[0],input_angles[-1]])
+
+        point_results= np.zeros(( len(self.kinematic_loop_points)+len(self.end_eff_points) , 2 , input_angles.shape[0])) #Result vector
+        
+        for i in range(len(input_angles)): #Solve the linkage at each angle of the input link, and convert to cartesian (see note)
+            klp_ss[0]=input_angles[i]
+            klp_sol = self.solve_kinematic_loop(klp_ss)
+            point_results[:,:,i] = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn) # (this is probably slow in here - can move out later if performance issues)
+
+        #Convert data to solution format
+        points_list = self.kinematic_loop_points + self.end_eff_points
+        solution = {}
+        for i in range(point_results.shape[0]):
+            name = points_list[i]
+            solution[name] = Pos_Result(point_results[i,0,:],point_results[i,1,:])
+        return solution
+
     def get_solution_space_vectors(self):
         """
         Returns vectors in solution space form, ready for solving. This form is the following:
@@ -105,31 +136,7 @@ class Kinematic_Solver_Scipy_Min():
         sol = loop_ls
         sol[1:mid-1] = x_sol
         return sol
-
-    def solution_to_cartesian(self,klp_off,klp_sol,eep_ss,eep_posn):
-        """
-        Takes klp_off,klp_sol,eep_ss,eep_posn as described in self.get_solution_space_vectors, and returns cartesian coords of form:
-        [[xl1,yl1],...,[xl(nl),yl(nl)],[xe1,ye1],...,[xe(ne),ye(ne)]], where nl and ne denote number of kinematic loop and end effector
-        points respectively
-        """
-        #Linkage loop points can be directly converted
-        klp_v = self.link_space_to_cartesian(klp_off,
-                                             klp_sol,
-                                             'loop')
-        
-        #End effector points need dealt with 
-        mid = int(eep_ss.shape[0]/2)
-        eep_v = np.zeros((mid,2)) #Reshape (2n x 1)-> (n x 2)
-        for i in range(mid): #Loop through ee generalised coords and get position in cartesian space
-            pos = self.link_space_to_cartesian(klp_v[eep_posn[i],:], #Offset is attach point
-                                               np.vstack([klp_sol[eep_posn[i]]-eep_ss[i],eep_ss[mid+i]])) #Gets representation in form [th(n),L(n)]. Global th(n) must be found from global 
-                                                                                                          #klp theta, klp_sol[eep_posn[i]], minus the constant offset, eep_ss[i],
-                                                                                                          # the end effector has form the kinematic link
-            eep_v[i,:]=pos[1] #Don't need attachemnt coords, only end effector coords
-
-        #Return expected format
-        return np.vstack([klp_v,eep_v])
-
+    
     def constraint_eqn(self,x,args):
         """
         Finds vector u = [u_x,u_y], given by u_x = sum(lcos(th)), and u_y = sum(lsin(th)) by some neat matrix multiplication
@@ -152,36 +159,6 @@ class Kinematic_Solver_Scipy_Min():
         err = np.linalg.norm(u)
 
         return err
-
-    def solve_suspension_motion(self,travel):
-        """
-        Solves the suspension motion for a desired travel in PIXELS AT THE MOMENT THIS NEEDS TO CHANGE,
-        This is the one you want to run and it calls all the other functions as needed - probably a better stylistic way to represent this??
-
-        Returns a solution as a dictionary of NamedTuples with x and y data, for example to get x data for point with name Name use solution[Name].x
-        This returns a N long vector/list/np_thingy where N is the number of solver steps
-        """
-
-        #Convert data into link space coordinates for solving
-        klp_off,klp_ss,eep_ss,eep_posn = self.get_solution_space_vectors()
-        
-        #Find the input angles in form [current input angle,......, angle required to acheive desired simulation travel] 
-        input_angles = self.find_input_angle_range(travel,klp_off,klp_ss,eep_ss,eep_posn)
-        #print([input_angles[0],input_angles[-1]])
-
-        point_results= np.zeros(( len(self.kinematic_loop_points)+len(self.end_eff_points) , 2 , input_angles.shape[0])) #Result vector
-        for i in range(len(input_angles)): #Solve the linkage at each angle of the input link, and convert to cartesian (see note)
-            klp_ss[0]=input_angles[i]
-            klp_sol = self.solve_kinematic_loop(klp_ss)
-            point_results[:,:,i] = self.solution_to_cartesian(klp_off,klp_sol,eep_ss,eep_posn) # (this is probably slow in here - can move out later if performance issues)
-
-        #Convert data to solution format
-        points_list = self.kinematic_loop_points + self.end_eff_points
-        solution = {}
-        for i in range(point_results.shape[0]):
-            name = points_list[i]
-            solution[name] = Pos_Result(point_results[i,0,:],point_results[i,1,:])
-        return solution
 
     def find_input_angle_range(self,travel,klp_off,klp_ss,eep_ss,eep_posn):
         """
@@ -238,6 +215,31 @@ class Kinematic_Solver_Scipy_Min():
         #print(err)
         return err
 
+    def solution_to_cartesian(self,klp_off,klp_sol,eep_ss,eep_posn):
+        """
+        Takes klp_off,klp_sol,eep_ss,eep_posn as described in self.get_solution_space_vectors, and returns cartesian coords of form:
+        [[xl1,yl1],...,[xl(nl),yl(nl)],[xe1,ye1],...,[xe(ne),ye(ne)]], where nl and ne denote number of kinematic loop and end effector
+        points respectively
+        """
+        #Linkage loop points can be directly converted
+        klp_v = self.link_space_to_cartesian(klp_off,
+                                             klp_sol,
+                                             'loop')
+        
+        #End effector points need dealt with 
+        mid = int(eep_ss.shape[0]/2)
+        eep_v = np.zeros((mid,2)) #Reshape (2n x 1)-> (n x 2)
+        for i in range(mid): #Loop through ee generalised coords and get position in cartesian space
+            pos = self.link_space_to_cartesian(klp_v[eep_posn[i],:], #Offset is attach point
+                                               np.vstack([klp_sol[eep_posn[i]]-eep_ss[i],eep_ss[mid+i]])) #Gets representation in form [th(n),L(n)]. Global th(n) must be found from global 
+                                                                                                          #klp theta, klp_sol[eep_posn[i]], minus the constant offset, eep_ss[i],
+                                                                                                          # the end effector has form the kinematic link
+            eep_v[i,:]=pos[1] #Don't need attachemnt coords, only end effector coords
+
+        #Return expected format
+        return np.vstack([klp_v,eep_v])
+
+    ##Coordinate conversion functions:
     def cartesian_to_link_space(self,v,*params):
         """
         Takes a (n x 2) vector of points in form v = [[x1,y1],[x2,y2],...,[x(n),y(n)]], and converts to generalised coord: angles from horizontal Theta,
