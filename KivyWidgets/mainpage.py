@@ -14,9 +14,8 @@ from KivyWidgets.points import Point
 from KivyWidgets.points import PointData
 from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
-from Solver.bike import Bike
 
-
+#Custom imports
 from Solver.bike import Bike
 
 #Kivy Layouts
@@ -42,45 +41,66 @@ class MainPage(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         #Window.maximize()
+        #Window resize binding
         Window.bind(on_resize=self.on_window_resize)
+
+        #Sizes of some GUI elements - edit in .kv file
         self.sidebar_width = self.ids['sidebar'].width
         self.topbar_height = self.ids['topbar'].height
         self.info_text_height = self.ids['current_mode'].height
 
-    #Kivy properties
+    ##Kivy properties
+    #Info text
     mode = StringProperty('Main')
     info = StringProperty()
+
+    #Link creation list
     link_points = ListProperty()
 
+    #Unit and window scaling
     px_to_mm = NumericProperty(1)
-
     cur_width = NumericProperty(Window.width)
     cur_height = NumericProperty(Window.height)
+
+    #Sizes of some GUI elements - edit in .kv file
     sidebar_width = NumericProperty()
     topbar_height = NumericProperty()
     info_text_height = NumericProperty()
 
-    #General methods
+    #
+
+    ##General methods
     def dismiss_popup(self):
+        """
+        Dismisses current popup
+        """
         self.mode = 'Main'
         self._popup.dismiss()
 
     def clear_all(self):
+        """
+        Clears all geometry widgets
+        """
         for wid in self.walk():
             if isinstance(wid,Point):
                 self.delete_point(wid)
             if isinstance(wid,Link):
                 self.delete_link(wid)
 
-    def on_window_resize(self, window, width, height): #Resizes geo elements on window resize
+    def on_window_resize(self, window, width, height): 
+        """
+        Resizes geo elements on window resize
+        """
+        #Gets size of image frame before resize
         cur_imf_width = self.cur_width - self.sidebar_width 
-        new_imf_width = width - self.sidebar_width
+        cur_imf_height = self.cur_height - self.topbar_height
 
-        cur_imf_height = self.cur_height - self.topbar_height 
+        #Gets size of image frame after resize
+        new_imf_width = width - self.sidebar_width 
         new_imf_height = height - self.topbar_height
 
         height_offset = 0
-
+        #Rescale all point widgets:
         for w in self.walk():
             if isinstance(w,Point):
                 w.scale_with_window(cur_imf_width,
@@ -88,13 +108,20 @@ class MainPage(FloatLayout):
                                     cur_imf_height,
                                     new_imf_height,
                                     height_offset,)
-
+        
+        #Update stored 'old' value of window width
         self.cur_width = width
         self.cur_height = height
-
+        #Update scaling factor from pixels to mm
         self.update_px_mm_conversion()
 
     def update_px_mm_conversion(self):
+        """
+        Modifies the scaling factor self.px_to_mm, giving ratio of wheelbase in pixels to actual bike wheelbase in mm
+
+        Sets self.px_to_mm to 1 if the front and rear wheels are not defined in geometry, and 0 if bad data is entered in wheelbase GUI input
+        """
+        #Find which points are the front and rear wheels - (Maybe store these as an instance variable this looks kind of slow)
         fw = None
         rw = None
         for wid in self.children:
@@ -104,19 +131,21 @@ class MainPage(FloatLayout):
                 if wid.point_type == 'rear_wheel':
                     rw = wid
         if fw != None and rw != None:
+            #If front and rear wheel exist, calculate scaling factor
             wbase_px = fw.x-rw.x
             try:
                 wbase_mm = float(self.ids['params_list'].wheelbase)
             except:
-                wbase_mm = 0
+                wbase_mm = 0 #If user has entered some funky stuf in text box, set wbase_mm (and tf px_to_mm) to zero
             self.px_to_mm = wbase_mm / wbase_px
         else:
+            #If front and rear wheel not specified, set scaling to 1
             self.px_to_mm = 1
         
-        print(self.px_to_mm)
-
     def goto_plot(self):
-        #  
+        """
+        Displays plotpage....
+        """  
         self.parent.manager.current = 'Plot' #lol what a mess this line is
     
     #Top menu dropdown load functions - can probably condense this into
