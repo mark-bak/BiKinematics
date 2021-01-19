@@ -42,7 +42,7 @@ Builder.load_file("KivyWidgets\\mainpage.kv")
 class MainPage(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        #Window.maximize()
+        Window.maximize()
         #Window resize binding
         Window.bind(on_resize=self.on_window_resize)
 
@@ -175,13 +175,7 @@ class MainPage(FloatLayout):
         else:
             #If front and rear wheel not specified, set scaling to 1
             self.px_to_mm = 1
-        
-    def goto_plot(self):
-        """
-        Displays plotpage
-        """  
-        self.parent.manager.current = 'Plot' #lol what a mess this line is
-    
+   
     def show_dropdown(self,dropdown,parent):
         """
         Opens dropdown, attaching to parent widget

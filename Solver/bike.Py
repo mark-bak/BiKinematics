@@ -27,6 +27,7 @@ class Bike():
         #Required bike geo values
         self.points = {}
         self.links = {}
+        self.shock = None
         self.kinematic_loop_points = []
         self.end_eff_points = []
         self.static_points = []
@@ -65,7 +66,7 @@ class Bike():
                 P = Point(name,data[name]['type'],np.array(data[name]['position']))
                 self.points[name] = P
         for name in data: # needs new loop as all points must be created before links
-            if data[name]['object']=="Link":
+            if data[name]['object']=="Link" or data[name]['object']=="Shock":
                 a_name = data[name]['a']
                 b_name = data[name]['b']
                 for point_name,point in self.points.items():
@@ -75,7 +76,11 @@ class Bike():
                         b = point
                 length = np.linalg.norm([b.pos-a.pos])
                 L = Link(a,b,length)
-                self.links[name] = L
+                if data[name]['object']=="Link":
+                    self.links[name] = L
+                if data[name]['object']=="Shock":
+                    self.shock = L
+
 
     def find_kinematic_loop(self):
         """
@@ -128,41 +133,37 @@ class Bike():
 
         Directly modifies self.solution[sol_name]
         """
+        sol = self.solution[sol_name]
 
         ##Static Points
         for point_name in self.static_points: 
-            x = np.ones(np.size(list(self.solution[sol_name].values())[0].x)) * self.points[point_name].pos[0]
-            y = np.ones(np.size(list(self.solution[sol_name].values())[0].y)) * self.points[point_name].pos[1]
+            x = np.ones(np.size(list(sol.values())[0].x)) * self.points[point_name].pos[0]
+            y = np.ones(np.size(list(sol.values())[0].y)) * self.points[point_name].pos[1]
             self.solution[sol_name][point_name] = Pos_Result(x,y)
 
         ##Travels and leverage ratio
-
-        #Find points of interest
+        #Find points of interest for calcs
         for name in self.points:
             if self.points[name].type == 'rear_wheel':
                 rw_name = name 
-            if self.points[name].type == 'shock_linkage':
-                sl_name = name
-            if self.points[name].type == 'shock_frame':
-                sf_name = name
-        
+        s_a_name = self.shock.a.name
+        s_b_name = self.shock.b.name
+     
         #Maths
-        Vertical_Travel = self.solution[sol_name][rw_name].y - np.ones(np.size(self.solution[sol_name][rw_name].y)) * self.solution[sol_name][rw_name].y[0]
-        shock_delta_x = np.subtract(self.solution[sol_name][sl_name].x, self.solution[sol_name][sf_name].x)
-        shock_delta_y = np.subtract(self.solution[sol_name][sl_name].y, self.solution[sol_name][sf_name].y)
-        Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0)
-        #Shock_Length = np.abs(Shock_Length - np.ones(np.size(Shock_Length)) * Shock_Length[0])
-        
-        #Numerical derivative (shoddy rn, do a better one!!)
-        delta_shock_length = np.diff(Shock_Length)
-        delta_vertical_travel = np.diff(Vertical_Travel)             
-        Leverage_Ratio = np.abs(np.divide(delta_vertical_travel, delta_shock_length))
-        Leverage_Ratio = np.hstack([Leverage_Ratio,Leverage_Ratio[-1]]) 
+        Vertical_Travel = sol[rw_name].y - np.ones(np.size(sol[rw_name].y)) * sol[rw_name].y[0] # s - I*s[0]     
+        shock_delta_x = np.subtract(sol[s_a_name].x, sol[s_b_name].x)
+        shock_delta_y = np.subtract(sol[s_a_name].y, sol[s_b_name].y)
+        Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0) 
+        Leverage_Ratio = self.calc_leverage_ratio(Vertical_Travel,Shock_Length)
         
         #Derived suspension characeristics
-        self.solution[sol_name]['Vertical_Travel'] = Vertical_Travel
-        self.solution[sol_name]['Shock_length'] = Shock_Length
-        self.solution[sol_name]['LeverageRatio'] = Leverage_Ratio
+        self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
+        self.solution[sol_name]['Shock Length'] = Shock_Length
+        self.solution[sol_name]['Leverage Ratio'] = Leverage_Ratio
+
+    def calc_leverage_ratio(self,travel,shock_length):
+        Leverage_Ratio = np.abs(np.gradient(travel, shock_length))
+        return Leverage_Ratio
 
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):

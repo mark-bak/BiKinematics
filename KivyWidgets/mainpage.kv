@@ -203,17 +203,11 @@
 
 <LoadDropDown>:
     TopbarButton:
-        text: 'Load Geo Data'
+        text: 'Load'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.open_load_dialog()
-    TopbarButton:
-        text: 'Load Image'
-        size_hint_y: None
-        height: topbar_height
-        on_release:root.dismiss()
-        on_release: root.mp.open_image_dialog()
     TopbarButton:
         text: 'Save'
         size_hint_y: None
@@ -241,6 +235,12 @@
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.change_mode('Add_Shock',' : {} of 2 points selected'.format(str(len(root.mp.link_points))))
+    TopbarButton:
+        text: 'Add Image'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.open_image_dialog()
 
 <DeleteDropDown>:
     TopbarButton:
@@ -280,8 +280,10 @@
         text: 'Plotting'
         size_hint_y: None
         height: topbar_height
-        on_release: root.dismiss()  
-        on_release: root.mp.goto_plot()
+        on_release: root.dismiss() 
+        on_release: app.sm.transition.direction = 'left' 
+        on_release: app.sm.current = 'Plot'
+
 
 <-ThemePopup>:
     title_color: Colour_1
