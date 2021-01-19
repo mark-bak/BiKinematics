@@ -6,6 +6,8 @@ import os
 #pylint: disable=import-error
 from KivyWidgets.links import Link
 from KivyWidgets.links import LinkData
+from KivyWidgets.components import Shock
+from KivyWidgets.components import ShockData
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
@@ -119,6 +121,10 @@ class MainPage(FloatLayout):
         self.cur_width = width
         self.cur_height = height
 
+    def change_mode(self,mode,info):
+        self.mode = mode
+        self.info = info
+
     def rescale_geo(self, old_width, new_width, old_height, new_height,height_offset=0):
         """
         Walks all points and rescales according to window changes
@@ -215,9 +221,9 @@ class MainPage(FloatLayout):
                 if data[key]['object']=="Point":
                     self.add_point(key,data[key]['type'],data[key]['position'])
 
-            #Add links between the points - needs new loop as all points must be created before links      
+            #Add links and shocks between the points - needs new loop as all points must be created before links      
             for key in data:
-                if data[key]['object']=="Link":
+                if data[key]['object']=="Link" or data[key]['object']=="Shock":
                     a_ref = data[key]['a']
                     b_ref = data[key]['b']
                     for w in self.walk(): #Find points corresponding to ref string
@@ -226,8 +232,11 @@ class MainPage(FloatLayout):
                                 a = w
                             if w.name == b_ref:
                                 b = w
-                    self.add_link(a=a,b=b) #Create link with corresponding points
-            
+                    if data[key]['object']=="Link":            
+                        self.add_link(a=a,b=b) #Create link with corresponding points
+                    if data[key]['object']=="Shock":
+                        self.add_shock(a=a,b=b)
+
             ##Parameter Loading
             self.ids['wheelbase_value'].text = str(data['wheelbase']['value'])
             #Rescaling
@@ -287,6 +296,9 @@ class MainPage(FloatLayout):
             if isinstance(w,Link):
                 properties={'object':'Link','a':w.a.name,'b':w.b.name}
                 data[w.name]= properties
+            if isinstance(w,Shock):
+                properties={'object':'Shock','a':w.a.name,'b':w.b.name}
+                data[w.name]= properties
         
         ##Add other parameters
         values = [['wheelbase',          float(self.ids['params_list'].wheelbase)],
@@ -329,20 +341,6 @@ class MainPage(FloatLayout):
             self.ids['image_frame'].remove_widget(child)
 
     ##Add point methods
-    def point_mode(self):
-        """
-        Switches to point adding app mode
-        """
-        self.mode = 'Add_Point'
-        self.info = ': click to add point'
-
-    def delete_point_mode(self):
-        """
-        Switches to point deleting app mode
-        """
-        self.mode = 'Del_Point'
-        self.info = ': click to delete point (must be no link attached)'
-    
     def open_point_dialog(self,touch):
         """
         Opens a point dialog for point parameter entry, at click/touch position
@@ -381,20 +379,6 @@ class MainPage(FloatLayout):
         self.update_px_mm_conversion()
 
     ##Add link methods
-    def link_mode(self):
-        """
-        Switches to link adding app mode
-        """
-        self.mode = 'Add_Link'
-        self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
-
-    def delete_link_mode(self):
-        """
-        Switches to link_deleting app mode
-        """
-        self.mode = 'Del_Link'
-        self.info = ': click to delete Link'
-         
     def on_link_points(self,instance,value):
         """
         Called when the self.link_points list is modified. If this list now has 2 unique points, creates a link between them and exits link creating mode
@@ -408,7 +392,10 @@ class MainPage(FloatLayout):
         if len(objs)>1:
             a = objs[0]
             b = objs[1]
-            self.add_link(a,b)
+            if self.mode == 'Add_Link':
+                self.add_link(a,b)
+            if self.mode == 'Add_Shock':
+                self.add_shock(a,b)
             self.link_points.clear()
             self.mode = 'Main'
 
@@ -425,6 +412,17 @@ class MainPage(FloatLayout):
         self.ids['links_list'].add_widget(new_link_data)
         #Info text update
         self.info = ': link \'{}\' added'.format(new_link.name)
+
+    def add_shock(self,a,b):
+        #Create shock and add
+        new_shock = Shock(a = a, b = b)
+        new_shock_data = ShockData(link = new_shock,mp=self)
+        new_shock.link_data = new_shock_data
+        self.add_widget(new_shock)
+        #Add sidebar info widget
+        self.ids['links_list'].add_widget(new_shock_data)
+        #Info text update
+        self.info = ': link \'{}\' added'.format(new_shock.name)
 
     def delete_link(self,link):
         """

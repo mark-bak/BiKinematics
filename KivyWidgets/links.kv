@@ -6,6 +6,7 @@
     center: self.midpoint
     name: self.a.name+'_'+self.b.name
     points: [self.a.pos,self.b.pos]
+    colour: Colour_1
 
     canvas.after:
         Color:
@@ -15,7 +16,7 @@
             size: self.size
             pos: self.pos
         Color:
-            rgba: Colour_1
+            rgba: root.colour
         Line:
             points: self.points
 

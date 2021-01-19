@@ -93,6 +93,7 @@
         DialogButton:
             text: "Save"
             on_release: root.save(filename_input.text,filechooser.path)
+            on_release: root.cancel()
 
 <SimulateDialog>:
     size: root.size
