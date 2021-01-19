@@ -52,17 +52,32 @@ class PlotPage(FloatLayout):
                             size_hint=(0.9, 0.9))
         self._popup.open()
     
-    def load_results(self,path,selection):
-        filename = selection[-1]
+    def load_results(self,path,filename):
+        ##Filename parsing
+        if isinstance(filename,list):
+            filename = filename[-1]
+        
+        filename = filename.replace(path+"\\","") #Remove path from filename
 
-        self.results_filename = filename.replace(path+"\\","")
+        #Set name in GUI before we add path and stuff
+        self.results_filename = filename
 
+        ind = filename.find('.') #Find whether there is file ext
+        if ind != -1: 
+            #Remove file ext if present
+            filename = filename[0:ind]
+        filename = "{}\\{}.csv".format(path,filename) #Put in path with .json extension
+
+        ##Load in results
         with open(filename) as f:
             reader = csv.reader(f, delimiter=',',quotechar='|')
             for row in reader:
                 self.results[row[0]] = np.array(row[1:],dtype = 'float')
-        self.dismiss_popup()
-    
+
+        #GUI prompts
+        self.x_data_name = 'Select'
+        self.y_data_name = 'Select'
+            
     def show_data_dropdown(self,parent,axis):
         dropdown = DropDown()
         for result_name in self.results:

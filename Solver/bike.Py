@@ -156,7 +156,7 @@ class Bike():
         #Numerical derivative (shoddy rn, do a better one!!)
         delta_shock_length = np.diff(Shock_Length)
         delta_vertical_travel = np.diff(Vertical_Travel)             
-        Leverage_Ratio = np.divide(delta_vertical_travel, delta_shock_length)
+        Leverage_Ratio = np.abs(np.divide(delta_vertical_travel, delta_shock_length))
         Leverage_Ratio = np.hstack([Leverage_Ratio,Leverage_Ratio[-1]]) 
         
         #Derived suspension characeristics
