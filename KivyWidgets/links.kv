@@ -1,4 +1,4 @@
-#:kivy 1.11.1 
+#:kivy 1.11.1
 
 <Link>:
     size_hint:  None,None
@@ -6,7 +6,7 @@
     center: self.midpoint
     name: self.a.name+'_'+self.b.name
     points: [self.a.pos,self.b.pos]
-    colour: Colour_1
+    colour: self.colour_picker.color
 
     canvas.after:
         Color:

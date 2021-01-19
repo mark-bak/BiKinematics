@@ -4,6 +4,7 @@
 #Geometry point
     size_hint: None,None
     size: lbl.size
+    colour: self.colour_picker.color
     canvas.after:
         # Color:
         #     rgba: Colour_2
@@ -12,13 +13,13 @@
         #     size: self.size
         #     pos: self.pos 
         Color:
-            rgba: Colour_1
+            rgba: root.colour
         Ellipse:
             size: 5,5
             pos: self.pos[0]-2.5,self.pos[1]-2.5
     Label:
         id:lbl
-        color: Colour_2
+        color: root.colour
         text: root.name
         size: self.texture_size
 

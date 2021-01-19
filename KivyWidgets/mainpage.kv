@@ -75,6 +75,31 @@
             height: root.height - topbar_height
 
             BoxLayout:
+                size_hint_y:None
+                height: 100
+                orientation: 'horizontal'
+                Label:
+                    text: 'Point Colour:'
+                ColorWheel:
+                    id: point_colour
+            BoxLayout:
+                size_hint_y:None
+                height: 100
+                orientation: 'horizontal'
+                Label:
+                    text: 'Link Colour:'
+                ColorWheel:
+                    id: link_colour       
+            BoxLayout:
+                size_hint_y:None
+                height: 100
+                orientation: 'horizontal'
+                Label:
+                    text: 'Shock Colour:'
+                ColorWheel:
+                    id: shock_colour
+
+            BoxLayout:
                 id: params_list
                 orientation: "vertical"
                 size_hint: (None,None)
@@ -94,7 +119,7 @@
                     size_hint_y:None
                     height: sidebar_coords_height
                     SidebarLabel:
-                        text: "Parameter"
+                        text: "Input Parameter"
                     SidebarLabel:
                         size_hint_x: None
                         width: number_disp_width
