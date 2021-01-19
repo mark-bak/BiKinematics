@@ -42,10 +42,9 @@ Builder.load_file("KivyWidgets\\mainpage.kv")
 class MainPage(FloatLayout):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        Window.maximize()
         #Window resize binding
         Window.bind(on_resize=self.on_window_resize)
-
+        Window.maximize()
         #Sizes of some GUI elements - edit in .kv file
         self.sidebar_width = self.ids['sidebar'].width
         self.topbar_height = self.ids['topbar'].height
@@ -125,7 +124,7 @@ class MainPage(FloatLayout):
         self.mode = mode
         self.info = info
 
-    def rescale_geo(self, old_width, new_width, old_height, new_height,height_offset=0):
+    def rescale_geo(self, old_width, new_width, old_height, new_height, height_offset=0):
         """
         Walks all points and rescales according to window changes
         """
@@ -173,8 +172,8 @@ class MainPage(FloatLayout):
                 wbase_mm = 0 #If user has entered some funky stuf in text box, set wbase_mm (and tf px_to_mm) to zero
             self.px_to_mm = wbase_mm / wbase_px
         else:
-            #If front and rear wheel not specified, set scaling to 1
-            self.px_to_mm = 1
+            #If front and rear wheel not specified, set scaling to 0
+            self.px_to_mm = 0
         
     def goto_plot(self):
         """
@@ -448,6 +447,7 @@ class MainPage(FloatLayout):
         Simulates geometry on screen for desired_travel (mm) - outputs results in \\Results\\filename.csv
         """
         #Setup sim params
+
         desired_travel = float(desired_travel)
         sim_data = self.create_bike_data(sf = self.px_to_mm)
         b = Bike(sim_data)
@@ -485,6 +485,3 @@ class ThemePopup(Popup):
 #Button theme
 class TopbarButton(Button):
     pass
-
-
-

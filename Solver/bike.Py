@@ -89,14 +89,22 @@ class Bike():
         Uses shortest path algorithm to find path between two points of type 'ground', along the minimum
         number of links
         """  
+        grounds = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "ground"]
+
+        #Create graph for shortest path
         g = Graph(undirected=True)
-        ground =[]
         for name in self.points: # add nodes
             g.add_node(name)
         for name,link in self.links.items(): # add links
             g.add_edge(link.a.name,link.b.name,1)
-        ground = [name for name in self.points if self.points[name].type=='ground'] # this is dirty
-        path = find_path(g,ground[0],ground[1])
+        
+        for i in range(len(grounds)):
+            for j in range(len(grounds)):
+                if i !=j and i<j:
+                    try:
+                        path = find_path(g,grounds[i],grounds[j])
+                    except:
+                        pass
         self.kinematic_loop_points = path.nodes
         return path
 
@@ -104,7 +112,7 @@ class Bike():
         """
         Populates the list of point names (str) that do not move relative to frame in self.end_static_points[]
         """   
-        self.static_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "shock_frame"]
+        self.static_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "ground"]
 
     def find_end_eff_points(self):
         """
@@ -141,25 +149,28 @@ class Bike():
             y = np.ones(np.size(list(sol.values())[0].y)) * self.points[point_name].pos[1]
             self.solution[sol_name][point_name] = Pos_Result(x,y)
 
+        
         ##Travels and leverage ratio
         #Find points of interest for calcs
+        rw_name = None
         for name in self.points:
             if self.points[name].type == 'rear_wheel':
                 rw_name = name 
-        s_a_name = self.shock.a.name
-        s_b_name = self.shock.b.name
-     
-        #Maths
-        Vertical_Travel = sol[rw_name].y - np.ones(np.size(sol[rw_name].y)) * sol[rw_name].y[0] # s - I*s[0]     
-        shock_delta_x = np.subtract(sol[s_a_name].x, sol[s_b_name].x)
-        shock_delta_y = np.subtract(sol[s_a_name].y, sol[s_b_name].y)
-        Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0) 
-        Leverage_Ratio = self.calc_leverage_ratio(Vertical_Travel,Shock_Length)
         
-        #Derived suspension characeristics
-        self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
-        self.solution[sol_name]['Shock Length'] = Shock_Length
-        self.solution[sol_name]['Leverage Ratio'] = Leverage_Ratio
+        if self.shock is not None and rw_name is not None:
+            #Find shock point names
+            s_a_name = self.shock.a.name
+            s_b_name = self.shock.b.name
+            #Maths
+            Vertical_Travel = sol[rw_name].y - np.ones(np.size(sol[rw_name].y)) * sol[rw_name].y[0] # s - I*s[0]
+            shock_delta_x = np.subtract(sol[s_a_name].x, sol[s_b_name].x)
+            shock_delta_y = np.subtract(sol[s_a_name].y, sol[s_b_name].y)
+            Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0) 
+            Leverage_Ratio = self.calc_leverage_ratio(Vertical_Travel,Shock_Length)
+            #Add to solution
+            self.solution[sol_name]['Shock Length'] = Shock_Length
+            self.solution[sol_name]['Leverage Ratio'] = Leverage_Ratio
+            self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
 
     def calc_leverage_ratio(self,travel,shock_length):
         Leverage_Ratio = np.abs(np.gradient(travel, shock_length))
