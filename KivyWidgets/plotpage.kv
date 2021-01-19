@@ -23,19 +23,28 @@
 
             TopbarButton:
                 text: 'Return'
+                on_release: app.sm.transition.direction = 'right'
                 on_release: app.sm.current = 'Main'
-            TopbarButton:
-                width: topbar_btn_width * 1.5
-                background_color: Colour_2
-                text: root.results_filename
-                on_release: root.open_results_dialog()
             BoxLayout:
                 size_hint_x: None
                 width: pl.width
                 width: self.minimum_width
                 orientation: 'vertical'
                 PlotLabel:
-                    text: 'y data:'
+                    text: 'Results file:'
+                    width: topbar_btn_width * 1.5
+                TopbarButton:
+                    width: topbar_btn_width * 1.5
+                    background_color: Colour_2
+                    text: root.results_filename
+                    on_release: root.open_results_dialog()
+            BoxLayout:
+                size_hint_x: None
+                width: pl.width
+                width: self.minimum_width
+                orientation: 'vertical'
+                PlotLabel:
+                    text: 'y axis data:'
                 TopbarButton:
                     background_color: Colour_2
                     text: root.y_data_name
@@ -47,7 +56,7 @@
                 orientation: 'vertical'
                 PlotLabel:
                     id: pl
-                    text: 'x data:'
+                    text: 'x axis data:'
                 TopbarButton:
                     background_color: Colour_2
                     text: root.x_data_name
