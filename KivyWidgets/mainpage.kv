@@ -228,13 +228,19 @@
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
-        on_release: root.mp.point_mode()
+        on_release: root.mp.change_mode('Add_Point',' : click to add point')
     TopbarButton:
         text: 'Add Link'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
-        on_release: root.mp.link_mode()
+        on_release: root.mp.change_mode('Add_Link',' : {} of 2 points selected'.format(str(len(root.mp.link_points))))
+    TopbarButton:
+        text: 'Add Shock'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.change_mode('Add_Shock',' : {} of 2 points selected'.format(str(len(root.mp.link_points))))
 
 <DeleteDropDown>:
     TopbarButton:
@@ -242,13 +248,13 @@
         size_hint_y: None
         height: topbar_height
         on_release: root.dismiss()
-        on_release: root.mp.delete_point_mode()
+        on_release: root.mp.change_mode('Del_Point',': click to delete point (must be no link attached)')
     TopbarButton:
         text: 'Delete Link'
         size_hint_y: None
         height: topbar_height
         on_release: root.dismiss()
-        on_release: root.mp.delete_link_mode()
+        on_release: root.mp.change_mode('Del_Link',': click to delete Link')
     TopbarButton:
         text: 'Clear All Geo'
         size_hint_y: None

@@ -12,6 +12,7 @@ from kivy.properties import ObjectProperty
 from kivy.properties import ListProperty
 from kivy.properties import NumericProperty
 from kivy.properties import StringProperty
+from kivy.properties import ColorProperty
 
 #Kivy Language Tools
 from kivy.lang.builder import Builder
@@ -31,6 +32,7 @@ class Link(Widget):
     length = NumericProperty()
     name = StringProperty(None)
     midpoint = ListProperty([0,0])
+    colour = ColorProperty()
    
     def on_points(self,instance,value):
         new_len = float(np.linalg.norm([self.a.x-self.b.x,self.a.y-self.b.y]))
