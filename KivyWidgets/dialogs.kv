@@ -24,7 +24,7 @@
         DialogSpinner:
             id: point_typ
             text: 'ground'
-            values: 'ground', 'joint', 'shock_linkage','shock_frame','rear_wheel','front_wheel'
+            values: 'ground', 'linkage', 'rear_wheel', 'front_wheel'
     BoxLayout:
         canvas.after:
             Color:
@@ -113,7 +113,7 @@
         orientation: 'horizontal'
         Label:
             text: 'Simulation Travel (mm)'
-        TextInput:
+        FloatInput:
             id: desired_travel
             
     BoxLayout:
@@ -153,3 +153,4 @@
     background_color: Colour_3
     option_cls: Factory.SpinnerOptions
 
+<FloatInput>:

@@ -6,6 +6,7 @@
 #: set sidebar_coords_height 30
 #: set topbar_height 50
 #: set topbar_btn_width 150
+#: set number_disp_width 100
 
 #: set Colour_1 rgba("#f7f2f5")
 #: set Colour_2 rgba("#6e8e9e")
@@ -95,6 +96,8 @@
                     SidebarLabel:
                         text: "Parameter"
                     SidebarLabel:
+                        size_hint_x: None
+                        width: number_disp_width
                         text: "Value"
                 BoxLayout:
                     orientation: 'horizontal'
@@ -103,6 +106,8 @@
                     Label:
                         text: 'Wheelbase (mm)'
                     TextInput:
+                        size_hint_x: None
+                        width: number_disp_width
                         id: wheelbase_value
 
             BoxLayout: #Sidebar button layout
@@ -126,9 +131,13 @@
                     SidebarLabel:
                         text: "Type"
                     SidebarLabel:
-                        text: "x_pos"
+                        size_hint_x: None
+                        width: number_disp_width
+                        text: "x_pos (px)"
                     SidebarLabel:
-                        text: "y_pos" 
+                        size_hint_x: None
+                        width: number_disp_width
+                        text: "y_pos (px)" 
 
             BoxLayout:
                 id: links_list
@@ -149,7 +158,13 @@
                     SidebarLabel:
                         text: "Link"
                     SidebarLabel:
-                        text: "Length"
+                        size_hint_x: None
+                        width: number_disp_width
+                        text: "Length (px)"
+                    SidebarLabel:
+                        size_hint_x: None
+                        width: number_disp_width
+                        text: "Length (mm)"
 
     AnchorLayout: #Top button anchor      
         anchor_y: "top"

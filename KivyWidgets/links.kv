@@ -25,9 +25,15 @@
     orientation: "horizontal"
     size_hint_y:None
     height: sidebar_coords_height
-
-    len_txt: str(round(self.link.length*self.mp.px_to_mm,2))
+    len_txt_px: str(round(self.link.length,2))
+    len_txt_mm: str(round(self.link.length*self.mp.px_to_mm,2))
     Label:
         text: root.link.name
     TextInput:
-        text: root.len_txt
+        size_hint_x: None
+        width: number_disp_width
+        text: root.len_txt_px
+    TextInput:
+        size_hint_x: None
+        width: number_disp_width
+        text: root.len_txt_mm
