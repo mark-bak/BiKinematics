@@ -26,8 +26,20 @@
                 on_release: app.sm.current = 'Main'
             TopbarButton:
                 width: topbar_btn_width * 1.5
+                background_color: Colour_2
                 text: root.results_filename
                 on_release: root.open_results_dialog()
+            BoxLayout:
+                size_hint_x: None
+                width: pl.width
+                width: self.minimum_width
+                orientation: 'vertical'
+                PlotLabel:
+                    text: 'y data:'
+                TopbarButton:
+                    background_color: Colour_2
+                    text: root.y_data_name
+                    on_release: root.show_data_dropdown(self,'y')
             BoxLayout:
                 size_hint_x: None
                 width: pl.width
@@ -40,19 +52,8 @@
                     background_color: Colour_2
                     text: root.x_data_name
                     on_release: root.show_data_dropdown(self,'x')
-            BoxLayout:
-                size_hint_x: None
-                width: pl.width
-                width: self.minimum_width
-                orientation: 'vertical'
-                PlotLabel:
-                    text: 'y data:'
-                TopbarButton:
-                    background_color: Colour_2
-                    text: root.y_data_name
-                    on_release: root.show_data_dropdown(self,'y')
             TopbarButton:
-                text: 'Plot_Results'
+                text: 'Update Plot'
                 on_release: root.plot()
 
 

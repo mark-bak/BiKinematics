@@ -242,8 +242,6 @@ class MainPage(FloatLayout):
             #Image Loading
             if data['image_file']['value']:
                 self.load_image('',data['image_file']['value'])
-        
-        self.dismiss_popup()
 
     #Save methods
     def open_save_dialog(self):
@@ -271,8 +269,6 @@ class MainPage(FloatLayout):
         save_data = self.create_bike_data(sf=1)
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
-        
-        self.dismiss_popup()
 
     def create_bike_data(self,sf=1):
         """
@@ -324,7 +320,6 @@ class MainPage(FloatLayout):
         self.image_file = filename
         self.ids['image_frame'].add_widget(Image(source=filename,
                                                  pos=self.ids['image_frame'].pos))
-        self.dismiss_popup()
 
     def clear_image(self):
         """
@@ -333,17 +328,25 @@ class MainPage(FloatLayout):
         for child in self.ids['image_frame'].children:
             self.ids['image_frame'].remove_widget(child)
 
-    #Add point methods
+    ##Add point methods
     def point_mode(self):
-        #Called on add link button press (see .kv)
+        """
+        Switches to point adding app mode
+        """
         self.mode = 'Add_Point'
         self.info = ': click to add point'
 
     def delete_point_mode(self):
+        """
+        Switches to point deleting app mode
+        """
         self.mode = 'Del_Point'
         self.info = ': click to delete point (must be no link attached)'
     
     def open_point_dialog(self,touch):
+        """
+        Opens a point dialog for point parameter entry, at click/touch position
+        """
         content = PointDialog(add=self.add_point,cancel = self.dismiss_popup,touch = touch)
         self._popup = ThemePopup(title="Add Point", content=content,
                             size_hint=(None,None),size = (400,150),
@@ -352,37 +355,56 @@ class MainPage(FloatLayout):
         self._popup.open()
 
     def add_point(self,name,typ,pos):
-        #Called on Add button press in point dialog popup (see dialogs.kv)
+        """
+        Adds Point wdiget to app, with name type and position, name,typ,pos respectively
+        """
+        #Create and add point widget
         new_point = Point(name = name,point_type = typ,pos = pos)
         new_point_data = PointData(point = new_point,name=name,point_type=typ)
         new_point.point_data = new_point_data
         self.add_widget(new_point)
+        #Add sidebar info widgets
         self.ids['points_list'].add_widget(new_point_data)
         self.dismiss_popup()
+        #Update app info text
         self.info = ': point \'{}\' added'.format(new_point.name)
-        self.update_px_mm_conversion()
+        self.update_px_mm_conversion() #Run in case new wheel point added
 
     def delete_point(self,point):
+        """
+        Removes Point widget, point, from the app, and associated sidebar info widget
+        """
         self.ids['points_list'].remove_widget(point.point_data)
         self.remove_widget(point)
         self.info = ': point \'{}\' removed'.format(point.name)
         self.mode = 'Main'
         self.update_px_mm_conversion()
 
-    #Add link methods
+    ##Add link methods
     def link_mode(self):
+        """
+        Switches to link adding app mode
+        """
         self.mode = 'Add_Link'
         self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
 
     def delete_link_mode(self):
+        """
+        Switches to link_deleting app mode
+        """
         self.mode = 'Del_Link'
         self.info = ': click to delete Link'
          
     def on_link_points(self,instance,value):
+        """
+        Called when the self.link_points list is modified. If this list now has 2 unique points, creates a link between them and exits link creating mode
+        """
         objs = value
         self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
-        if len(objs)>1 and objs[0]==objs[1]: # stops acccidentally selecting same point twice
-            objs.pop(0)
+        #Check if points are unique, if duplicates, pop first from list
+        if len(objs)>1 and objs[0]==objs[1]:
+            objs.pop(0) 
+        #Add link between points in list
         if len(objs)>1:
             a = objs[0]
             b = objs[1]
@@ -391,34 +413,55 @@ class MainPage(FloatLayout):
             self.mode = 'Main'
 
     def add_link(self,a,b):
+        """
+        Adds Link widget to app, between Point widgets a and b
+        """
+        #Create link and add
         new_link = Link(a = a, b = b)
         new_link_data = LinkData(link = new_link,mp=self)
         new_link.link_data = new_link_data
-
         self.add_widget(new_link)
+        #Add sidebar info widget
         self.ids['links_list'].add_widget(new_link_data)
+        #Info text update
         self.info = ': link \'{}\' added'.format(new_link.name)
 
     def delete_link(self,link):
+        """
+        Deletes Link widget and associated sidebar info widget
+        """
         self.ids['links_list'].remove_widget(link.link_data)
         self.remove_widget(link)
         self.mode = 'Main'
 
     ##Simulate methods
     def open_sim_dialog(self):
+        """
+        Opens a dialog where simulation params can be sepcified
+        """
         content = SimulateDialog(simulate=self.simulate,cancel = self.dismiss_popup)
         self._popup = ThemePopup(title="Simulate", content=content,
                             size_hint=(None,None),size = (400,150)) 
         self._popup.open()
 
     def simulate(self,filename,desired_travel):
+        """
+        Simulates geometry on screen for desired_travel (mm) - outputs results in \\Results\\filename.csv
+        """
+        #Setup sim params
         desired_travel = float(desired_travel)
         sim_data = self.create_bike_data(sf = self.px_to_mm)
         b = Bike(sim_data)
         sol_name = 'Single_Sim'
-        b.get_suspension_motion(desired_travel,sol_name)
-        b.calculate_suspension_characteristics(sol_name)
-        b.save_solution_csv(sol_name,filename)
+        #Simulate
+        b.get_suspension_motion(desired_travel,sol_name) #Base linkage movement
+        b.calculate_suspension_characteristics(sol_name) #Derived susp characteristics
+        b.save_solution_csv(sol_name,filename) #Save
+
+        #Go to plotpage and view results:
+        self.parent.manager.get_screen('Plot').children[0].load_results('Results\\',filename) # potentially the worst line of code I have written so far
+        self.goto_plot()
+
         self.dismiss_popup()
         self.info = ': Simulation: {} complete'.format(filename)
 
