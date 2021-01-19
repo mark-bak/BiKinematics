@@ -32,7 +32,8 @@ class Link(Widget):
     length = NumericProperty()
     name = StringProperty(None)
     midpoint = ListProperty([0,0])
-    colour = ColorProperty()
+    colour = ListProperty()
+    colour_picker = ObjectProperty(None)
    
     def on_points(self,instance,value):
         new_len = float(np.linalg.norm([self.a.x-self.b.x,self.a.y-self.b.y]))

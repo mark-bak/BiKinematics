@@ -165,7 +165,7 @@ class MainPage(FloatLayout):
                     rw = wid
         if fw != None and rw != None:
             #If front and rear wheel exist, calculate scaling factor
-            wbase_px = fw.x-rw.x
+            wbase_px = abs(fw.x-rw.x)
             try:
                 wbase_mm = float(self.ids['params_list'].wheelbase)
             except:
@@ -248,6 +248,9 @@ class MainPage(FloatLayout):
                              new_width,
                              old_height, 
                              new_height)
+            self.ids['point_colour'].color = data['point_colour']['value']
+            self.ids['shock_colour'].color = data['shock_colour']['value']
+            self.ids['link_colour'].color = data['link_colour']['value']
             #Image Loading
             if data['image_file']['value']:
                 self.load_image('',data['image_file']['value'])
@@ -300,11 +303,14 @@ class MainPage(FloatLayout):
                 properties={'object':'Shock','a':w.a.name,'b':w.b.name}
                 data[w.name]= properties
         
-        ##Add other parameters
-        values = [['wheelbase',          float(self.ids['params_list'].wheelbase)],
-                  ['window_width',       self.cur_width                          ],
-                  ['window_height',      self.cur_height                         ],
-                  ['image_file',         self.image_file                         ]]
+        ##Add other parameters - these also end up getting passed to solver and not used but guess its no big deal
+        values = [['wheelbase',             float(self.ids['params_list'].wheelbase)],
+                  ['window_width',          self.cur_width                          ],
+                  ['window_height',         self.cur_height                         ],
+                  ['image_file',            self.image_file                         ],
+                  ['point_colour',          self.ids['point_colour'].color          ],
+                  ['link_colour',           self.ids['link_colour'].color           ],
+                  ['shock_colour',          self.ids['shock_colour'].color          ]]
                   
         for par in values:
             properties = {'object':'Parameter','value':par[1]}
@@ -331,7 +337,8 @@ class MainPage(FloatLayout):
         self.clear_image()
         self.image_file = filename
         self.ids['image_frame'].add_widget(Image(source=filename,
-                                                 pos=self.ids['image_frame'].pos))
+                                                 pos=self.ids['image_frame'].pos,
+                                                 allow_stretch=True))
 
     def clear_image(self):
         """
@@ -357,7 +364,7 @@ class MainPage(FloatLayout):
         Adds Point wdiget to app, with name type and position, name,typ,pos respectively
         """
         #Create and add point widget
-        new_point = Point(name = name,point_type = typ,pos = pos)
+        new_point = Point(name = name,point_type = typ,pos = pos,colour_picker=self.ids['point_colour'])
         new_point_data = PointData(point = new_point,name=name,point_type=typ)
         new_point.point_data = new_point_data
         self.add_widget(new_point)
@@ -404,8 +411,8 @@ class MainPage(FloatLayout):
         Adds Link widget to app, between Point widgets a and b
         """
         #Create link and add
-        new_link = Link(a = a, b = b)
-        new_link_data = LinkData(link = new_link,mp=self)
+        new_link = Link(a = a, b = b, colour_picker = self.ids['link_colour'])
+        new_link_data = LinkData(link = new_link, mp=self)
         new_link.link_data = new_link_data
         self.add_widget(new_link)
         #Add sidebar info widget
@@ -415,8 +422,8 @@ class MainPage(FloatLayout):
 
     def add_shock(self,a,b):
         #Create shock and add
-        new_shock = Shock(a = a, b = b)
-        new_shock_data = ShockData(link = new_shock,mp=self)
+        new_shock = Shock(a = a, b = b, colour_picker = self.ids['shock_colour'])
+        new_shock_data = ShockData(link = new_shock, mp=self)
         new_shock.link_data = new_shock_data
         self.add_widget(new_shock)
         #Add sidebar info widget
@@ -458,7 +465,7 @@ class MainPage(FloatLayout):
         b.save_solution_csv(sol_name,filename) #Save
 
         #Go to plotpage and view results:
-        self.parent.manager.get_screen('Plot').children[0].load_results('Results\\',filename) # potentially the worst line of code I have written so far
+        self.parent.manager.get_screen('Plot').children[0].load_results('Results\\',filename) #Potentially the worst line of code I have written so far
         self.goto_plot()
 
         self.dismiss_popup()

@@ -14,6 +14,7 @@ from kivy.properties import ObjectProperty
 from kivy.properties import StringProperty
 from kivy.properties import NumericProperty
 from kivy.properties import ReferenceListProperty
+from kivy.properties import ListProperty
 
 #Kivy Language Tools
 from kivy.lang.builder import Builder
@@ -27,6 +28,8 @@ class Point(Scatter):
     name = StringProperty()
     point_type = StringProperty()
     point_data = ObjectProperty(None)
+    colour = ListProperty()
+    colour_picker = ObjectProperty(None)
 
     def on_touch_down(self,touch):
         #custom touch behaviour for adding links
