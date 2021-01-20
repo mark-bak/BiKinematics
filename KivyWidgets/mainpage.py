@@ -48,7 +48,7 @@ class MainPage(FloatLayout):
         #Sizes of some GUI elements - edit in .kv file
         self.sidebar_width = self.ids['sidebar'].width
         self.topbar_height = self.ids['topbar'].height
-        self.info_text_height = self.ids['current_mode'].height
+        #self.info_text_height = self.ids['current_mode'].height
 
         #Set dropdown widgets
         self.LoadDropDown = LoadDropDown(mp = self)
@@ -374,7 +374,7 @@ class MainPage(FloatLayout):
         self.ids['points_list'].add_widget(new_point_data)
         self.dismiss_popup()
         #Update app info text
-        self.info = ': point \'{}\' added'.format(new_point.name)
+        self.info = 'Point \'{}\' added'.format(new_point.name)
         self.update_px_mm_conversion() #Run in case new wheel point added
 
     def delete_point(self,point):
@@ -383,7 +383,7 @@ class MainPage(FloatLayout):
         """
         self.ids['points_list'].remove_widget(point.point_data)
         self.remove_widget(point)
-        self.info = ': point \'{}\' removed'.format(point.name)
+        self.info = 'Point \'{}\' removed'.format(point.name)
         self.mode = 'Main'
         self.update_px_mm_conversion()
 
@@ -393,7 +393,7 @@ class MainPage(FloatLayout):
         Called when the self.link_points list is modified. If this list now has 2 unique points, creates a link between them and exits link creating mode
         """
         objs = value
-        self.info = ': {} of 2 points selected'.format(str(len(self.link_points)))
+        self.info = '{} of 2 points selected'.format(str(len(self.link_points)))
         #Check if points are unique, if duplicates, pop first from list
         if len(objs)>1 and objs[0]==objs[1]:
             objs.pop(0) 
@@ -420,7 +420,7 @@ class MainPage(FloatLayout):
         #Add sidebar info widget
         self.ids['links_list'].add_widget(new_link_data)
         #Info text update
-        self.info = ': link \'{}\' added'.format(new_link.name)
+        self.info = 'Link \'{}\' added'.format(new_link.name)
 
     def add_shock(self,a,b):
         #Create shock and add
@@ -431,7 +431,7 @@ class MainPage(FloatLayout):
         #Add sidebar info widget
         self.ids['links_list'].add_widget(new_shock_data)
         #Info text update
-        self.info = ': link \'{}\' added'.format(new_shock.name)
+        self.info = 'Link \'{}\' added'.format(new_shock.name)
 
     def delete_link(self,link):
         """
@@ -471,7 +471,7 @@ class MainPage(FloatLayout):
         self.goto_plot()
 
         self.dismiss_popup()
-        self.info = ': Simulation: {} complete'.format(filename)
+        self.info = 'Simulation: {} complete'.format(filename)
 
 ##Other widgets used for UI - see .kv for formatting
 #Dropdown style classes
