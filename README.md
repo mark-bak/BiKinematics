@@ -26,20 +26,20 @@ garden install matplotlib #Kivy - matplotlib addon
 ```
 py BiKinematics.py
 ```
-## Guide/Workflow:
+### Guide/Workflow:
 Typical workflow for analysing bike image
 
 1. Add image (Add.. menu)
 - Closer cropped the better
-<img src = ReadmeImages/AddImage.png width = 500>
+<img src = ReadmeImages/AddImage.PNG>
 
 2. Add points
 - Ground points do not move (in x,y) as linkage does (typically attached to front triangle)
 - Linkage points will move relative to front triangle as suspension compresses
 - Front and rear wheel should be pretty obvious...
-<br>
-<img src = ReadmeImages/Point.png width = 500>
-<br>
+
+<img src = ReadmeImages/Point.PNG>
+
 3. Add links between points
 - Add links between any points on the same member/rigidly connected to each other
 - Add shock between shock mountings
@@ -47,18 +47,18 @@ Typical workflow for analysing bike image
 4. Add wheelbase in User Parameters
 - Allows scaling from px to mm, gives accurate travel distance in simulation
 - Either get from datasheet or adjust until shock eye- eye length (mm) is correct
- <img src = “Bike.png” width = 500>
+<img src = ReadmeImages/Bike.PNG>
 
 5. Simulate for desired travel
-<img src = /ReadmeImages/SimMenu.png width = 500>
+<img src = ReadmeImages/SimMenu.PNG>
 
 6. Select data and desired characteristics
 - Note all sim results saved can be loaded in, and multiple different bikes can be compared
-<img src = “ReadmeImages/Plot.png” width = 500>
+<img src = ReadmeImages/Plot.PNG>
 
 There are also numerous examples in SaveFiles that can be loaded in using the Load/Save... menu
 ## Features
-# Current features 
+### Current features 
 Background image import
 Simulated motion of following (tested!) suspension systems - can probably handle more, solver is reasonably general:
 - Horst Link
@@ -69,7 +69,7 @@ Axle Path
 Leverage ratio calculation
 Results Plotting 
 
-# To add
+### To add
 - Other suspension systems (whatever tf yeti is doing)
 - Anti-squat calculations (Including with Idler pulley)
 - Pedal kickback calculations
