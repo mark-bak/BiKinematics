@@ -28,7 +28,7 @@ class Point(Scatter):
     name = StringProperty()
     point_type = StringProperty()
     point_data = ObjectProperty(None)
-    colour = ListProperty()
+    colour = ListProperty([1,0,0,1])
     colour_picker = ObjectProperty(None)
 
     def on_touch_down(self,touch):

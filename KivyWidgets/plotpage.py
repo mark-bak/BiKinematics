@@ -18,6 +18,7 @@ from kivy.uix.button import Button
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.mainpage import ThemePopup
 from KivyWidgets.mainpage import TopbarButton
+from KivyWidgets.misc import FloatInput
 
 #Kivy matplotlib
 import matplotlib
@@ -41,6 +42,7 @@ class PlotPage(FloatLayout):
     def create_plot(self):
         fig,ax = plt.subplots()
         self.ids['graph_frame'].add_widget(FigureCanvasKivyAgg(plt.gcf()))
+        ax.grid(b=True, which='major', color='#300000', linewidth='0.2')
         return fig,ax
  
     def dismiss_popup(self):
@@ -53,19 +55,23 @@ class PlotPage(FloatLayout):
         self._popup.open()
     
     def load_results(self,path,filename):
+        ##Clear currently loaded results
+        self.results.clear()
+
         ##Filename parsing
         if isinstance(filename,list):
             filename = filename[-1]
         
         filename = filename.replace(path+"\\","") #Remove path from filename
 
-        #Set name in GUI before we add path and stuff
-        self.results_filename = filename
-
         ind = filename.find('.') #Find whether there is file ext
         if ind != -1: 
             #Remove file ext if present
             filename = filename[0:ind]
+
+        #Set name in GUI before we add path and stuff
+        self.results_filename = filename
+
         filename = "{}\\{}.csv".format(path,filename) #Put in path with .json extension
 
         ##Load in results
@@ -100,14 +106,21 @@ class PlotPage(FloatLayout):
 
     def plot(self):
         try:
-            self.ax.clear()
-            self.ax.plot(self.x_plot_data, self.y_plot_data)
+            #self.ax.clear()
+            self.ax.plot(self.x_plot_data, self.y_plot_data, label = '{}: {} vs {}'.format(self.results_filename,self.y_data_name,self.x_data_name))
             self.ax.set_xlabel(self.x_data_name)
             self.ax.set_ylabel(self.y_data_name) 
+            self.ax.legend()
             self.fig.canvas.draw()
             self.ax.autoscale()
         except:
+            #If data not loaded or bad, do nothing
             pass
+    
+    def clear_plot(self):
+        self.ax.clear()
+        self.ax.grid(b=True, which='major', color='#300000', linewidth='0.2') #Redraw gridlines
+        self.fig.canvas.draw()
 
         
 

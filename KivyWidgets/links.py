@@ -32,7 +32,7 @@ class Link(Widget):
     length = NumericProperty()
     name = StringProperty(None)
     midpoint = ListProperty([0,0])
-    colour = ListProperty()
+    colour = ListProperty([1,0,0,1])
     colour_picker = ObjectProperty(None)
    
     def on_points(self,instance,value):

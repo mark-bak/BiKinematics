@@ -238,7 +238,7 @@ class MainPage(FloatLayout):
                         self.add_shock(a=a,b=b)
 
             ##Parameter Loading
-            self.ids['wheelbase_value'].text = str(data['wheelbase']['value'])
+            self.ids['wheelbase_value'].text = data['wheelbase']['value']
             #Rescaling
             new_width = Window.width
             new_height = Window.height
@@ -303,8 +303,10 @@ class MainPage(FloatLayout):
                 properties={'object':'Shock','a':w.a.name,'b':w.b.name}
                 data[w.name]= properties
         
+
+
         ##Add other parameters - these also end up getting passed to solver and not used but guess its no big deal
-        values = [['wheelbase',             float(self.ids['params_list'].wheelbase)],
+        values = [['wheelbase',             self.ids['params_list'].wheelbase       ],
                   ['window_width',          self.cur_width                          ],
                   ['window_height',         self.cur_height                         ],
                   ['image_file',            self.image_file                         ],
