@@ -37,8 +37,9 @@ Typical workflow for analysing bike image
 - Ground points do not move (in x,y) as linkage does (typically attached to front triangle)
 - Linkage points will move relative to front triangle as suspension compresses
 - Front and rear wheel should be pretty obvious...
-  ![t](AddPoint.PNG)
-
+<br>
+<img src = ReadmeImages/Point.png width = 500>
+<br>
 3. Add links between points
 - Add links between any points on the same member/rigidly connected to each other
 - Add shock between shock mountings
@@ -69,9 +70,9 @@ Leverage ratio calculation
 Results Plotting 
 
 # To add
-Other suspension systems (whatever tf yeti is doing)
-Anti-squat calculations (Including with Idler pulley)
-Pedal kickback calculations
-Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
-Slicker UI
+- Other suspension systems (whatever tf yeti is doing)
+- Anti-squat calculations (Including with Idler pulley)
+- Pedal kickback calculations
+- Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
+- Slicker UI
 
