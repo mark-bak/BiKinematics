@@ -20,7 +20,35 @@ garden install matplotlib #Kivy - matplotlib addon
 py BiKinematics.py
 '''
 # Guide/Workflow:
-To be added when I have time
+Typical workflow for analysing bike image
+
+1. Add image (Add.. menu)
+- Closer cropped the better
+<img src = “ReadmeImages/AddImage.png” width = 500>
+
+1. Add points
+- Ground points do not move (in x,y) as linkage does (typically attached to front triangle)
+- Linkage points will move relative to front triangle as suspension compresses
+- Front and rear wheel should be pretty obvious...
+<img src = “ReadmeImages/AddPoint.png” width = 500>
+
+1. Add links between points
+- Add links between any points on the same member/rigidly connected to each other
+- Add shock between shock mountings
+
+1. Add wheelbase in User Parameters
+- Allows scaling from px to mm, gives accurate travel distance in simulation
+- Either get from datasheet or adjust until shock eye- eye length (mm) is correct
+<img src = “ReadmeImages/Bike.png” width = 500>
+
+1. Simulate for desired travel
+<img src = “ReadmeImages/SimMenu.png” width = 500>
+
+1. Select data and desired characteristics
+- Note all sim results saved can be loaded in, and multiple different bikes can be compared
+<img src = “ReadmeImages/Plot.png” width = 500>
+
+There are also numerous examples in SaveFiles that can be loaded in using the Load/Save... menu
 ## Features
 # Current features 
 Background image import
@@ -37,6 +65,6 @@ Results Plotting
 Other suspension systems (whatever tf yeti is doing)
 Anti-squat calculations (Including with Idler pulley)
 Pedal kickback calculations
-Improved results plotting and graph image saving
+Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
 Slicker UI
 
