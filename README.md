@@ -29,7 +29,7 @@ py BiKinematics.py
 ### Guide/Workflow:
 Typical workflow for analysing bike image
 
-1. Add image (Add.. menu)
+1. Add image
 - Closer cropped the better
 <img src = ReadmeImages/AddImage.PNG>
 
@@ -56,7 +56,7 @@ Typical workflow for analysing bike image
 - Note all sim results saved can be loaded in, and multiple different bikes can be compared
 <img src = ReadmeImages/Plot.PNG>
 
-There are also numerous examples in SaveFiles that can be loaded in using the Load/Save... menu
+There are also numerous examples in SaveFiles that can be loaded in
 ## Features
 ### Current features 
 Background image import
