@@ -174,7 +174,11 @@ class Kinematic_Solver_Scipy_Min():
             if point.type == 'rear_wheel':
                 rear_wheel_name = name
                 rear_wheel_init_y = point.pos[1]
-        r_w_ind = self.end_eff_points.index(rear_wheel_name) + len(self.kinematic_loop_points) #List index of rear wheel point coordinates
+        
+        if rear_wheel_name in self.end_eff_points:
+            r_w_ind = self.end_eff_points.index(rear_wheel_name) + len(self.kinematic_loop_points) #List index of rear wheel point coordinates
+        if rear_wheel_name in self.kinematic_loop_points:
+            r_w_ind = self.kinematic_loop_points.index(rear_wheel_name)
 
         #Setup up solver to find angle that minimises error between desired y position (at specified travel), and y position of rear wheel
         #found from linkage solver
@@ -184,7 +188,7 @@ class Kinematic_Solver_Scipy_Min():
                                    th_in_0,
                                    [desired_y, r_w_ind,klp_off, klp_ss,eep_ss, eep_posn],
                                    method = 'Nelder-Mead',
-                                   options={'disp':True})
+                                   options={'disp':False})
         
         #Create return vector from initial and final angles
         th_in_end = res.x

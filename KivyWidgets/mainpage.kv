@@ -15,6 +15,7 @@
 #: set Colour_5 rgba("#1b2f37")
 
 <MainPage>:
+    ##Draw the background and colours and stuff
     canvas.before:
         Color:
             rgba: Colour_5
@@ -25,55 +26,69 @@
             rgba: Colour_3
         Rectangle:
             pos: (self.x,self.height-topbar_height)
-            size: (self.width,topbar_height)
+            size: (self.width-sidebar_width,topbar_height)
         Color:
             rgba: Colour_4
         Rectangle:
             pos: (self.width-sidebar_width,0)
-            size: (sidebar_width,self.height-topbar_height)
+            size: (sidebar_width,self.height)
     canvas.after:
         Color:
             rgba: Colour_1
         Line:
-            points: [(self.width-sidebar_width,0),(self.width-sidebar_width,self.height-topbar_height)]
-    AnchorLayout:
-        id: current_mode
-        anchor_x: "right"
-        anchor_y: "top"
-        #size_hint: None,None
-        #size: lbl.size 
-    
-        Label:
-            canvas.before:
-                Color:
-                    rgba: 1,0,0,0.5
-                Rectangle:
-                    size: self.size
-                    pos: self.pos
-            id: lbl
-            text: root.mode + root.info
-            color: Colour_1
-            size_hint: None,None
-            size: self.texture_size  
-    
+            points: [(self.width-sidebar_width,0),(self.width-sidebar_width,self.height)]
+
+    ##Positioning of image
     FloatLayout:
         id:image_frame
         pos: (0,0)
         size_hint: (None,None)
         size: (root.width-sidebar_width,root.height-topbar_height)
 
-    AnchorLayout:     
-        anchor_x: "right"
-        anchor_y: "bottom"
+    ##Sidebar
+    ScrollView:     
+        pos_hint: {'x':(root.width - sidebar_width)/root.width ,'y':0}
+        size_hint: None,None
+        height: root.height
+        width: sidebar_width
+        do_scroll_x: False
+
         BoxLayout:
             id: sidebar
             orientation: "vertical"
             size_hint_x: None
             width: sidebar_width
-            size_hint_y: None
-            height: root.height - topbar_height
+            size_hint_min_y:self.minimum_height
+            ##Info display
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: sidebar_coords_height
+                SidebarLabel:
+                    text: 'Mode:'
+                    size_hint_x: None
+                    width: sidebar_width * .25
+                SidebarLabel:
+                    text: 'Info:'
+                    size_hint_x: None
+                    width: sidebar_width * .75   
+            BoxLayout:
+                orientation: 'horizontal'
+                size_hint_y: None
+                height: sidebar_coords_height
+                Label:
+                    text: root.mode
+                    color: Colour_1
+                    size_hint_x:None
+                    width: sidebar_width * .25
+                Label:
+                    text: root.info
+                    color: Colour_1                
+                    size_hint_x:None
+                    width: sidebar_width * .75               
+
             SidebarLabel:
-                text: 'Graphics Options'
+                text: 'Graphics Options:'
                 size_hint_y: None
                 height: sidebar_coords_height
             BoxLayout:
@@ -124,11 +139,11 @@
                     size_hint_y:None
                     height: sidebar_coords_height
                     SidebarLabel:
-                        text: "Input Parameter"
+                        text: "Input Parameter:"
                     SidebarLabel:
                         size_hint_x: None
                         width: number_disp_width
-                        text: "Value"
+                        text: "Value:"
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y:None
@@ -157,17 +172,17 @@
                     size_hint_y:None
                     height: sidebar_coords_height
                     SidebarLabel:
-                        text: "Point"
+                        text: "Point:"
                     SidebarLabel:
-                        text: "Type"
-                    SidebarLabel:
-                        size_hint_x: None
-                        width: number_disp_width
-                        text: "x_pos (px)"
+                        text: "Type:"
                     SidebarLabel:
                         size_hint_x: None
                         width: number_disp_width
-                        text: "y_pos (px)" 
+                        text: "x Pos (px):"
+                    SidebarLabel:
+                        size_hint_x: None
+                        width: number_disp_width
+                        text: "y Pos (px):" 
 
             BoxLayout:
                 id: links_list
@@ -186,15 +201,15 @@
                     size_hint_y:None
                     height: sidebar_coords_height
                     SidebarLabel:
-                        text: "Link"
+                        text: "Link:"
                     SidebarLabel:
                         size_hint_x: None
                         width: number_disp_width
-                        text: "Length (px)"
+                        text: "Length (px):"
                     SidebarLabel:
                         size_hint_x: None
                         width: number_disp_width
-                        text: "Length (mm)"
+                        text: "Length (mm):"
 
     AnchorLayout: #Top button anchor      
         anchor_y: "top"
@@ -202,6 +217,8 @@
         BoxLayout: #Topbar button layout
             size_hint_y: None
             height: topbar_height
+            size_hint_x: None
+            width: root.width - sidebar_width
             id: topbar
             orientation: "horizontal"
             # canvas.after:
@@ -252,6 +269,7 @@
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
+        on_release: root.mp.clear_all()
         on_release: root.mp.open_load_dialog()
     TopbarButton:
         text: 'Save'
@@ -267,19 +285,19 @@
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
-        on_release: root.mp.change_mode('Add_Point',' : click to add point')
+        on_release: root.mp.change_mode('Add_Point','Click to add point')
     TopbarButton:
         text: 'Add Link'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
-        on_release: root.mp.change_mode('Add_Link',' : {} of 2 points selected'.format(str(len(root.mp.link_points))))
+        on_release: root.mp.change_mode('Add_Link','{} of 2 points selected'.format(str(len(root.mp.link_points))))
     TopbarButton:
         text: 'Add Shock'
         size_hint_y: None
         height: topbar_height
         on_release:root.dismiss()
-        on_release: root.mp.change_mode('Add_Shock',' : {} of 2 points selected'.format(str(len(root.mp.link_points))))
+        on_release: root.mp.change_mode('Add_Shock','{} of 2 points selected'.format(str(len(root.mp.link_points))))
     TopbarButton:
         text: 'Add Image'
         size_hint_y: None
@@ -293,13 +311,13 @@
         size_hint_y: None
         height: topbar_height
         on_release: root.dismiss()
-        on_release: root.mp.change_mode('Del_Point',': click to delete point (must be no link attached)')
+        on_release: root.mp.change_mode('Del_Point','Click to delete point (must be no link attached)')
     TopbarButton:
         text: 'Delete Link'
         size_hint_y: None
         height: topbar_height
         on_release: root.dismiss()
-        on_release: root.mp.change_mode('Del_Link',': click to delete Link')
+        on_release: root.mp.change_mode('Del_Link','Click to delete Link')
     TopbarButton:
         text: 'Clear All Geo'
         size_hint_y: None

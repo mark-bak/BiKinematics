@@ -1,0 +1,149 @@
+{
+  "Upper_Swingarm_Upper_Pivot": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Upper_Pivot"
+  },
+  "Shock_Linkage_Upper_Pivot": {
+    "object": "Link",
+    "a": "Shock_Linkage",
+    "b": "Upper_Pivot"
+  },
+  "Upper_Swingarm_Shock_Linkage": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Shock_Linkage"
+  },
+  "Upper_Swingarm_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Lower_Swingarm"
+  },
+  "Lower_Swingarm_Lower_Pivot": {
+    "object": "Link",
+    "a": "Lower_Swingarm",
+    "b": "Lower_Pivot"
+  },
+  "Upper_Swingarm_Rear_Wheel": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Rear_Wheel"
+  },
+  "Rear_Wheel_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Lower_Swingarm"
+  },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Linkage",
+    "b": "Shock_Frame"
+  },
+  "Upper_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      522.0,
+      349.00000000000006
+    ]
+  },
+  "Shock_Linkage": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      468.0,
+      388.9999999999999
+    ]
+  },
+  "Shock_Frame": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      795.0,
+      505.0
+    ]
+  },
+  "Lower_Swingarm": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      528.0,
+      234.00000000000003
+    ]
+  },
+  "Lower_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      578.0,
+      238.99999999999991
+    ]
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      96.0,
+      202.0
+    ]
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1412.0,
+      202.99999999999994
+    ]
+  },
+  "Upper_Swingarm": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      492.0,
+      371.9999999999999
+    ]
+  },
+  "wheelbase": {
+    "object": "Parameter",
+    "value": "1217"
+  },
+  "window_width": {
+    "object": "Parameter",
+    "value": 1920
+  },
+  "window_height": {
+    "object": "Parameter",
+    "value": 1017
+  },
+  "image_file": {
+    "object": "Parameter",
+    "value": "C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\ImageFiles\\Example_IbisRipleyAF.jpg"
+  },
+  "point_colour": {
+    "object": "Parameter",
+    "value": [
+      0.29999999999999993,
+      0.19999999999999996,
+      1,
+      1
+    ]
+  },
+  "link_colour": {
+    "object": "Parameter",
+    "value": [
+      1,
+      0,
+      0,
+      1
+    ]
+  },
+  "shock_colour": {
+    "object": "Parameter",
+    "value": [
+      0.25,
+      0.5,
+      0.0,
+      1
+    ]
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Frame",
+    "b": "Shock_Rocker"
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1209.0,
+      346.99999999999994
+    ]
+  },
+  "Shock_Frame": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      764.0,
+      546.9999999999999
+    ]
+  },
+  "Shock_Rocker_Rear_Wheel": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Rear_Wheel"
+  },
+  "Rear_Wheel_Main_Pivot": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Main_Pivot"
+  },
+  "Shock_Rocker": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      605.0,
+      524.0000000000001
+    ]
+  },
+  "Shock_Rocker_Main_Pivot": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Main_Pivot"
+  },
+  "Main_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      648.0,
+      395.9665821472338
+    ]
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      286.0,
+      337.4032670374213
+    ]
+  },
+  "wheelbase": {
+    "object": "Parameter",
+    "value": "1203"
+  },
+  "window_width": {
+    "object": "Parameter",
+    "value": 1920
+  },
+  "window_height": {
+    "object": "Parameter",
+    "value": 1017
+  },
+  "image_file": {
+    "object": "Parameter",
+    "value": "C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\ImageFiles\\OrangeFive.jpg"
+  },
+  "point_colour": {
+    "object": "Parameter",
+    "value": [
+      0.30000000000000004,
+      1,
+      1,
+      1
+    ]
+  },
+  "link_colour": {
+    "object": "Parameter",
+    "value": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "shock_colour": {
+    "object": "Parameter",
+    "value": [
+      0.925,
+      1,
+      0.4,
+      1
+    ]
+  }
+}

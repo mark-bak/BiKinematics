@@ -24,13 +24,17 @@ To be added when I have time
 ## Features
 # Current features 
 Background image import
-Simulated motion of 4-bar (plus!!) based bike suspensions
+Simulated motion of following (tested!) suspension systems - can probably handle more, solver is reasonably general:
+- Horst Link
+- DW Link
+- Split Pivot (Devinci)
+- Single Pivot
 Axle Path 
 Leverage ratio calculation
 Results Plotting 
 
 # To add
-Other suspension systems (single pivot, whatever tf yeti is doing)
+Other suspension systems (whatever tf yeti is doing)
 Anti-squat calculations (Including with Idler pulley)
 Pedal kickback calculations
 Improved results plotting and graph image saving

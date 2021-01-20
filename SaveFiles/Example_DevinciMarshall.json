@@ -1,0 +1,131 @@
+{
+  "Shock_Rocker": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      670.0,
+      575.0000000000001
+    ]
+  },
+  "Seatstay": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      570.0,
+      564.5708210010368
+    ]
+  },
+  "Upper_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      636.0,
+      540.0070176265435
+    ]
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1209.0,
+      346.99999999999994
+    ]
+  },
+  "Shock_Frame": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      685.0,
+      414.0
+    ]
+  },
+  "Upper_Pivot_Seatstay": {
+    "object": "Link",
+    "a": "Upper_Pivot",
+    "b": "Seatstay"
+  },
+  "Seatstay_Rear_Wheel": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Rear_Wheel"
+  },
+  "Shock_Rocker_Seatstay": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Seatstay"
+  },
+  "Upper_Pivot_Shock_Rocker": {
+    "object": "Link",
+    "a": "Upper_Pivot",
+    "b": "Shock_Rocker"
+  },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Frame",
+    "b": "Shock_Rocker"
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      276.0,
+      364.40326703742124
+    ]
+  },
+  "Rear_Wheel_Main_Pivot": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Main_Pivot"
+  },
+  "Main_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      607.0,
+      386.96658214723374
+    ]
+  },
+  "wheelbase": {
+    "object": "Parameter",
+    "value": "1203"
+  },
+  "window_width": {
+    "object": "Parameter",
+    "value": 1920
+  },
+  "window_height": {
+    "object": "Parameter",
+    "value": 1017
+  },
+  "image_file": {
+    "object": "Parameter",
+    "value": "C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\ImageFiles\\DevinciMarshall.jpg"
+  },
+  "point_colour": {
+    "object": "Parameter",
+    "value": [
+      0.30000000000000004,
+      1,
+      1,
+      1
+    ]
+  },
+  "link_colour": {
+    "object": "Parameter",
+    "value": [
+      0.9125,
+      1,
+      0.30000000000000004,
+      1
+    ]
+  },
+  "shock_colour": {
+    "object": "Parameter",
+    "value": [
+      1,
+      0.09999999999999998,
+      0.09999999999999998,
+      1
+    ]
+  }
+}

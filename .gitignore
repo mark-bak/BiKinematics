@@ -1,4 +1,5 @@
 .vscode
 *__
-env/
+.env/
 *.csv
+*.ipynb

@@ -9,17 +9,9 @@ import math
 from collections import namedtuple
 import json
 
-
- 
-#Local imports
-# pylint: disable = import-error
-if __name__ == '__main__':
-    import matplotlib
-    import matplotlib.pyplot as plt
-
-    from kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
-else:
-    from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
+#Solver imports
+#pylint: disable = import-error
+from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
 
 class Bike():
     def __init__(self,data):
@@ -98,14 +90,29 @@ class Bike():
         for name,link in self.links.items(): # add links
             g.add_edge(link.a.name,link.b.name,1)
         
+        path = None
+        #Loop between grounds, and find the ones connected by links
         for i in range(len(grounds)):
             for j in range(len(grounds)):
                 if i !=j and i<j:
                     try:
-                        path = find_path(g,grounds[i],grounds[j])
+                        path = find_path(g,grounds[i],grounds[j]) #Fnd shortest path betweeen these two grounds - almost 100% sure this always gives kin. path 
+                        path_list = path.nodes
                     except:
                         pass
-        self.kinematic_loop_points = path.nodes
+        
+        if path == None:
+            rear_wheel_name = [name for name in self.points if self.points[name].type == "rear_wheel"]
+            for i in range(len(grounds)):
+                try:
+                    path = find_path(g,grounds[i],rear_wheel_name[0])
+                    path_list = path.nodes
+                    path_list.append(grounds[i])
+                    print(path_list)
+                except:
+                    pass
+
+        self.kinematic_loop_points = path_list
         return path
 
     def find_static_points(self):
@@ -199,43 +206,5 @@ class Bike():
                     writer.writerow([point_name]+list(self.solution[solution_name][point_name]))
                     pass
 
-##Tests - requires Horst_Example.json - need to distribute this in the Github
-def load_json(filename):
-    with open(filename) as f:
-        data = json.load(f)
-    return data
-
-if __name__ == '__main__':
-
-    #example import from GUI
-    data = load_json("VitusSommetGeo.json")
-    b = Bike(data)
-
-    #check cartesian and link space conversions
-    print('Checking coordinate conversion:')
-    c = 100*np.random.rand(4,2)
-    offset=c[0,:]
-    ls = b.kinematic_solver.cartesian_to_link_space(c,'loop') 
-    c_check = b.kinematic_solver.link_space_to_cartesian(offset,ls,'loop')
-
-    origin = [0,0]
-    point = [1,1]
-    res = b.kinematic_solver.cartesian_to_link_space([origin,point])
-    if c.all() == c_check.all() and res[0]-np.pi/2<0.01 and res[1]-np.sqrt(2)<0.01:
-        print('--passed--')
-    else:
-        print('--failed--')
-
-    #plot example rear axle path
-    b.get_suspension_motion(100,'test')
-    b.calculate_suspension_characteristics('test')
-    fig, ax = plt.subplots()
-    x = b.solution['test']['Rear_Wheel'].x
-    y = b.solution['test']['Rear_Wheel'].y
-    ax.plot(x, y)
-    ax.set_title('Rear Axle Path')
-    #plt.show()
-    b.save_solution_csv('test','test_file')
-    
 
 
