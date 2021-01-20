@@ -1,4 +1,4 @@
-#:kivy 1.11.1 
+#:kivy 1.11.1
 #:import rgba kivy.utils.get_color_from_hex
 
 #general layout properties
@@ -65,7 +65,6 @@
     AnchorLayout:     
         anchor_x: "right"
         anchor_y: "bottom"
-
         BoxLayout:
             id: sidebar
             orientation: "vertical"
@@ -73,7 +72,10 @@
             width: sidebar_width
             size_hint_y: None
             height: root.height - topbar_height
-
+            SidebarLabel:
+                text: 'Graphics Options'
+                size_hint_y: None
+                height: sidebar_coords_height
             BoxLayout:
                 size_hint_y:None
                 height: 100
@@ -82,6 +84,7 @@
                     text: 'Point Colour:'
                 ColorWheel:
                     id: point_colour
+                    color: 1,1,1,1
             BoxLayout:
                 size_hint_y:None
                 height: 100
@@ -89,7 +92,8 @@
                 Label:
                     text: 'Link Colour:'
                 ColorWheel:
-                    id: link_colour       
+                    id: link_colour 
+                    color: 1,0,0,1      
             BoxLayout:
                 size_hint_y:None
                 height: 100
@@ -98,6 +102,7 @@
                     text: 'Shock Colour:'
                 ColorWheel:
                     id: shock_colour
+                    color: 0,1,0,1
 
             BoxLayout:
                 id: params_list
@@ -130,7 +135,7 @@
                     height: sidebar_coords_height
                     Label:
                         text: 'Wheelbase (mm)'
-                    TextInput:
+                    FloatInput:
                         size_hint_x: None
                         width: number_disp_width
                         id: wheelbase_value
@@ -209,10 +214,10 @@
                 text: 'Load/Save...'
                 on_release: root.show_dropdown(root.LoadDropDown,self)
             TopbarButton:
-                text: 'Add Geo...'
+                text: 'Add...'
                 on_release: root.show_dropdown(root.AddGeoDropDown,self)
             TopbarButton:
-                text: 'Delete...'
+                text: 'Delete/Clear...'
                 on_release: root.show_dropdown(root.DeleteDropDown,self)
             TopbarButton:
                 text: 'Analysis...'

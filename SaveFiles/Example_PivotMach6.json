@@ -1,0 +1,149 @@
+{
+  "Upper_Swingarm_Upper_Pivot": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Upper_Pivot"
+  },
+  "Shock_Linkage_Upper_Pivot": {
+    "object": "Link",
+    "a": "Shock_Linkage",
+    "b": "Upper_Pivot"
+  },
+  "Upper_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      622.0,
+      412.0
+    ]
+  },
+  "Upper_Swingarm_Shock_Linkage": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Shock_Linkage"
+  },
+  "Upper_Swingarm_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Lower_Swingarm"
+  },
+  "Lower_Swingarm_Lower_Pivot": {
+    "object": "Link",
+    "a": "Lower_Swingarm",
+    "b": "Lower_Pivot"
+  },
+  "Lower_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      625.0,
+      284.0
+    ]
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1448.0,
+      206.99999999999997
+    ]
+  },
+  "Upper_Swingarm": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      595.0,
+      473.00000000000006
+    ]
+  },
+  "Upper_Swingarm_Rear_Wheel": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Rear_Wheel"
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      156.0,
+      211.0
+    ]
+  },
+  "Rear_Wheel_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Lower_Swingarm"
+  },
+  "Shock_Linkage": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      677.0,
+      452.0
+    ]
+  },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Linkage",
+    "b": "Shock_Frame"
+  },
+  "Shock_Frame": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      692.0,
+      231.99999999999997
+    ]
+  },
+  "Lower_Swingarm": {
+    "object": "Point",
+    "type": "linkage",
+    "position": [
+      573.0,
+      279.0
+    ]
+  },
+  "wheelbase": {
+    "object": "Parameter",
+    "value": "1233"
+  },
+  "window_width": {
+    "object": "Parameter",
+    "value": 1920
+  },
+  "window_height": {
+    "object": "Parameter",
+    "value": 1017
+  },
+  "image_file": {
+    "object": "Parameter",
+    "value": "C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\ImageFiles\\Example_PivotMach6.png"
+  },
+  "point_colour": {
+    "object": "Parameter",
+    "value": [
+      1,
+      1,
+      1,
+      1
+    ]
+  },
+  "link_colour": {
+    "object": "Parameter",
+    "value": [
+      1,
+      0,
+      0,
+      1
+    ]
+  },
+  "shock_colour": {
+    "object": "Parameter",
+    "value": [
+      0.925,
+      1,
+      0.4,
+      1
+    ]
+  }
+}

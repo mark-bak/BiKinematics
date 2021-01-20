@@ -62,9 +62,11 @@
                     text: root.x_data_name
                     on_release: root.show_data_dropdown(self,'x')
             TopbarButton:
-                text: 'Update Plot'
+                text: 'Add to Plot'
                 on_release: root.plot()
-
+            TopbarButton:
+                text: 'Clear Plot'
+                on_release: root.clear_plot()
 
     BoxLayout:
         id: graph_frame
