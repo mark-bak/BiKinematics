@@ -6,7 +6,7 @@ Written as a project to learn Python :)
 ## Installation
 Ideally setup a [Python 3.7.0 virtual environment](https://medium.com/swlh/how-to-run-a-different-version-of-python-from-your-terminal-fe744276ff22) - later python versions should work however I haven't tested.
 
-# Install requirements:
+# Install requirements
 
 '''
 pip install -r requirements.txt #Python reqs
@@ -15,11 +15,11 @@ garden install matplotlib #Kivy - matplotlib addon
 '''
 
 ## Usage
-# Run app:
+# Run app
 '''
 py BiKinematics.py
 '''
-# Guide/Workflow:
+# Guide/Workflow
 To be added when I have time
 ## Features
 # Current features 
