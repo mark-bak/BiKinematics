@@ -26,12 +26,12 @@ garden install matplotlib #Kivy - matplotlib addon
 ```
 py BiKinematics.py
 ```
-# Guide/Workflow:
+## Guide/Workflow:
 Typical workflow for analysing bike image
 
 1. Add image (Add.. menu)
 - Closer cropped the better
-<img src = “ReadmeImages/AddImage.png” width = 500>
+<img src = ReadmeImages/AddImage.png width = 500>
 
 2. Add points
 - Ground points do not move (in x,y) as linkage does (typically attached to front triangle)
