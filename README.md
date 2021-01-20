@@ -37,7 +37,7 @@ Typical workflow for analysing bike image
 - Ground points do not move (in x,y) as linkage does (typically attached to front triangle)
 - Linkage points will move relative to front triangle as suspension compresses
 - Front and rear wheel should be pretty obvious...
-<img src = “ReadmeImages/AddPoint.png” width = 500>
+  ![t](AddPoint.PNG)
 
 3. Add links between points
 - Add links between any points on the same member/rigidly connected to each other
@@ -46,10 +46,10 @@ Typical workflow for analysing bike image
 4. Add wheelbase in User Parameters
 - Allows scaling from px to mm, gives accurate travel distance in simulation
 - Either get from datasheet or adjust until shock eye- eye length (mm) is correct
-<img src = “ReadmeImages/Bike.png” width = 500>
+ <img src = “Bike.png” width = 500>
 
 5. Simulate for desired travel
-<img src = “ReadmeImages/SimMenu.png” width = 500>
+<img src = /ReadmeImages/SimMenu.png width = 500>
 
 6. Select data and desired characteristics
 - Note all sim results saved can be loaded in, and multiple different bikes can be compared
