@@ -38,7 +38,7 @@ Typical workflow for analysing bike image
 - Linkage points will move relative to front triangle as suspension compresses
 - Front and rear wheel should be pretty obvious...
 
-<img src = ReadmeImages/Point.PNG>
+<img src = ReadmeImages/AddPoint.PNG>
 
 3. Add links between points
 - Add links between any points on the same member/rigidly connected to each other
