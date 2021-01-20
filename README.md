@@ -60,13 +60,17 @@ There are also numerous examples in SaveFiles that can be loaded in using the Lo
 ## Features
 ### Current features 
 Background image import
+
 Simulated motion of following (tested!) suspension systems - can probably handle more, solver is reasonably general:
 - Horst Link
 - DW Link
 - Split Pivot (Devinci)
 - Single Pivot
+
 Axle Path 
+
 Leverage ratio calculation
+
 Results Plotting 
 
 ### To add
