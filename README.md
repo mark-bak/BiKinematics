@@ -3,6 +3,11 @@ Application to analyse mtb suspension kinematics.
 
 Written as a project to learn Python :)
 
+Uses the following main packages:
+* Kivy - GUI
+* Numpy/Scipy - Linkage Simulation
+* Matplotlib - Plotting
+
 ## Installation
 Ideally setup a [Python 3.7.0 virtual environment](https://medium.com/swlh/how-to-run-a-different-version-of-python-from-your-terminal-fe744276ff22) - later python versions should work however I haven't tested.
 
