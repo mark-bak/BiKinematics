@@ -6,12 +6,12 @@ import numpy as np
 import scipy as sp
 from scipy.optimize import minimize
 import math
-from collections import namedtuple
 import json
 
 #Solver imports
 #pylint: disable = import-error
-from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min,Pos_Result
+from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
+from Solver.dtypes import Pos_Result
 
 class Bike():
     def __init__(self,data):
@@ -101,7 +101,7 @@ class Bike():
                     except:
                         pass
         
-        if path == None:
+        if path is None:
             rear_wheel_name = [name for name in self.points if self.points[name].type == "rear_wheel"]
             for i in range(len(grounds)):
                 try:
@@ -149,39 +149,99 @@ class Bike():
         Directly modifies self.solution[sol_name]
         """
         sol = self.solution[sol_name]
+        size = np.size(list(sol.values())[0].x) 
 
         ##Static Points
-        for point_name in self.static_points: 
-            x = np.ones(np.size(list(sol.values())[0].x)) * self.points[point_name].pos[0]
-            y = np.ones(np.size(list(sol.values())[0].y)) * self.points[point_name].pos[1]
-            self.solution[sol_name][point_name] = Pos_Result(x,y)
-
+        for point_name in self.static_points:
+            r = self.populate_static_point(sol, size,point_name)
+            self.solution[sol_name][point_name] = r
         
-        ##Travels and leverage ratio
-        #Find points of interest for calcs
+        ##Instant centre
+        if len(self.kinematic_loop_points) < 4:
+            #If single pivot - Ic is constant
+            Instant_Centre = self.populate_static_point(sol,size,self.kinematic_loop_points[0])
+        else:
+            #4-bar soln
+            a1 = sol[ self.kinematic_loop_points[0] ]
+            a2 = sol[ self.kinematic_loop_points[1] ]
+            b1 = sol[ self.kinematic_loop_points[-2] ]
+            b2 = sol[ self.kinematic_loop_points[-1] ] 
+
+            Instant_Centre = self.find_intersection(a1,a2,b1,b2)
+
+        ##Derived characteristics
+        #Find RW point
         rw_name = None
         for name in self.points:
             if self.points[name].type == 'rear_wheel':
-                rw_name = name 
-        
-        if self.shock is not None and rw_name is not None:
+                rw_name = name
+        #Get zero-based wheel travel 
+        if rw_name is not None:
+            rw_norm = self.offset_to_zero(sol,size,rw_name)
+            Vertical_Travel = rw_norm.y
+            Axle_Path_X = rw_norm.x
+        else:
+            Vertical_Travel = np.zeros(size)
+            Axle_Path_X = np.zeros(size)
+
+        if self.shock is not None:
             #Find shock point names
             s_a_name = self.shock.a.name
             s_b_name = self.shock.b.name
-            #Maths
-            Vertical_Travel = sol[rw_name].y - np.ones(np.size(sol[rw_name].y)) * sol[rw_name].y[0] # s - I*s[0]
-            shock_delta_x = np.subtract(sol[s_a_name].x, sol[s_b_name].x)
-            shock_delta_y = np.subtract(sol[s_a_name].y, sol[s_b_name].y)
-            Shock_Length = np.linalg.norm(np.vstack([shock_delta_x,shock_delta_y]),axis=0) 
-            Leverage_Ratio = self.calc_leverage_ratio(Vertical_Travel,Shock_Length)
+            Shock_Length = self.calc_distance(sol[s_a_name] , sol[s_b_name])
+            Leverage_Ratio = self.calc_derivative(Vertical_Travel,Shock_Length)
             #Add to solution
-            self.solution[sol_name]['Shock Length'] = Shock_Length
-            self.solution[sol_name]['Leverage Ratio'] = Leverage_Ratio
-            self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
+        else:
+            Shock_Length = np.zeros(size)
+            Leverage_Ratio = np.zers(size)
 
-    def calc_leverage_ratio(self,travel,shock_length):
-        Leverage_Ratio = np.abs(np.gradient(travel, shock_length))
-        return Leverage_Ratio
+        #Populate solution
+        self.solution[sol_name]['Shock Length'] = Shock_Length
+        self.solution[sol_name]['Leverage Ratio'] = Leverage_Ratio
+        self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
+        self.solution[sol_name]['Axle Path X'] = Axle_Path_X
+        self.solution[sol_name]['Instant Centre'] = Instant_Centre
+
+    def populate_static_point(self,sol,size,point_name):
+        x = np.ones(size) * self.points[point_name].pos[0]
+        y = np.ones(size) * self.points[point_name].pos[1]
+        return Pos_Result(x,y)
+
+    def offset_to_zero(self,sol,size,point_name):
+        #Normalised  path
+        y = sol[point_name].y - np.ones(size) * sol[point_name].y[0] # s - I*s[0]
+        x = sol[point_name].x - np.ones(size)  * sol[point_name].x[0]
+        return Pos_Result(x,y)
+
+    def calc_distance(self,a,b):
+        dx = np.subtract(a.x , b.x)
+        dy = np.subtract(a.y , b.y)
+        L = np.linalg.norm(np.vstack([dx,dy]),axis=0)
+        return L
+
+    def calc_derivative(self,x,y):
+        dydx = np.abs(np.gradient(x, y))
+        return dydx
+
+
+    def find_intersection(self,a1,a2,b1,b2):
+        """
+        Finds intersection of lines a and b, described by points a1,a2,b1,b2
+        Accepts vector input of shape (2,N)
+        Returns (x_int,y_int)
+        """
+        #Eqn first line
+        m_a = np.divide( np.subtract( a2[1] , a1[1] ), np.subtract( a2[0] , a1[0] ) )
+        c_a = np.subtract( a1.y, np.multiply( m_a , a1[0]) ) 
+        #Eqn second line
+        m_b = np.divide( np.subtract( b2[1] , b1[1] ), np.subtract( b2[0] , b1[0] ) )
+        c_b = np.subtract( b1.y, np.multiply( m_b , b1[0]) )
+        #Intersction point
+        x_ic = np.divide( np.subtract( c_b , c_a ) , np.subtract( m_a, m_b ) )
+        y_ic = np.add( np.multiply( m_b , x_ic ) , c_b ) 
+
+        ic = Pos_Result(x_ic,y_ic)      
+        return ic
 
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):

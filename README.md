@@ -80,4 +80,5 @@ Typical workflow for analysing bike image
 - Pedal kickback calculations
 - Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
 - Much Slicker UI
+- write specific optimised solvers for each layout (4 bar, single piv etc)
 

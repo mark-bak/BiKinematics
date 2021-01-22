@@ -4,10 +4,10 @@ import numpy as np
 import scipy as sp
 from scipy.optimize import minimize
 import math
-from collections import namedtuple
 import json
 
-Pos_Result = namedtuple('Pos_Result',['x','y'])
+#pylint: disable = import-error
+from Solver.dtypes import Pos_Result
 
 class Kinematic_Solver_Scipy_Min():
     def __init__(self,points,links,kin_loop_points,end_eff_points):
@@ -154,7 +154,7 @@ class Kinematic_Solver_Scipy_Min():
         stheta = np.sin(theta)
         thetas = np.vstack([ctheta,stheta])
         L = args[q-len(x):]
-        u = np.matmul(thetas,L)
+        u = thetas @ L #matrix mult
         #Error
         err = np.linalg.norm(u)
 
