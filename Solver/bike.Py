@@ -7,22 +7,25 @@ import scipy as sp
 from scipy.optimize import minimize
 import math
 import json
+from collections import namedtuple
 
 #Solver imports
 #pylint: disable = import-error
 from Solver.kinematic_solver_scipy_min import Kinematic_Solver_Scipy_Min
-from Solver.dtypes import Pos_Result
+from Solver.dtypes import Pos_Result,Link,Point
+import Solver.geometry as g
 
 class Bike():
     def __init__(self,data):
         
-        #Required bike geo values
+        #RBike geo
         self.points = {}
         self.links = {}
         self.shock = None
         self.kinematic_loop_points = []
         self.end_eff_points = []
         self.static_points = []
+        self.chainline = []
         
         self.kinematic_solver = None #Added later in set_kinematic_solver
 
@@ -33,6 +36,8 @@ class Bike():
         self.find_kinematic_loop()
         self.find_static_points()
         self.find_end_eff_points()
+        teeth_temp = (32,50) #add as input to class later
+        self.find_chainline(teeth_temp)
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
         #linkage constraint eqns, however more solvers will likely need to be created for
@@ -50,8 +55,6 @@ class Bike():
         This fcn takes input data, and populates the self.points{} and self.links{} dictionaries with point and
         link data represented as nametdtuples
         """  
-        Point = namedtuple('Point',['name','type','pos'])
-        Link = namedtuple('Link',['a','b','length'])
 
         for name in data:
             if data[name]['object']=="Point":
@@ -81,9 +84,11 @@ class Bike():
         Uses shortest path algorithm to find path between two points of type 'ground', along the minimum
         number of links
         """  
-        grounds = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "ground"]
+        grounds = [name for name in self.points
+                  if self.points[name].type == "front_wheel"
+                  or self.points[name].type == "ground"]
 
-        #Create graph for shortest path
+        #Create graph for shortest path 
         g = Graph(undirected=True)
         for name in self.points: # add nodes
             g.add_node(name)
@@ -119,13 +124,37 @@ class Bike():
         """
         Populates the list of point names (str) that do not move relative to frame in self.end_static_points[]
         """   
-        self.static_points = [name for name in self.points if self.points[name].type == "front_wheel" or self.points[name].type == "ground"]
+        self.static_points = [name for name in self.points
+                              if self.points[name].type == "front_wheel"
+                              or self.points[name].type == "ground"
+                              or self.points[name].type == "bottom_bracket"]
 
     def find_end_eff_points(self):
         """
         Populates the list of point names (str) that are attached to kinematic loop in self.end_eff_points[]
         """
-        self.end_eff_points = [name for name in self.points if not name in self.kinematic_loop_points and not name in self.static_points]
+        self.end_eff_points = [name for name in self.points 
+                               if not name in self.kinematic_loop_points 
+                               and not name in self.static_points]
+
+    def find_chainline(self,teeth):
+        """
+        Populates the list of chainline cogs, with tuples of form (point_name,pitch_circ_dia), specifiying the center point and pcd of the cogs on chainline.
+        Input teeth should be a tuple of form (teetg_chainring, teeth_idler, teeth_cassette) - where the idler pcd can be omitted if unused
+        Output list is ordered from chainring - idler - rear cassette
+        """
+        #Calculate pcd from https://www.mathopenref.com/polygonradius.html
+        n = np.array(teeth)
+        link_len = 12.7
+        pitch_circle_dia = link_len / np.sin( np.pi / n  )
+
+        for point in self.points.values():
+            if point.type == 'bottom_bracket':
+                self.chainline.insert(0,(point.name,pitch_circle_dia[0]))
+            if point.type == 'rear_wheel':
+                self.chainline.append((point.name,pitch_circle_dia[-1]))
+            if point.type == 'idler':
+                self.chainline.insert(1,(point.name,pitch_circle_dia[1])) #one idler only for now - if some crazy person makes bike with two idlers this will need fixed       
 
     def set_kinematic_solver(self,Solver):
         """
@@ -167,7 +196,7 @@ class Bike():
             b1 = sol[ self.kinematic_loop_points[-2] ]
             b2 = sol[ self.kinematic_loop_points[-1] ] 
 
-            Instant_Centre = self.find_intersection(a1,a2,b1,b2)
+            Instant_Centre = g.find_intersection(a1,a2,b1,b2)
 
         ##Derived characteristics
         #Find RW point
@@ -223,25 +252,6 @@ class Bike():
         dydx = np.abs(np.gradient(x, y))
         return dydx
 
-
-    def find_intersection(self,a1,a2,b1,b2):
-        """
-        Finds intersection of lines a and b, described by points a1,a2,b1,b2
-        Accepts vector input of shape (2,N)
-        Returns (x_int,y_int)
-        """
-        #Eqn first line
-        m_a = np.divide( np.subtract( a2[1] , a1[1] ), np.subtract( a2[0] , a1[0] ) )
-        c_a = np.subtract( a1.y, np.multiply( m_a , a1[0]) ) 
-        #Eqn second line
-        m_b = np.divide( np.subtract( b2[1] , b1[1] ), np.subtract( b2[0] , b1[0] ) )
-        c_b = np.subtract( b1.y, np.multiply( m_b , b1[0]) )
-        #Intersction point
-        x_ic = np.divide( np.subtract( c_b , c_a ) , np.subtract( m_a, m_b ) )
-        y_ic = np.add( np.multiply( m_b , x_ic ) , c_b ) 
-
-        ic = Pos_Result(x_ic,y_ic)      
-        return ic
 
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):
