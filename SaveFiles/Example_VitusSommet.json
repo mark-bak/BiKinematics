@@ -1,44 +1,4 @@
 {
-  "Upper_Pivot_Seatstay": {
-    "object": "Link",
-    "a": "Upper_Pivot",
-    "b": "Seatstay"
-  },
-  "Seatstay_Rear_Wheel": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Rear_Wheel"
-  },
-  "Horst_Pivot_Rear_Wheel": {
-    "object": "Link",
-    "a": "Horst_Pivot",
-    "b": "Rear_Wheel"
-  },
-  "Seatstay_Horst_Pivot": {
-    "object": "Link",
-    "a": "Seatstay",
-    "b": "Horst_Pivot"
-  },
-  "Horst_Pivot_Main_Pivot": {
-    "object": "Link",
-    "a": "Horst_Pivot",
-    "b": "Main_Pivot"
-  },
-  "Shock_Rocker_Seatstay": {
-    "object": "Link",
-    "a": "Shock_Rocker",
-    "b": "Seatstay"
-  },
-  "Upper_Pivot_Shock_Rocker": {
-    "object": "Link",
-    "a": "Upper_Pivot",
-    "b": "Shock_Rocker"
-  },
-  "Shock Eye-Eye": {
-    "object": "Shock",
-    "a": "Shock_Frame",
-    "b": "Shock_Rocker"
-  },
   "Upper_Pivot": {
     "object": "Point",
     "type": "ground",
@@ -101,6 +61,54 @@
     "position": [
       1221.0,
       343.9999999999999
+    ]
+  },
+  "Upper_Pivot_Seatstay": {
+    "object": "Link",
+    "a": "Upper_Pivot",
+    "b": "Seatstay"
+  },
+  "Seatstay_Rear_Wheel": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Rear_Wheel"
+  },
+  "Horst_Pivot_Rear_Wheel": {
+    "object": "Link",
+    "a": "Horst_Pivot",
+    "b": "Rear_Wheel"
+  },
+  "Seatstay_Horst_Pivot": {
+    "object": "Link",
+    "a": "Seatstay",
+    "b": "Horst_Pivot"
+  },
+  "Horst_Pivot_Main_Pivot": {
+    "object": "Link",
+    "a": "Horst_Pivot",
+    "b": "Main_Pivot"
+  },
+  "Shock_Rocker_Seatstay": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Seatstay"
+  },
+  "Upper_Pivot_Shock_Rocker": {
+    "object": "Link",
+    "a": "Upper_Pivot",
+    "b": "Shock_Rocker"
+  },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Frame",
+    "b": "Shock_Rocker"
+  },
+  "Bottom_Bracket": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      616.0,
+      322.99999999999994
     ]
   },
   "wheelbase": {
