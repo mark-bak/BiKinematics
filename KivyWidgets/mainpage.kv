@@ -126,7 +126,7 @@
                 width: sidebar_width
                 height: self.minimum_height
 
-                wheelbase: wheelbase_value.text
+                wheelbase: wheelbase.text
                 on_wheelbase: root.update_px_mm_conversion()
                 # canvas.before:
                 #     Color:
@@ -153,7 +153,27 @@
                     FloatInput:
                         size_hint_x: None
                         width: number_disp_width
-                        id: wheelbase_value
+                        id: wheelbase
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: 'Chainring Size (Teeth)'
+                    FloatInput:
+                        size_hint_x: None
+                        width: number_disp_width
+                        id: chainring_teeth
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: 'Cassette Size (Teeth)'
+                    FloatInput:
+                        size_hint_x: None
+                        width: number_disp_width
+                        id: cassette_teeth
 
             BoxLayout: #Sidebar button layout
                 id: points_list
