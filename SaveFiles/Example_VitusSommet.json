@@ -63,6 +63,14 @@
       343.9999999999999
     ]
   },
+  "Bottom_Bracket": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      616.0,
+      322.99999999999994
+    ]
+  },
   "Upper_Pivot_Seatstay": {
     "object": "Link",
     "a": "Upper_Pivot",
@@ -103,17 +111,17 @@
     "a": "Shock_Frame",
     "b": "Shock_Rocker"
   },
-  "Bottom_Bracket": {
-    "object": "Point",
-    "type": "bottom_bracket",
-    "position": [
-      616.0,
-      322.99999999999994
-    ]
-  },
   "wheelbase": {
     "object": "Parameter",
-    "value": "1257"
+    "value": "1255"
+  },
+  "chainring_teeth": {
+    "object": "Parameter",
+    "value": "32"
+  },
+  "cassette_teeth": {
+    "object": "Parameter",
+    "value": "50"
   },
   "window_width": {
     "object": "Parameter",

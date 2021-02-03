@@ -107,6 +107,14 @@
     "object": "Parameter",
     "value": "1260.0"
   },
+  "chainring_teeth": {
+    "object": "Parameter",
+    "value": "30"
+  },
+  "cassette_teeth": {
+    "object": "Parameter",
+    "value": "52"
+  },
   "window_width": {
     "object": "Parameter",
     "value": 1920

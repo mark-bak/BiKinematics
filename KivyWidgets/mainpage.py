@@ -238,7 +238,14 @@ class MainPage(FloatLayout):
                         self.add_shock(a=a,b=b)
 
             ##Parameter Loading
-            self.ids['wheelbase_value'].text = data['wheelbase']['value']
+            #self.ids['wheelbase'].text = data['wheelbase']['value']
+            self.load_param(data,'wheelbase')
+            self.load_param(data,'chainring_teeth')
+            self.load_param(data,'cassette_teeth')
+            #self.ids['cassette_teeth'].text = data['cassette_teeth']['value']
+            self.ids['point_colour'].color = data['point_colour']['value']
+            self.ids['shock_colour'].color = data['shock_colour']['value']
+            self.ids['link_colour'].color = data['link_colour']['value']
             #Rescaling
             new_width = Window.width
             new_height = Window.height
@@ -248,13 +255,19 @@ class MainPage(FloatLayout):
                              new_width,
                              old_height, 
                              new_height)
-            self.ids['point_colour'].color = data['point_colour']['value']
-            self.ids['shock_colour'].color = data['shock_colour']['value']
-            self.ids['link_colour'].color = data['link_colour']['value']
             #Image Loading
             if data['image_file']['value']:
                 self.load_image('',data['image_file']['value'])
 
+    def load_param(self,data,param_name):
+        """
+        Attempts to load parameter from file, and won't crash the program if it can't :)
+        """
+        try:
+            self.ids[param_name].text = data[param_name]['value']
+        except:
+            pass
+        
     #Save methods
     def open_save_dialog(self):
         """
@@ -306,7 +319,9 @@ class MainPage(FloatLayout):
 
 
         ##Add other parameters - these also end up getting passed to solver and not used but guess its no big deal
-        values = [['wheelbase',             self.ids['params_list'].wheelbase       ],
+        values = [['wheelbase',             self.ids['wheelbase'].text              ],
+                  ['chainring_teeth',       self.ids['chainring_teeth'].text        ],
+                  ['cassette_teeth',        self.ids['cassette_teeth'].text         ],
                   ['window_width',          self.cur_width                          ],
                   ['window_height',         self.cur_height                         ],
                   ['image_file',            self.image_file                         ],
