@@ -15,14 +15,6 @@
       462.57082100103696
     ]
   },
-  "Rear_Wheel": {
-    "object": "Point",
-    "type": "rear_wheel",
-    "position": [
-      1198.0,
-      332.4032670374212
-    ]
-  },
   "Horst_Pivot": {
     "object": "Point",
     "type": "linkage",
@@ -103,6 +95,22 @@
     "a": "Shock_Frame",
     "b": "Shock_Rocker"
   },
+  "bb": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      852.0,
+      299.99999999999994
+    ]
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      1195.0,
+      334.4032670374211
+    ]
+  },
   "wheelbase": {
     "object": "Parameter",
     "value": "1260.0"
@@ -113,7 +121,7 @@
   },
   "cassette_teeth": {
     "object": "Parameter",
-    "value": "52"
+    "value": "30"
   },
   "window_width": {
     "object": "Parameter",

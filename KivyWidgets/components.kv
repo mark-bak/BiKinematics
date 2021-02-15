@@ -8,13 +8,21 @@
 <ShockData>:
 
 <Cog>:
-    pos: self.centrepoint.x - self.diameter/2, self.centrepoint.y - self.diameter/2
+    pos: self.centrepoint.x, self.centrepoint.y
     diameter: self.teeth_to_dia(self.diameter_ref.text)
     canvas:
         Color:
             rgba:1,1,1,1
         Line:
-            ellipse: (root.x,root.y,root.diameter,root.diameter)
+            ellipse: (root.x - self.diameter/2,root.y - self.diameter/2,root.diameter,root.diameter)
 
 
 
+<Chain>:
+    centres: [self.cassette.centrepoint.pos,self.chainring.centrepoint.pos]
+    dias: [self.cassette.diameter,self.chainring.diameter]
+    canvas:
+        Color:
+            rgba: 1,1,1,1
+        Line:
+            points: [root.int_cassette,root.int_chainring]
