@@ -44,7 +44,7 @@ class Link(Widget):
     def on_touch_down(self,touch):
         #custom touch behaviour
         if self.collide_point(touch.x,touch.y):
-            print('touch '+self.name)
+            #print('touch '+self.name)
             if self.parent.mode == 'Del_Link': #if in Add_Link mode, add this to the selection list
                 self.parent.delete_link(self)
         return super(Link,self).on_touch_down(touch) #do standard scatter touch behaviour

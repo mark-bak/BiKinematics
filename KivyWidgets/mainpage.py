@@ -9,6 +9,7 @@ from KivyWidgets.links import LinkData
 from KivyWidgets.components import Shock
 from KivyWidgets.components import ShockData
 from KivyWidgets.components import Cog
+from KivyWidgets.components import Chain
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
@@ -101,6 +102,10 @@ class MainPage(FloatLayout):
                 self.delete_point(wid)
             if isinstance(wid,Link):
                 self.delete_link(wid)
+            if isinstance(wid,Chain):
+                self.remove_widget(wid)
+            if isinstance(wid,Cog):
+                self.remove_widget(wid)
 
     def on_window_resize(self, window, width, height): 
         """
@@ -383,8 +388,13 @@ class MainPage(FloatLayout):
         """
         #Create and add point widget
         new_point = Point(name = name,point_type = typ,pos = pos,colour_picker=self.ids['point_colour'])
+        #Add chanring circles if bb or rw
         if new_point.point_type == 'bottom_bracket':
             self.add_widget(Cog(centrepoint = new_point,diameter_ref = self.ids['chainring_teeth'],mp = self))
+        if new_point.point_type == 'rear_wheel':
+            self.add_widget(Cog(centrepoint = new_point,diameter_ref = self.ids['cassette_teeth'],mp = self))
+
+        #Link to data display at sidebar
         new_point_data = PointData(point = new_point,name=name,point_type=typ)
         new_point.point_data = new_point_data       
         self.add_widget(new_point)
@@ -459,6 +469,19 @@ class MainPage(FloatLayout):
         self.ids['links_list'].remove_widget(link.link_data)
         self.remove_widget(link)
         self.mode = 'Main'
+
+    #Chainline
+    def show_chain(self):
+        cog_list =[]
+        for wid in self.walk():
+            if isinstance(wid,Cog):
+                cog_list.append(wid)
+        if len(cog_list)==2:
+            print('here')
+            self.add_widget(Chain(cassette = cog_list[0],chainring = cog_list[1]))
+            print('h2')
+        else:
+            self.info = 'Need chainring and cassette to add a chain!'
 
     ##Simulate methods
     def open_sim_dialog(self):

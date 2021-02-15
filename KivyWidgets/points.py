@@ -34,7 +34,7 @@ class Point(Scatter):
     def on_touch_down(self,touch):
         #custom touch behaviour for adding links
         if self.collide_point(touch.x,touch.y):
-            print('touch '+self.name)
+            #print('touch '+self.name)
             if self.parent.mode == 'Add_Link' or self.parent.mode == 'Add_Shock': #if in Add_Link mode, add this to the selection list
                 self.parent.link_points.append(self)
             if self.parent.mode =='Del_Point':

@@ -1,15 +1,18 @@
-
+#Library imports
 import numpy as np
 
 #Custom Imports
 #pylint: disable=import-error
 from KivyWidgets.links import Link,LinkData
-from kivy.uix.widget import Widget
+import Solver.geometry as g
 
 #Kivy Properties
 #pylint: disable=no-name-in-module
 from kivy.properties import ObjectProperty
 from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
+from kivy.properties import ReferenceListProperty
+from kivy.uix.widget import Widget
 
 #Kivy Language Tools
 from kivy.lang.builder import Builder
@@ -39,3 +42,56 @@ class Cog(Widget):
             n_teeth = float(str_teeth)
             dia = link_len / np.sin( np.pi / n_teeth ) *  (1/self.mp.px_to_mm)
             return float(dia)
+
+class Chain(Widget):
+    def __init__(self,**kwargs):
+        super().__init__(**kwargs)
+
+    chainring = ObjectProperty(None)
+    cassette = ObjectProperty(None)
+    centres = ListProperty()
+    dias = ListProperty()
+    x_int_cassette = NumericProperty(0)
+    y_int_cassette = NumericProperty(0)
+    int_cassette = ReferenceListProperty(x_int_cassette, y_int_cassette)
+    x_int_chainring = NumericProperty(1)
+    y_int_chainring = NumericProperty(1)
+    int_chainring = ReferenceListProperty(x_int_chainring, y_int_chainring)
+
+
+    def on_centres(self,instance,value):
+        self.update_chain_int()
+
+    def on_dias(self,instance,value):
+        self.update_chain_int()
+
+    def update_chain_int(self):
+        """
+        Updates chainline intersection points
+        """
+        t_lines = g.find_common_circle_tangent( self.cassette.pos,
+                                                self.cassette.diameter/2,
+                                                self.chainring.pos,
+                                                self.chainring.diameter/2)
+
+
+        p_cassette =[]
+        p_chainring = []
+
+        for line in t_lines:
+            p_cassette.append(g.find_circle_tangent_intersection(self.cassette.pos,line))
+            p_chainring.append(g.find_circle_tangent_intersection(self.chainring.pos,line))
+
+        positive_inds_cassette = [p_cassette.index(point) for point in p_cassette
+                           if point.y-self.cassette.y > 0]
+        positive_inds_chainring = [p_chainring.index(point) for point in p_chainring
+                           if point.y-self.chainring.y > 0]
+
+        ind = [i for i in positive_inds_cassette if i in positive_inds_chainring]
+        if ind:
+            #only update if we have found a soln for upper chain
+            ind = ind[0]
+            self.x_int_cassette = float(p_cassette[ind].x)
+            self.y_int_cassette = float(p_cassette[ind].y)
+            self.x_int_chainring = float(p_chainring[ind].x)
+            self.y_int_chainring = float(p_chainring[ind].y)

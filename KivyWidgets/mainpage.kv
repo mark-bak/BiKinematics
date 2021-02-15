@@ -176,7 +176,7 @@
                         width: number_disp_width
                         id: cassette_teeth
                         text: '69'
-                        
+
             BoxLayout: #Sidebar button layout
                 id: points_list
                 orientation: "vertical"
@@ -326,6 +326,12 @@
         height: topbar_height
         on_release:root.dismiss()
         on_release: root.mp.open_image_dialog()
+    TopbarButton:
+        text: 'Show Chain'
+        size_hint_y: None
+        height: topbar_height
+        on_release:root.dismiss()
+        on_release: root.mp.show_chain()
 
 <DeleteDropDown>:
     TopbarButton:
