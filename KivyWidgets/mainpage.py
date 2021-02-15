@@ -8,6 +8,7 @@ from KivyWidgets.links import Link
 from KivyWidgets.links import LinkData
 from KivyWidgets.components import Shock
 from KivyWidgets.components import ShockData
+from KivyWidgets.components import Cog
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
@@ -382,9 +383,12 @@ class MainPage(FloatLayout):
         """
         #Create and add point widget
         new_point = Point(name = name,point_type = typ,pos = pos,colour_picker=self.ids['point_colour'])
+        if new_point.point_type == 'bottom_bracket':
+            self.add_widget(Cog(centrepoint = new_point,diameter_ref = self.ids['chainring_teeth'],mp = self))
         new_point_data = PointData(point = new_point,name=name,point_type=typ)
-        new_point.point_data = new_point_data
+        new_point.point_data = new_point_data       
         self.add_widget(new_point)
+
         #Add sidebar info widgets
         self.ids['points_list'].add_widget(new_point_data)
         self.dismiss_popup()
