@@ -6,3 +6,15 @@
     colour: (1,0,0,1)
 
 <ShockData>:
+
+<Cog>:
+    pos: self.centrepoint.x - self.diameter/2, self.centrepoint.y - self.diameter/2
+    diameter: self.teeth_to_dia(self.diameter_ref.text)
+    canvas:
+        Color:
+            rgba:1,1,1,1
+        Line:
+            ellipse: (root.x,root.y,root.diameter,root.diameter)
+
+
+
