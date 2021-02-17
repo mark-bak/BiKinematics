@@ -1,17 +1,4 @@
 {
-  "Shock Eye-Eye": {
-    "object": "Shock",
-    "a": "Shock_Frame",
-    "b": "Shock_Rocker"
-  },
-  "Front_Wheel": {
-    "object": "Point",
-    "type": "front_wheel",
-    "position": [
-      1209.0,
-      346.99999999999994
-    ]
-  },
   "Shock_Frame": {
     "object": "Point",
     "type": "ground",
@@ -20,16 +7,6 @@
       546.9999999999999
     ]
   },
-  "Shock_Rocker_Rear_Wheel": {
-    "object": "Link",
-    "a": "Shock_Rocker",
-    "b": "Rear_Wheel"
-  },
-  "Rear_Wheel_Main_Pivot": {
-    "object": "Link",
-    "a": "Rear_Wheel",
-    "b": "Main_Pivot"
-  },
   "Shock_Rocker": {
     "object": "Point",
     "type": "linkage",
@@ -37,11 +14,6 @@
       605.0,
       524.0000000000001
     ]
-  },
-  "Shock_Rocker_Main_Pivot": {
-    "object": "Link",
-    "a": "Shock_Rocker",
-    "b": "Main_Pivot"
   },
   "Main_Pivot": {
     "object": "Point",
@@ -59,9 +31,57 @@
       337.4032670374213
     ]
   },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Frame",
+    "b": "Shock_Rocker"
+  },
+  "Shock_Rocker_Rear_Wheel": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Rear_Wheel"
+  },
+  "Rear_Wheel_Main_Pivot": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Main_Pivot"
+  },
+  "Shock_Rocker_Main_Pivot": {
+    "object": "Link",
+    "a": "Shock_Rocker",
+    "b": "Main_Pivot"
+  },
+  "Front_Wheel": {
+    "object": "Point",
+    "type": "front_wheel",
+    "position": [
+      1236.0,
+      365.0
+    ]
+  },
+  "Bottom_Bracket": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      622.0,
+      330.00000000000006
+    ]
+  },
   "wheelbase": {
     "object": "Parameter",
     "value": "1203"
+  },
+  "chainring_teeth": {
+    "object": "Parameter",
+    "value": "32"
+  },
+  "cassette_teeth": {
+    "object": "Parameter",
+    "value": "50"
+  },
+  "wheel_size": {
+    "object": "Parameter",
+    "value": "27.5"
   },
   "window_width": {
     "object": "Parameter",
@@ -101,5 +121,9 @@
       0.4,
       1
     ]
+  },
+  "p2mm": {
+    "object": "Parameter",
+    "value": 1.2663157894736843
   }
 }

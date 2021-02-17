@@ -36,7 +36,7 @@ class Bike():
         self.find_kinematic_loop()
         self.find_static_points()
         self.find_end_eff_points()
-        teeth_temp = (32,50) #add as input to class later
+        teeth_temp = (30,52) #add as input to class later
         self.find_chainline(teeth_temp)
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
@@ -182,7 +182,7 @@ class Bike():
 
         ##Static Points
         for point_name in self.static_points:
-            r = self.populate_static_point(sol, size,point_name)
+            r = self.populate_static_point(sol, size, point_name)
             self.solution[sol_name][point_name] = r
         
         ##Instant centre
@@ -198,13 +198,11 @@ class Bike():
 
             Instant_Centre = g.find_intersection(a1,a2,b1,b2)
 
-        ##Derived characteristics
-        #Find RW point
+        ##Rear wheel 'travel'
         rw_name = None
         for name in self.points:
             if self.points[name].type == 'rear_wheel':
                 rw_name = name
-        #Get zero-based wheel travel 
         if rw_name is not None:
             rw_norm = self.offset_to_zero(sol,size,rw_name)
             Vertical_Travel = rw_norm.y
@@ -213,6 +211,7 @@ class Bike():
             Vertical_Travel = np.zeros(size)
             Axle_Path_X = np.zeros(size)
 
+        ##Shock Length and Leverage Ratio
         if self.shock is not None:
             #Find shock point names
             s_a_name = self.shock.a.name
@@ -222,7 +221,78 @@ class Bike():
             #Add to solution
         else:
             Shock_Length = np.zeros(size)
-            Leverage_Ratio = np.zers(size)
+            Leverage_Ratio = np.zeros(size)
+
+        ##Anti Squat:
+        if len(self.chainline) > 1:
+            input_name = self.chainline[-2][0]
+            inp_rad = self.chainline[-2][1] * 0.5
+
+            output_name = self.chainline[-1][0]
+            out_rad = self.chainline[-1][1] * 0.5
+            #Find chainline and IFC
+            IFC_x = np.zeros(size)
+            IFC_y = np.zeros(size)
+            Cline1_x = np.zeros(size)
+            Cline1_y = np.zeros(size)
+            Cline2_x = np.zeros(size)
+            Cline2_y = np.zeros(size)
+            #loop through and find:
+            #- upper circle intersection points for each step in solution
+            #- ifc: intersection of chainline and 'effective swingarm' line between rw and instant centre
+            for i in range(size): 
+                #grim processing, maybe need to optimizez datatypes a bit
+                out_pos = Pos_Result(sol[output_name].x[i],sol[output_name].y[i])
+                inp_pos = Pos_Result(sol[input_name].x[i],sol[input_name].y[i])
+                IC = Pos_Result(Instant_Centre.x[i],Instant_Centre.y[i])
+                #find all possible lines tangent to the two circles
+                possible_clines = g.find_common_circle_tangent(inp_pos,
+                                                        inp_rad,
+                                                        out_pos,
+                                                        out_rad)
+                #find which is the 'upper' solution
+                cline_pts = g.find_upper_tangent_points(possible_clines,inp_pos,out_pos)
+                #find ifc (intersection)
+                res = (g.find_intersection(cline_pts[0],cline_pts[1],out_pos,IC))
+                
+                #more grim processing - cant wait to rewrite this nicer :)
+                Cline1_x[i] = cline_pts[0].x
+                Cline1_y[i] = cline_pts[0].y
+                Cline2_x[i] = cline_pts[1].x
+                Cline2_y[i] = cline_pts[1].y
+                IFC_x[i] = res.x
+                IFC_y[i] = res.y           
+
+            #Results in expected data format
+            IFC = Pos_Result(IFC_x,IFC_y)
+            CLINE_1 = Pos_Result(Cline1_x,Cline1_y)
+            CLINE_2 = Pos_Result(Cline2_x,Cline2_y)
+
+            #Find tyre contact and AS line
+            wheel_rad_temp = 29.25*25.4 * 0.5
+            Tyre_Contact = Pos_Result(sol[rw_name].x, sol[rw_name].y - np.ones(size) * wheel_rad_temp)
+            fw_name = None # needs moved and tidied
+            for name in self.points:
+                if self.points[name].type == 'front_wheel':
+                    fw_name = name        
+            AS_x = sol[fw_name].x
+            AS_y = np.add( Tyre_Contact.y , (np.subtract(AS_x, Tyre_Contact.x) / np.subtract(IFC.x , Tyre_Contact.x)) * np.subtract(IFC.y,Tyre_Contact.y) )
+
+            AS_P = Pos_Result(AS_x,AS_y) 
+
+            ground_y = Tyre_Contact.y[0]
+            h_cog_temp = 1100 * np.ones(size) # un-hardcode later
+            h_AS = AS_P.y - ground_y * np.ones(size) 
+
+            AS_Percent = 100 *  (h_AS / h_cog_temp) 
+        else:
+            IFC = np.zeros(size) 
+            CLINE_1 = np.zeros(size) 
+            CLINE_2 = np.zeros(size)
+            AS_P = np.zeros(size) 
+            Tyre_Contact = np.zeros(size)
+            AS_Percent = np.zeros(size) 
+                       
 
         #Populate solution
         self.solution[sol_name]['Shock Length'] = Shock_Length
@@ -230,6 +300,12 @@ class Bike():
         self.solution[sol_name]['Vertical Travel'] = Vertical_Travel
         self.solution[sol_name]['Axle Path X'] = Axle_Path_X
         self.solution[sol_name]['Instant Centre'] = Instant_Centre
+        self.solution[sol_name]['IFC'] = IFC
+        self.solution[sol_name]['CLINE_1'] = CLINE_1
+        self.solution[sol_name]['CLINE_2'] = CLINE_2
+        self.solution[sol_name]['AS_Point'] = AS_P
+        self.solution[sol_name]['Tyre_Contact'] = Tyre_Contact
+        self.solution[sol_name]['Anti Squat Percent'] = AS_Percent
 
     def populate_static_point(self,sol,size,point_name):
         x = np.ones(size) * self.points[point_name].pos[0]
@@ -252,6 +328,8 @@ class Bike():
         dydx = np.abs(np.gradient(x, y))
         return dydx
 
+    def find_ifc(self):
+        pass
 
     ##Data i/o functions
     def save_solution_csv(self,solution_name,filename):

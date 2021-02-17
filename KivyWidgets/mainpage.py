@@ -107,6 +107,8 @@ class MainPage(FloatLayout):
                 self.remove_widget(wid)
             if isinstance(wid,Cog):
                 self.remove_widget(wid)
+            if isinstance(wid,Wheel):
+                self.remove_widget(wid)
 
     def on_window_resize(self, window, width, height): 
         """
@@ -303,7 +305,7 @@ class MainPage(FloatLayout):
         with open(filename,'w') as f:
             json.dump(save_data,f,indent=2)
 
-    def create_bike_data(self,sf=1):
+    def create_bike_data(self,sf):
         """
         Creates simple json file with info describing the geometry objects and constants needed to define the bike.
         This file is typically 'keyed' by the name of the widget/point/link
@@ -330,13 +332,14 @@ class MainPage(FloatLayout):
         values = [['wheelbase',             self.ids['wheelbase'].text              ],
                   ['chainring_teeth',       self.ids['chainring_teeth'].text        ],
                   ['cassette_teeth',        self.ids['cassette_teeth'].text         ],
-                  ['wheel_size',            self.ids['wheel_size'].text              ],
+                  ['wheel_size',            self.ids['wheel_size'].text             ],
                   ['window_width',          self.cur_width                          ],
                   ['window_height',         self.cur_height                         ],
                   ['image_file',            self.image_file                         ],
                   ['point_colour',          self.ids['point_colour'].color          ],
                   ['link_colour',           self.ids['link_colour'].color           ],
-                  ['shock_colour',          self.ids['shock_colour'].color          ]]
+                  ['shock_colour',          self.ids['shock_colour'].color          ],
+                  ['p2mm',                  self.px_to_mm                           ]]
                   
         for par in values:
             properties = {'object':'Parameter','value':par[1]}

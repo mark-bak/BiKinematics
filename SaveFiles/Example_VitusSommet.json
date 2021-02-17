@@ -123,6 +123,10 @@
     "object": "Parameter",
     "value": "50"
   },
+  "wheel_size": {
+    "object": "Parameter",
+    "value": "29"
+  },
   "window_width": {
     "object": "Parameter",
     "value": 1920
@@ -161,5 +165,9 @@
       0.4,
       1
     ]
+  },
+  "p2mm": {
+    "object": "Parameter",
+    "value": 1.3379530916844349
   }
 }
