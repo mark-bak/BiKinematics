@@ -34,11 +34,11 @@ class Cog(Widget):
     diameter_ref = ObjectProperty(None)
     diameter = NumericProperty(69)
     mp = ObjectProperty(None)
-    p2mm = NumericProperty(None)
+    p2mm = NumericProperty() #just used as a flag for changing scaling factor
 
     
     def on_p2mm(self,instance,value):
-        print('here')
+        #print('here')
         self.diameter = self.teeth_to_dia(self.diameter_ref.text)
 
     def teeth_to_dia(self,str_teeth):

@@ -178,7 +178,7 @@ class MainPage(FloatLayout):
             except:
                 wbase_mm = 0 #If user has entered some funky stuf in text box, set wbase_mm (and tf px_to_mm) to zero
             self.px_to_mm = wbase_mm / wbase_px
-            print(self.px_to_mm)
+            #print(self.px_to_mm)
         else:
             #If front and rear wheel not specified, set scaling to 0
             self.px_to_mm = 0
