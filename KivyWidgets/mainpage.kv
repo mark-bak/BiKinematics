@@ -176,6 +176,17 @@
                         width: number_disp_width
                         id: cassette_teeth
                         text: '69'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y:None
+                    height: sidebar_coords_height
+                    Label:
+                        text: 'Wheel Size (in)'
+                    FloatInput:
+                        size_hint_x: None
+                        width: number_disp_width
+                        id: wheel_size
+                        text: '29'
 
             BoxLayout: #Sidebar button layout
                 id: points_list

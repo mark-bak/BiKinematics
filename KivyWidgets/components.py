@@ -29,10 +29,17 @@ class ShockData(LinkData):
     pass
 
 class Cog(Widget):
+
     centrepoint = ObjectProperty(None)
     diameter_ref = ObjectProperty(None)
     diameter = NumericProperty(69)
     mp = ObjectProperty(None)
+    p2mm = NumericProperty(None)
+
+    
+    def on_p2mm(self,instance,value):
+        print('here')
+        self.diameter = self.teeth_to_dia(self.diameter_ref.text)
 
     def teeth_to_dia(self,str_teeth):
         if not str_teeth or self.mp.px_to_mm == 0:
@@ -42,6 +49,17 @@ class Cog(Widget):
             n_teeth = float(str_teeth)
             dia = link_len / np.sin( np.pi / n_teeth ) *  (1/self.mp.px_to_mm)
             return float(dia)
+
+class Wheel(Cog):
+
+    def on_p2mm(self,instance,value):
+        self.diameter = self.inches_to_mm(self.diameter_ref.text)
+
+    def inches_to_mm(self,str_inch):
+        if not str_inch or self.mp.px_to_mm == 0:
+            return 0
+        else:
+            return (float(str_inch)*25.4) * (1/self.mp.px_to_mm)
 
 class Chain(Widget):
     def __init__(self,**kwargs):

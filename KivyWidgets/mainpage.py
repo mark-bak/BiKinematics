@@ -10,6 +10,7 @@ from KivyWidgets.components import Shock
 from KivyWidgets.components import ShockData
 from KivyWidgets.components import Cog
 from KivyWidgets.components import Chain
+from KivyWidgets.components import Wheel
 from KivyWidgets.dialogs import LoadDialog
 from KivyWidgets.dialogs import SaveDialog
 from KivyWidgets.dialogs import PointDialog
@@ -158,7 +159,7 @@ class MainPage(FloatLayout):
         """
         Modifies the scaling factor self.px_to_mm, giving ratio of wheelbase in pixels to actual bike wheelbase in mm
 
-        Sets self.px_to_mm to 1 if the front and rear wheels are not defined in geometry, and 0 if bad data is entered in wheelbase GUI input
+        Sets self.px_to_mm to 0 if the front and rear wheels are not defined in geometry, and 0 if bad data is entered in wheelbase GUI input
         """
         #Find which points are the front and rear wheels - (Maybe store these as an instance variable this looks kind of slow)
         fw = None
@@ -177,6 +178,7 @@ class MainPage(FloatLayout):
             except:
                 wbase_mm = 0 #If user has entered some funky stuf in text box, set wbase_mm (and tf px_to_mm) to zero
             self.px_to_mm = wbase_mm / wbase_px
+            print(self.px_to_mm)
         else:
             #If front and rear wheel not specified, set scaling to 0
             self.px_to_mm = 0
@@ -244,11 +246,11 @@ class MainPage(FloatLayout):
                         self.add_shock(a=a,b=b)
 
             ##Parameter Loading
-            #self.ids['wheelbase'].text = data['wheelbase']['value']
             self.load_param(data,'wheelbase')
             self.load_param(data,'chainring_teeth')
             self.load_param(data,'cassette_teeth')
-            #self.ids['cassette_teeth'].text = data['cassette_teeth']['value']
+            self.load_param(data,'wheel_size')
+
             self.ids['point_colour'].color = data['point_colour']['value']
             self.ids['shock_colour'].color = data['shock_colour']['value']
             self.ids['link_colour'].color = data['link_colour']['value']
@@ -328,6 +330,7 @@ class MainPage(FloatLayout):
         values = [['wheelbase',             self.ids['wheelbase'].text              ],
                   ['chainring_teeth',       self.ids['chainring_teeth'].text        ],
                   ['cassette_teeth',        self.ids['cassette_teeth'].text         ],
+                  ['wheel_size',            self.ids['wheel_size'].text              ],
                   ['window_width',          self.cur_width                          ],
                   ['window_height',         self.cur_height                         ],
                   ['image_file',            self.image_file                         ],
@@ -388,11 +391,14 @@ class MainPage(FloatLayout):
         """
         #Create and add point widget
         new_point = Point(name = name,point_type = typ,pos = pos,colour_picker=self.ids['point_colour'])
-        #Add chanring circles if bb or rw
+        #Add circles and stuff to certain points
         if new_point.point_type == 'bottom_bracket':
             self.add_widget(Cog(centrepoint = new_point,diameter_ref = self.ids['chainring_teeth'],mp = self))
         if new_point.point_type == 'rear_wheel':
             self.add_widget(Cog(centrepoint = new_point,diameter_ref = self.ids['cassette_teeth'],mp = self))
+            self.add_widget(Wheel(centrepoint = new_point,diameter_ref = self.ids['wheel_size'],mp = self))
+        if new_point.point_type == 'front_wheel':
+            self.add_widget(Wheel(centrepoint = new_point,diameter_ref = self.ids['wheel_size'],mp = self))
 
         #Link to data display at sidebar
         new_point_data = PointData(point = new_point,name=name,point_type=typ)
