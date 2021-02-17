@@ -1,14 +1,4 @@
 {
-  "Upper_Swingarm_Upper_Pivot": {
-    "object": "Link",
-    "a": "Upper_Swingarm",
-    "b": "Upper_Pivot"
-  },
-  "Shock_Linkage_Upper_Pivot": {
-    "object": "Link",
-    "a": "Shock_Linkage",
-    "b": "Upper_Pivot"
-  },
   "Upper_Pivot": {
     "object": "Point",
     "type": "ground",
@@ -16,21 +6,6 @@
       622.0,
       412.0
     ]
-  },
-  "Upper_Swingarm_Shock_Linkage": {
-    "object": "Link",
-    "a": "Upper_Swingarm",
-    "b": "Shock_Linkage"
-  },
-  "Upper_Swingarm_Lower_Swingarm": {
-    "object": "Link",
-    "a": "Upper_Swingarm",
-    "b": "Lower_Swingarm"
-  },
-  "Lower_Swingarm_Lower_Pivot": {
-    "object": "Link",
-    "a": "Lower_Swingarm",
-    "b": "Lower_Pivot"
   },
   "Lower_Pivot": {
     "object": "Point",
@@ -56,11 +31,6 @@
       473.00000000000006
     ]
   },
-  "Upper_Swingarm_Rear_Wheel": {
-    "object": "Link",
-    "a": "Upper_Swingarm",
-    "b": "Rear_Wheel"
-  },
   "Rear_Wheel": {
     "object": "Point",
     "type": "rear_wheel",
@@ -69,11 +39,6 @@
       211.0
     ]
   },
-  "Rear_Wheel_Lower_Swingarm": {
-    "object": "Link",
-    "a": "Rear_Wheel",
-    "b": "Lower_Swingarm"
-  },
   "Shock_Linkage": {
     "object": "Point",
     "type": "linkage",
@@ -81,11 +46,6 @@
       677.0,
       452.0
     ]
-  },
-  "Shock Eye-Eye": {
-    "object": "Shock",
-    "a": "Shock_Linkage",
-    "b": "Shock_Frame"
   },
   "Shock_Frame": {
     "object": "Point",
@@ -103,9 +63,69 @@
       279.0
     ]
   },
+  "Upper_Swingarm_Upper_Pivot": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Upper_Pivot"
+  },
+  "Shock_Linkage_Upper_Pivot": {
+    "object": "Link",
+    "a": "Shock_Linkage",
+    "b": "Upper_Pivot"
+  },
+  "Upper_Swingarm_Shock_Linkage": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Shock_Linkage"
+  },
+  "Upper_Swingarm_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Lower_Swingarm"
+  },
+  "Lower_Swingarm_Lower_Pivot": {
+    "object": "Link",
+    "a": "Lower_Swingarm",
+    "b": "Lower_Pivot"
+  },
+  "Upper_Swingarm_Rear_Wheel": {
+    "object": "Link",
+    "a": "Upper_Swingarm",
+    "b": "Rear_Wheel"
+  },
+  "Rear_Wheel_Lower_Swingarm": {
+    "object": "Link",
+    "a": "Rear_Wheel",
+    "b": "Lower_Swingarm"
+  },
+  "Shock Eye-Eye": {
+    "object": "Shock",
+    "a": "Shock_Linkage",
+    "b": "Shock_Frame"
+  },
+  "Bottom_Bracket": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      626.0,
+      202.99999999999997
+    ]
+  },
   "wheelbase": {
     "object": "Parameter",
     "value": "1233"
+  },
+  "chainring_teeth": {
+    "object": "Parameter",
+    "value": "30"
+  },
+  "cassette_teeth": {
+    "object": "Parameter",
+    "value": "50"
+  },
+  "wheel_size": {
+    "object": "Parameter",
+    "value": "29"
   },
   "window_width": {
     "object": "Parameter",
@@ -145,5 +165,9 @@
       0.4,
       1
     ]
+  },
+  "p2mm": {
+    "object": "Parameter",
+    "value": 0.9543343653250774
   }
 }

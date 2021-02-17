@@ -39,6 +39,14 @@
       414.0
     ]
   },
+  "Main_Pivot": {
+    "object": "Point",
+    "type": "ground",
+    "position": [
+      607.0,
+      386.96658214723374
+    ]
+  },
   "Upper_Pivot_Seatstay": {
     "object": "Link",
     "a": "Upper_Pivot",
@@ -64,30 +72,42 @@
     "a": "Shock_Frame",
     "b": "Shock_Rocker"
   },
-  "Rear_Wheel": {
-    "object": "Point",
-    "type": "rear_wheel",
-    "position": [
-      276.0,
-      364.40326703742124
-    ]
-  },
   "Rear_Wheel_Main_Pivot": {
     "object": "Link",
     "a": "Rear_Wheel",
     "b": "Main_Pivot"
   },
-  "Main_Pivot": {
+  "Rear_Wheel": {
     "object": "Point",
-    "type": "ground",
+    "type": "rear_wheel",
     "position": [
-      607.0,
-      386.96658214723374
+      278.0,
+      364.40326703742124
+    ]
+  },
+  "Bottom_Bracket": {
+    "object": "Point",
+    "type": "bottom_bracket",
+    "position": [
+      608.0,
+      330.0
     ]
   },
   "wheelbase": {
     "object": "Parameter",
     "value": "1203"
+  },
+  "chainring_teeth": {
+    "object": "Parameter",
+    "value": "30"
+  },
+  "cassette_teeth": {
+    "object": "Parameter",
+    "value": "50"
+  },
+  "wheel_size": {
+    "object": "Parameter",
+    "value": "29"
   },
   "window_width": {
     "object": "Parameter",
@@ -127,5 +147,9 @@
       0.09999999999999998,
       1
     ]
+  },
+  "p2mm": {
+    "object": "Parameter",
+    "value": 1.2921589688506983
   }
 }

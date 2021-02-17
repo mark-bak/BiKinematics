@@ -50,8 +50,15 @@ class Cog(Widget):
             dia = link_len / np.sin( np.pi / n_teeth ) *  (1/self.mp.px_to_mm)
             return float(dia)
 
-class Wheel(Cog):
+class Wheel(Widget):
 
+    
+    centrepoint = ObjectProperty(None)
+    diameter_ref = ObjectProperty(None)
+    diameter = NumericProperty(69)
+    mp = ObjectProperty(None)
+    p2mm = NumericProperty() #just used as a flag for changing scaling factor
+    
     def on_p2mm(self,instance,value):
         self.diameter = self.inches_to_mm(self.diameter_ref.text)
 
@@ -92,24 +99,25 @@ class Chain(Widget):
                                                 self.chainring.pos,
                                                 self.chainring.diameter/2)
 
+        p_list = g.find_upper_tangent_points(t_lines,self.cassette.pos,self.chainring.pos)
+        self.x_int_cassette = float(p_list[0].x)
+        self.y_int_cassette = float(p_list[0].y)
+        self.x_int_chainring = float(p_list[1].x)
+        self.y_int_chainring = float(p_list[1].y)
 
-        p_cassette =[]
-        p_chainring = []
+        # p_cassette =[]
+        # p_chainring = []
 
-        for line in t_lines:
-            p_cassette.append(g.find_circle_tangent_intersection(self.cassette.pos,line))
-            p_chainring.append(g.find_circle_tangent_intersection(self.chainring.pos,line))
+        # for line in t_lines:
+        #     p_cassette.append(g.find_circle_tangent_intersection(self.cassette.pos,line))
+        #     p_chainring.append(g.find_circle_tangent_intersection(self.chainring.pos,line))
 
-        positive_inds_cassette = [p_cassette.index(point) for point in p_cassette
-                           if point.y-self.cassette.y > 0]
-        positive_inds_chainring = [p_chainring.index(point) for point in p_chainring
-                           if point.y-self.chainring.y > 0]
+        # positive_inds_cassette = [p_cassette.index(point) for point in p_cassette
+        #                    if point.y-self.cassette.y > 0]
+        # positive_inds_chainring = [p_chainring.index(point) for point in p_chainring
+        #                    if point.y-self.chainring.y > 0]
 
-        ind = [i for i in positive_inds_cassette if i in positive_inds_chainring]
-        if ind:
-            #only update if we have found a soln for upper chain
-            ind = ind[0]
-            self.x_int_cassette = float(p_cassette[ind].x)
-            self.y_int_cassette = float(p_cassette[ind].y)
-            self.x_int_chainring = float(p_chainring[ind].x)
-            self.y_int_chainring = float(p_chainring[ind].y)
+        # ind = [i for i in positive_inds_cassette if i in positive_inds_chainring]
+        # if ind:
+        #     #only update if we have found a soln for upper chain
+        #     ind = ind[0]

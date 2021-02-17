@@ -47,12 +47,20 @@
       340.9665821472337
     ]
   },
-  "Front_Wheel": {
+  "bb": {
     "object": "Point",
-    "type": "front_wheel",
+    "type": "bottom_bracket",
     "position": [
-      258.0,
-      309.9999999999999
+      852.0,
+      299.99999999999994
+    ]
+  },
+  "Rear_Wheel": {
+    "object": "Point",
+    "type": "rear_wheel",
+    "position": [
+      1195.0,
+      334.4032670374211
     ]
   },
   "Upper_Pivot_Seatstay": {
@@ -95,20 +103,12 @@
     "a": "Shock_Frame",
     "b": "Shock_Rocker"
   },
-  "bb": {
+  "Front_Wheel": {
     "object": "Point",
-    "type": "bottom_bracket",
+    "type": "front_wheel",
     "position": [
-      852.0,
-      299.99999999999994
-    ]
-  },
-  "Rear_Wheel": {
-    "object": "Point",
-    "type": "rear_wheel",
-    "position": [
-      1195.0,
-      334.4032670374211
+      260.0,
+      310.9999999999999
     ]
   },
   "wheelbase": {
@@ -121,7 +121,11 @@
   },
   "cassette_teeth": {
     "object": "Parameter",
-    "value": "30"
+    "value": "52"
+  },
+  "wheel_size": {
+    "object": "Parameter",
+    "value": "29"
   },
   "window_width": {
     "object": "Parameter",
@@ -161,5 +165,9 @@
       0.09999999999999998,
       1
     ]
+  },
+  "p2mm": {
+    "object": "Parameter",
+    "value": 1.3475935828877006
   }
 }

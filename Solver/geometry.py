@@ -58,3 +58,24 @@ def find_circle_tangent_intersection(cen,tangent_line):
 
     ic = Pos_Result(x0,y0)
     return ic
+
+def find_upper_tangent_points(t_lines,cen1,cen2):
+        
+        p1 =[]
+        p2 = []
+
+        for line in t_lines:
+            p1.append(find_circle_tangent_intersection(cen1,line))
+            p2.append(find_circle_tangent_intersection(cen2,line))
+
+        positive_inds_1 = [p1.index(point) for point in p1
+                           if point.y-cen1[1] > 0]
+        positive_inds_2 = [p2.index(point) for point in p2
+                           if point.y-cen2[1] > 0]
+
+        ind = [i for i in positive_inds_1 if i in positive_inds_2]
+        if ind:
+            ind = ind[0]
+            return [p1[ind],p2[ind]]
+        else:
+            return [Pos_Result(0,0),Pos_Result(0,0)]
