@@ -48,7 +48,7 @@ py BiKinematics.py
 - Slicker UI
 - Write specific optimised solvers for each layout (4 bar, single piv etc)
 
-### Guide/Workflow:
+### Guide/Workflow (Slightly out of date - best to load up an example and see what it contains):
 Typical workflow for analysing bike image
 
 1. Add image
