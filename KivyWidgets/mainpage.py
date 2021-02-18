@@ -252,6 +252,7 @@ class MainPage(FloatLayout):
             self.load_param(data,'chainring_teeth')
             self.load_param(data,'cassette_teeth')
             self.load_param(data,'wheel_size')
+            self.load_param(data,'cog_height')
 
             self.ids['point_colour'].color = data['point_colour']['value']
             self.ids['shock_colour'].color = data['shock_colour']['value']
@@ -339,7 +340,8 @@ class MainPage(FloatLayout):
                   ['point_colour',          self.ids['point_colour'].color          ],
                   ['link_colour',           self.ids['link_colour'].color           ],
                   ['shock_colour',          self.ids['shock_colour'].color          ],
-                  ['p2mm',                  self.px_to_mm                           ]]
+                  ['p2mm',                  self.px_to_mm                           ],
+                  ['cog_height',            self.ids['cog_height'].text             ]]
                   
         for par in values:
             properties = {'object':'Parameter','value':par[1]}

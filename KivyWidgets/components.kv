@@ -7,9 +7,8 @@
 
 <ShockData>:
 
-<Cog>:
+<CircleDraw>:
     pos: self.centrepoint.x, self.centrepoint.y
-    diameter: self.teeth_to_dia(self.diameter_ref.text)
     p2mm: self.mp.px_to_mm
     canvas:
         Color:
@@ -17,15 +16,12 @@
         Line:
             ellipse: (root.x - self.diameter/2,root.y - self.diameter/2,root.diameter,root.diameter)
 
+<Cog>:
+    diameter: self.teeth_to_dia(self.diameter_ref.text)
+
 <Wheel>:
-    pos: self.centrepoint.x, self.centrepoint.y
     diameter: self.inches_to_mm(self.diameter_ref.text)
-    p2mm: self.mp.px_to_mm
-    canvas:
-        Color:
-            rgba:1,1,1,1
-        Line:
-            ellipse: (root.x - self.diameter/2,root.y - self.diameter/2,root.diameter,root.diameter)
+
 <Chain>:
     centres: [self.cassette.centrepoint.pos,self.chainring.centrepoint.pos]
     dias: [self.cassette.diameter,self.chainring.diameter]

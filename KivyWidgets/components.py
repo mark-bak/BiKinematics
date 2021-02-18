@@ -28,17 +28,16 @@ class Shock(Link):
 class ShockData(LinkData):
     pass
 
-class Cog(Widget):
-
+class CircleDraw(Widget):
     centrepoint = ObjectProperty(None)
-    diameter_ref = ObjectProperty(None)
     diameter = NumericProperty(69)
+    diameter_ref = ObjectProperty(None)
     mp = ObjectProperty(None)
     p2mm = NumericProperty() #just used as a flag for changing scaling factor
 
-    
+class Cog(CircleDraw):
+   
     def on_p2mm(self,instance,value):
-        #print('here')
         self.diameter = self.teeth_to_dia(self.diameter_ref.text)
 
     def teeth_to_dia(self,str_teeth):
@@ -50,14 +49,7 @@ class Cog(Widget):
             dia = link_len / np.sin( np.pi / n_teeth ) *  (1/self.mp.px_to_mm)
             return float(dia)
 
-class Wheel(Widget):
-
-    
-    centrepoint = ObjectProperty(None)
-    diameter_ref = ObjectProperty(None)
-    diameter = NumericProperty(69)
-    mp = ObjectProperty(None)
-    p2mm = NumericProperty() #just used as a flag for changing scaling factor
+class Wheel(CircleDraw):
     
     def on_p2mm(self,instance,value):
         self.diameter = self.inches_to_mm(self.diameter_ref.text)
