@@ -2,3 +2,4 @@
 *__
 .env/
 *.csv
+*.ipynb*
