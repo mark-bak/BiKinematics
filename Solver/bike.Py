@@ -38,8 +38,7 @@ class Bike():
         self.find_static_points()
         self.find_end_eff_points()
         teeth = (self.load_param('chainring_teeth'),
-                 self.load_param('cassette_teeth')) #add as input to class later
-        print(teeth)
+                 self.load_param('cassette_teeth'))
         self.find_chainline(teeth)
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve

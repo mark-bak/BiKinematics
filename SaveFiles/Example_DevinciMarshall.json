@@ -151,5 +151,9 @@
   "p2mm": {
     "object": "Parameter",
     "value": 1.2921589688506983
+  },
+  "cog_height": {
+    "object": "Parameter",
+    "value": 1100
   }
 }
