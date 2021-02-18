@@ -7,6 +7,7 @@ Uses the following main packages:
 * Kivy - GUI
 * Numpy/Scipy - Linkage Simulation
 * Matplotlib - Plotting
+* Jupyter - Development/prototyping of solver eqns/maths
 
 ## Installation
 
@@ -25,7 +26,29 @@ garden install matplotlib #Kivy - matplotlib addon
 ```
 py BiKinematics.py
 ```
-### Guide/Workflow:
+
+## Features
+### Current features 
+- Background image import
+- Simulated motion of following (tested!) suspension systems - can probably handle more, solver is reasonably general (handles any system that is a single-piv or a 4-bar arrangement with slightly different placed pivots (seems like >80% of suspension despite all the different names/trademarks):
+  - Horst Link
+  - DW Link
+  - Split Pivot (Devinci)
+  - Single Pivot
+- Axle Path 
+- Leverage ratio calculation
+- Anti squat calculation
+- Results Plotting 
+
+### To add
+- Other suspension systems (whatever tf yeti is doing, specialised demo/canyon sender with the extra links for shock)
+- Idler pulley support (solver side is almost there, not much more work to be done)
+- Pedal kickback calculations
+- Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
+- Slicker UI
+- Write specific optimised solvers for each layout (4 bar, single piv etc)
+
+### Guide/Workflow (Slightly out of date - best to load up an example and see what it contains):
 Typical workflow for analysing bike image
 
 1. Add image
@@ -62,23 +85,5 @@ Typical workflow for analysing bike image
 - Note all simulated results saved can be loaded in, so multiple different bikes can be compared
 <img src = ReadmeImages/Plot.PNG>
 
-## Features
-### Current features 
-- Background image import
-- Simulated motion of following (tested!) suspension systems - can probably handle more, solver is reasonably general:
-  - Horst Link
-  - DW Link
-  - Split Pivot (Devinci)
-  - Single Pivot
-- Axle Path 
-- Leverage ratio calculation
-- Results Plotting 
 
-### To add
-- Other suspension systems (whatever tf yeti is doing)
-- Anti-squat calculations (Including with Idler pulley)
-- Pedal kickback calculations
-- Improved results plotting (axis ranges, data normalising to zero etc..) and graph image saving
-- Much Slicker UI
-- write specific optimised solvers for each layout (4 bar, single piv etc)
 
