@@ -26,6 +26,7 @@ class Bike():
         self.end_eff_points = []
         self.static_points = []
         self.chainline = []
+        self.params = {}
         
         self.kinematic_solver = None #Added later in set_kinematic_solver
 
@@ -36,8 +37,10 @@ class Bike():
         self.find_kinematic_loop()
         self.find_static_points()
         self.find_end_eff_points()
-        teeth_temp = (30,52) #add as input to class later
-        self.find_chainline(teeth_temp)
+        teeth = (self.load_param('chainring_teeth'),
+                 self.load_param('cassette_teeth')) #add as input to class later
+        print(teeth)
+        self.find_chainline(teeth)
 
         #Currently adds a solver that uses Scipy minimisation fcns to numerically solve
         #linkage constraint eqns, however more solvers will likely need to be created for
@@ -48,7 +51,13 @@ class Bike():
                                                     self.end_eff_points)
         self.set_kinematic_solver(default_Solver)
 
-        
+    def load_param(self,param_name):
+        try:
+            ret = self.params[param_name]
+        except:
+            ret = 0
+        return ret
+
     ##Functions to process input data
     def parse_input_data(self,data):
         """
@@ -75,7 +84,9 @@ class Bike():
                     self.links[name] = L
                 if data[name]['object']=="Shock":
                     self.shock = L
-
+        for name in data:
+            if data[name]['object'] == "Parameter":
+                self.params[name] = data[name]['value']
 
     def find_kinematic_loop(self):
         """
@@ -144,7 +155,7 @@ class Bike():
         Output list is ordered from chainring - idler - rear cassette
         """
         #Calculate pcd from https://www.mathopenref.com/polygonradius.html
-        n = np.array(teeth)
+        n = np.array(teeth,dtype = float)
         link_len = 12.7
         pitch_circle_dia = link_len / np.sin( np.pi / n  )
 
@@ -269,8 +280,8 @@ class Bike():
             CLINE_2 = Pos_Result(Cline2_x,Cline2_y)
 
             #Find tyre contact and AS line
-            wheel_rad_temp = 29.25*25.4 * 0.5
-            Tyre_Contact = Pos_Result(sol[rw_name].x, sol[rw_name].y - np.ones(size) * wheel_rad_temp)
+            wheel_rad = float(self.load_param('wheel_size')) * 25.4 * 0.5
+            Tyre_Contact = Pos_Result(sol[rw_name].x, sol[rw_name].y - np.ones(size) * wheel_rad)
             fw_name = None # needs moved and tidied
             for name in self.points:
                 if self.points[name].type == 'front_wheel':
@@ -281,10 +292,10 @@ class Bike():
             AS_P = Pos_Result(AS_x,AS_y) 
 
             ground_y = Tyre_Contact.y[0]
-            h_cog_temp = 1100 * np.ones(size) # un-hardcode later
+            h_cog = float(self.load_param('cog_height')) * np.ones(size)
             h_AS = AS_P.y - ground_y * np.ones(size) 
 
-            AS_Percent = 100 *  (h_AS / h_cog_temp) 
+            AS_Percent = 100 *  (h_AS / h_cog) 
         else:
             IFC = np.zeros(size) 
             CLINE_1 = np.zeros(size) 
