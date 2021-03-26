@@ -2,6 +2,7 @@
 from kivy.app import App
 
 #Custom Widget Imports
+#pylint: disable=import-error
 from KivyWidgets.mainpage import MainPage
 from KivyWidgets.plotpage import PlotPage
 

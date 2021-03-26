@@ -27,11 +27,6 @@ isort==5.6.4
 jedi==0.18.0
 Jinja2==2.11.3
 jsonschema==3.2.0
-jupyter-client==6.1.11
-jupyter-console==6.2.0
-jupyter-core==4.7.0
-jupyterlab-pygments==0.1.2
-jupyterlab-widgets==1.0.0
 Kivy==2.0.0
 kivy-deps.angle==0.3.0
 kivy-deps.glew==0.3.0
