@@ -7,6 +7,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 
 #Custo Layouts
+#pylint: disable=import-error
 from KivyWidgets.misc import FloatInput
 
 #Kivy Properties

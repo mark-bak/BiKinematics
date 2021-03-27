@@ -1,9 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from kivy_deps import sdl2, glew
+
 block_cipher = None
 
 a = Analysis(['C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\BiKinematics.py'],
-             pathex=['C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\.env\\Lib\\site-packages', 'C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics'],
+             pathex=['C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\Build_Windows',
+             'C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\.env\\Lib\\site-packages'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -16,7 +19,7 @@ a = Analysis(['C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\
              noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
-exe = EXE(pyz, Tree('C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics\\'),
+exe = EXE(pyz, Tree('C:\\Users\\Mark\\Documents\\Important\\Programming\\BiKinematics'),
           a.scripts,
           a.binaries,
           a.zipfiles,

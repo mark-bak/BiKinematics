@@ -3,3 +3,4 @@
 .env/
 *.csv
 *.ipynb*
+/Build_Windows/build
