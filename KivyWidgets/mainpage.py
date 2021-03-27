@@ -39,7 +39,7 @@ from kivy.properties import NumericProperty
 #Kivy Language Tools
 from kivy.lang.builder import Builder
 from kivy.core.window import Window
-
+if 
 Builder.load_file("KivyWidgets\\mainpage.kv")
 
 class MainPage(FloatLayout):
