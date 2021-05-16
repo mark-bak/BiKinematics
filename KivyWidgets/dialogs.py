@@ -1,14 +1,11 @@
 #Standard Imports
 import os
-import re
 
 #Kivy Layouts
 from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.textinput import TextInput
 
-#Custo Layouts
+#Custom Layouts
 #pylint: disable=import-error
-from KivyWidgets.misc import FloatInput
 
 #Kivy Properties
 #pylint: disable=no-name-in-module

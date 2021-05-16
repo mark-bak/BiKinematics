@@ -1,6 +1,5 @@
 #Custom Widget Imports
 #pylint: disable=import-error
-from KivyWidgets.links import Link 
 
 #Kivy Widgets
 from kivy.uix.widget import Widget

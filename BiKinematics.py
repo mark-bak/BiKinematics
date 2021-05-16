@@ -6,7 +6,7 @@ if hasattr(sys, '_MEIPASS'):
     resource_add_path(sys._MEIPASS)
 #Custom Widget Imports
 #pylint: disable=import-error
-import KivyWidgets
+#import KivyWidgets
 from KivyWidgets.mainpage import MainPage
 from KivyWidgets.plotpage import PlotPage
 

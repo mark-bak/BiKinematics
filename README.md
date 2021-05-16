@@ -7,6 +7,7 @@ Uses the following main packages:
 * Kivy - GUI
 * Numpy/Scipy - Linkage Simulation
 * Matplotlib - Plotting
+* bikinematicsolver - A library I made to analyse bike supsensions
 * Jupyter - Development/prototyping of solver eqns/maths
 
 ## Installation
@@ -17,6 +18,7 @@ Uses the following main packages:
 
 ```
 pip install -r requirements.txt #Python reqs
+pip install git+https://github.com/mark-bak/bikinematicsolver.git #Solver module - not on PyPi yet - will probably get an error when dling requirement.txt because of this - haven't tested this yet
   
 garden install matplotlib #Kivy - matplotlib addon
 ```

@@ -4,7 +4,7 @@ import numpy as np
 #Custom Imports
 #pylint: disable=import-error
 from KivyWidgets.links import Link,LinkData
-import Solver.geometry as g
+import bikinematicsolver.geometry as g
 
 #Kivy Properties
 #pylint: disable=no-name-in-module

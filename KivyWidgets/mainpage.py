@@ -1,6 +1,5 @@
 #Standard Imports
 import json
-import os
 
 #Custom Widget Imports
 #pylint: disable=import-error
@@ -21,7 +20,7 @@ from kivy.uix.dropdown import DropDown
 from kivy.uix.button import Button
 
 #Custom imports
-from Solver.bike import Bike
+from bikinematicsolver.bike import Bike
 
 #Kivy Layouts
 from kivy.uix.boxlayout import BoxLayout
