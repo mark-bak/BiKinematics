@@ -226,25 +226,25 @@ class MainPage(FloatLayout):
 
             ##Geometry  Loading
             #Add all Points
-            for key in data:
-                if data[key]['object']=="Point":
-                    self.add_point(key,data[key]['type'],data[key]['position'])
+            for point_name,point in data['points'].items():
+                self.add_point(point_name,point['type'],point['pos'])
 
             #Add links and shocks between the points - needs new loop as all points must be created before links      
-            for key in data:
-                if data[key]['object']=="Link" or data[key]['object']=="Shock":
-                    a_ref = data[key]['a']
-                    b_ref = data[key]['b']
-                    for w in self.walk(): #Find points corresponding to ref string
-                        if isinstance(w,Point):
-                            if w.name == a_ref:
-                                a = w
-                            if w.name == b_ref:
-                                b = w
-                    if data[key]['object']=="Link":            
-                        self.add_link(a=a,b=b) #Create link with corresponding points
-                    if data[key]['object']=="Shock":
-                        self.add_shock(a=a,b=b)
+            for link_name,link in data['links'].items():
+                a_ref = link['a']
+                b_ref = link['b']
+                for w in self.walk(): #Find points corresponding to ref string
+                    if isinstance(w,Point):
+                        if w.name == a_ref:
+                            a = w
+                        if w.name == b_ref:
+                            b = w
+                if link_name == data['shock']:
+                    self.add_shock(a=a,b=b)
+                else:
+                    self.add_link(a=a,b=b) #Create link with corresponding points
+
+            #Add shock
 
             ##Parameter Loading
             self.load_param(data,'wheelbase')
@@ -253,28 +253,28 @@ class MainPage(FloatLayout):
             self.load_param(data,'wheel_size')
             self.load_param(data,'cog_height')
 
-            self.ids['point_colour'].color = data['point_colour']['value']
-            self.ids['shock_colour'].color = data['shock_colour']['value']
-            self.ids['link_colour'].color = data['link_colour']['value']
+            self.ids['point_colour'].color = data['params']['point_colour']
+            self.ids['shock_colour'].color = data['params']['shock_colour']
+            self.ids['link_colour'].color = data['params']['link_colour']
             #Rescaling
             new_width = Window.width
             new_height = Window.height
-            old_width = data['window_width']['value']
-            old_height = data['window_height']['value']
+            old_width = data['params']['window_width']
+            old_height = data['params']['window_height']
             self.rescale_geo(old_width,
                              new_width,
                              old_height, 
                              new_height)
             #Image Loading
-            if data['image_file']['value']:
-                self.load_image('',data['image_file']['value'])
+            if data['params']['image_file']:
+                self.load_image('',data['params']['image_file'])
 
     def load_param(self,data,param_name):
         """
         Attempts to load parameter from file, and won't crash the program if it can't :)
         """
         try:
-            self.ids[param_name].text = data[param_name]['value']
+            self.ids[param_name].text = data['params'][param_name]
         except:
             pass
         
@@ -312,23 +312,23 @@ class MainPage(FloatLayout):
 
         The geometry positions will be scaled by sf (defualt value 1 - no scaling).
         """
-        data = {}
+
+        points = {}
+        links = {}
+        #data = {}
 
         ##Add geometry object/widget data
         for w in self.walk():
             if isinstance(w,Point):
-                properties={'object':'Point','type':w.point_type,'position':tuple([w.x*sf,w.y*sf])}
-                data[w.name]= properties
+                point_data={'name':w.name,'type':w.point_type,'pos':tuple([w.x*sf,w.y*sf])}
+                points[w.name]= point_data
             if isinstance(w,Link):
-                properties={'object':'Link','a':w.a.name,'b':w.b.name}
-                data[w.name]= properties
+                link_data={'name':w.name,'a':w.a.name,'b':w.b.name}
+                links[w.name]= link_data
             if isinstance(w,Shock):
-                properties={'object':'Shock','a':w.a.name,'b':w.b.name}
-                data[w.name]= properties
+                shock = w.name
         
-
-
-        ##Add other parameters - these also end up getting passed to solver and not used but guess its no big deal
+        ##Add other parameters - these also end up getting passed to solver and some not used but guess its no big deal
         values = [['wheelbase',             self.ids['wheelbase'].text              ],
                   ['chainring_teeth',       self.ids['chainring_teeth'].text        ],
                   ['cassette_teeth',        self.ids['cassette_teeth'].text         ],
@@ -341,10 +341,15 @@ class MainPage(FloatLayout):
                   ['shock_colour',          self.ids['shock_colour'].color          ],
                   ['p2mm',                  self.px_to_mm                           ],
                   ['cog_height',            self.ids['cog_height'].text             ]]
-                  
+
+        params = {}
         for par in values:
-            properties = {'object':'Parameter','value':par[1]}
-            data[par[0]] = properties
+            params[par[0]] = par[1]
+
+        data = {'points':points,
+                'links':links,
+                'shock':shock,
+                'params':params}   
 
         return data
 
