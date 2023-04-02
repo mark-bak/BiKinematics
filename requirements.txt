@@ -1,4 +1,4 @@
-﻿altgraph==0.17
+altgraph==0.17
 appdirs==1.4.4
 argon2-cffi==20.1.0
 astroid==2.4.2
@@ -19,7 +19,7 @@ distlib==0.3.1
 docutils==0.16
 entrypoints==0.3
 filelock==3.0.12
-future==0.18.2
+future==0.18.3
 idna==2.10
 importlib-metadata==2.0.0
 ipykernel==5.4.3
