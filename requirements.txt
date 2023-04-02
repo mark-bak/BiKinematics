@@ -1,4 +1,4 @@
-﻿altgraph==0.17
+altgraph==0.17
 appdirs==1.4.4
 argon2-cffi==20.1.0
 astroid==2.4.2
@@ -32,7 +32,7 @@ Jinja2==2.11.3
 jsonschema==3.2.0
 jupyter-client==6.1.11
 jupyter-console==6.2.0
-jupyter-core==4.7.0
+jupyter-core==4.11.2
 jupyterlab-pygments==0.1.2
 jupyterlab-widgets==1.0.0
 Kivy==2.0.0
