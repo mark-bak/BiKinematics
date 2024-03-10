@@ -1,4 +1,4 @@
-6altgraph==0.17
+altgraph==0.17
 appdirs==1.4.4
 argon2-cffi==20.1.0
 astroid==2.4.2
