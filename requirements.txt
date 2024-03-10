@@ -37,7 +37,7 @@ jupyterlab-pygments==0.1.2
 jupyterlab-widgets==1.0.0
 Kivy==2.3.0
 kivy[angle]
-kivyglew]
+kivy[glew]
 kivy[sdl2]
 Kivy-Garden==0.1.4
 kiwisolver==1.3.1
