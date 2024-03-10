@@ -1,4 +1,4 @@
-altgraph==0.17
+6altgraph==0.17
 appdirs==1.4.4
 argon2-cffi==20.1.0
 astroid==2.4.2
@@ -14,7 +14,7 @@ colorama==0.4.4
 cycler==0.10.0
 decorator==4.4.2
 defusedxml==0.6.0
-Dijkstar==2.5.0
+Dijkstar==2.6.0
 distlib==0.3.1
 docutils==0.16
 entrypoints==0.3
