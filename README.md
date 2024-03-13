@@ -12,15 +12,14 @@ Uses the following main packages:
 
 ## Installation
 
-1. Ideally setup a [Python 3.7.0 virtual environment](https://medium.com/swlh/how-to-run-a-different-version-of-python-from-your-terminal-fe744276ff22) - later python versions should work however I haven't tested.
+1. Ideally setup a [Python 3.10.11 virtual environment](https://medium.com/swlh/how-to-run-a-different-version-of-python-from-your-terminal-fe744276ff22) - later python versions should work however I haven't tested.
 
 1. Install requirements
 
 ```
 pip install -r requirements.txt #Python reqs
-pip install git+https://github.com/mark-bak/bikinematicsolver.git #Solver module - not on PyPi yet - will probably get an error when dling requirement.txt because of this - haven't tested this yet
-  
-garden install matplotlib #Kivy - matplotlib addon
+
+python -m pip install https://github.com/kivy-garden/matplotlib/archive/master.zip #https://stackoverflow.com/questions/77910687/kivy-2-3-0-attributeerror-figurecanvaskivyagg-object-has-no-attribute-resiz
 ```
 ## Usage
 ### Run app
