@@ -42,7 +42,8 @@ class Point(Scatter):
 
     def on_touch_up(self,touch):
         if self.collide_point(touch.x,touch.y):
-            self.parent.update_px_mm_conversion()
+            if self.parent:
+                self.parent.update_px_mm_conversion()
         return super(Point,self).on_touch_up(touch)
 
     def scale_with_window(self,cur_width,new_width,cur_height,new_height,height_offset):

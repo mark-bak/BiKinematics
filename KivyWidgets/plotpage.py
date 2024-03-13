@@ -23,7 +23,7 @@ from KivyWidgets.misc import FloatInput
 #Kivy matplotlib
 import matplotlib
 import matplotlib.pyplot as plt
-from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
+from kivy_garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg
 
 Builder.load_file("KivyWidgets/plotpage.kv")
 
@@ -42,7 +42,7 @@ class PlotPage(FloatLayout):
     def create_plot(self):
         fig,ax = plt.subplots()
         self.ids['graph_frame'].add_widget(FigureCanvasKivyAgg(plt.gcf()))
-        ax.grid(b=True, which='major', color='#300000', linewidth='0.2')
+        ax.grid(True, which='major', color='#300000', linewidth='0.2')
         return fig,ax
  
     def dismiss_popup(self):
@@ -119,7 +119,7 @@ class PlotPage(FloatLayout):
     
     def clear_plot(self):
         self.ax.clear()
-        self.ax.grid(b=True, which='major', color='#300000', linewidth='0.2') #Redraw gridlines
+        self.ax.grid(True, which='major', color='#300000', linewidth='0.2') #Redraw gridlines
         self.fig.canvas.draw()
 
         
